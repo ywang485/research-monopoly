@@ -1,0 +1,14 @@
+Library
+Temp
+.vs
+.DS_Store
+project.sublime-workspace
+*.booproj
+*.csproj
+*.sln
+*.userprefs
+.tags
+.tags_sorted_by_file
+*.unityproj
+obj
+
