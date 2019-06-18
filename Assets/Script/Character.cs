@@ -14,7 +14,7 @@ public class Character : MonoBehaviour {
     public Vector2 characterOffset;
     public string name;
     private int age = 20;
-    private int fame = 0;
+    private int fame = 1000;
     private Character supervisor = null;
     private int academicSkill = 0;
     private int numPublication = 0;
@@ -34,6 +34,18 @@ public class Character : MonoBehaviour {
     public bool dead = false;
 
     public Sprite[] characterSprites;
+
+    public int getCurrGridIdx()
+    {
+        return currDestIdx;
+    }
+
+    public void beAPhDStudent(PhDStudent student, Character newSupervisor, int currGrid)
+    {
+        name = Util.UppercaseFirst(student.getFirstName()) + " " + Util.UppercaseFirst(student.getLastName());
+        supervisor = newSupervisor;
+        currDestIdx = currGrid;
+    }
 
     public int getGridLoc()
     {

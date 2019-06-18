@@ -68,6 +68,8 @@ public class ResourceLibrary
 
     public static string paperSubmitBtn = "Prefabs/FindingBtn";
 
+    public static string characterPrefab = "Prefabs/Character";
+
     public static string diceRollSFX = "SFX/diceRoll";
 
     public static string randomEventSFX = "SFX/event";

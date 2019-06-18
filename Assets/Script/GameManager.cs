@@ -50,7 +50,15 @@ public class GameManager : MonoBehaviour {
     public void hirePhDStudent(PhDStudent student)
     {
         Debug.Log("PhD student " + student.getFirstName() + " " + student.getLastName() + " has been hired by " + characters[currPlayer].name);
-        // Todo: implement this
+        // Create a PhD student on the map
+        Vector2 newPosition = new Vector2(UnityEngine.Random.Range(0.0f, 0.2f), UnityEngine.Random.Range(0.0f, 0.2f)); 
+        GameObject studentObj = Instantiate(Resources.Load<GameObject>(ResourceLibrary.characterPrefab), characters[currPlayer].transform.position, Quaternion.identity, GameObject.FindWithTag("CharacterContainer").transform);
+        studentObj.GetComponent<Character>().beAPhDStudent(student, getCurrPlayer(), getCurrPlayer().getCurrGridIdx());
+        List<Character> characterList = new List<Character>(characters);
+        characterList.Add(studentObj.GetComponent<Character>());
+        characters = characterList.ToArray();
+        recruitmentDialog.SetActive(false);
+        characterTurnEnds();
     }
 
     public void gameOver()

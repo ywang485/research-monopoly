@@ -48,7 +48,7 @@ public class PhDStudentPreview : MonoBehaviour {
         int fameReq = Random.Range(minLowestFame, maxLowestFame);
 
         // Update UI
-        nameView.text = Util.UppercaseFirst(student.getFirstName()) + " " + Util.UppercaseFirst(student.getLastName()); ;
+        nameView.text = Util.UppercaseFirst(student.getFirstName()) + " " + Util.UppercaseFirst(student.getLastName());
         lowestFameView.text = "at least " + fameReq + " fame";
         selectButton.GetComponentInChildren<Button>().onClick.AddListener(() => gameManager.hirePhDStudent(student));
         if (gameManager.getCurrPlayer().getFame() < fameReq)
