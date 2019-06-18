@@ -19,7 +19,7 @@ public class Character : MonoBehaviour {
     private int academicSkill = 0;
     private int numPublication = 0;
     private ArrayList unpublishedFindings;
-    private int numControlDice = 1;
+    private int numControlDice = 100;
 
     private int[] movingDestSeq;
     private int currDestIdx = 0;

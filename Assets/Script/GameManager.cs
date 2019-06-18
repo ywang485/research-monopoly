@@ -47,6 +47,12 @@ public class GameManager : MonoBehaviour {
         controlDiceDialog.SetActive(true);
     }
 
+    public void hirePhDStudent(PhDStudent student)
+    {
+        Debug.Log("PhD student " + student.getFirstName() + " " + student.getLastName() + " has been hired by " + characters[currPlayer].name);
+        // Todo: implement this
+    }
+
     public void gameOver()
     {
         showDialog(gameOverDialog);
