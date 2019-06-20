@@ -8908,6 +8908,11 @@ MonoBehaviour:
   - {fileID: 1832068888}
   - {fileID: 1444921827}
   - {fileID: 548352331}
+  characterColorMarks:
+  - {r: 0.40806338, g: 0.5673675, b: 0.6603774, a: 1}
+  - {r: 0.41509432, g: 0.3071317, b: 0.1938412, a: 1}
+  - {r: 0.509434, g: 0.31959775, b: 0.43882418, a: 1}
+  - {r: 1, g: 1, b: 1, a: 0}
   hypothesisGridDialog: {fileID: 1547410219}
   hypothesisVerifiedDialog: {fileID: 175374188}
   noMeaningfulResultsDialog: {fileID: 1430049411}

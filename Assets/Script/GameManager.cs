@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 
     public Character[] characters;
+    public Color[] characterColorMarks;
     public GameObject hypothesisGridDialog;
     public GameObject hypothesisVerifiedDialog;
     public GameObject noMeaningfulResultsDialog;
@@ -316,6 +317,7 @@ public class GameManager : MonoBehaviour {
         HypothesisGrid grid = map.getMapGrids()[gridIdx].GetComponent<HypothesisGrid>();
         Hypothesis hyp = ResourceLibrary.hypothesisLib[grid.hypothesisIdx];
         characters[currPlayer].loseLife(hyp.numYears);
+        // We now assume that each hypothesis grid can only be occupied by one player, so the following can be simplified
         if (grid.investigation.ContainsKey(currPlayer))
         {
             grid.investigation[currPlayer] += hyp.numYears;
@@ -324,6 +326,7 @@ public class GameManager : MonoBehaviour {
             grid.investigation.Add(currPlayer, hyp.numYears);
         }
         playSFX(Resources.Load<AudioClip>(ResourceLibrary.randomEventSFX));
+        map.getMapGrids()[gridIdx].GetComponent<SpriteRenderer>().color = characterColorMarks[currPlayer];
 
     }
 
