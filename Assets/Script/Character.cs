@@ -15,7 +15,6 @@ public class Character : MonoBehaviour {
     public string name;
     private int age = 20;
     private int fame = 1000;
-    private Character supervisor = null;
     private int academicSkill = 0;
     private int numPublication = 0;
     private ArrayList unpublishedFindings;
@@ -40,12 +39,12 @@ public class Character : MonoBehaviour {
         return currDestIdx;
     }
 
-    public void beAPhDStudent(PhDStudent student, Character newSupervisor, int currGrid)
+    /* public void beAPhDStudent(PhDStudent student, Character newSupervisor, int currGrid)
     {
         name = Util.UppercaseFirst(student.getFirstName()) + " " + Util.UppercaseFirst(student.getLastName());
         supervisor = newSupervisor;
         currDestIdx = currGrid;
-    }
+    }*/
 
     public int getGridLoc()
     {
@@ -203,11 +202,6 @@ public class Character : MonoBehaviour {
     public int getNumPublication()
     {
         return numPublication;
-    }
-
-    public Character getSupervisor()
-    {
-        return supervisor;
     }
 
 	// Update is called once per frame
