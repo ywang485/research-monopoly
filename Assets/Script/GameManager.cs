@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour {
     public GameObject controlDiceDialog;
     public GameObject evilBargainShop;
     public GameObject recruitmentDialog;
+    public GameObject viewPhDStudentsDialog;
     public GameObject genericInfoDialog;
     public GameObject gameOverDialog;
 
@@ -48,16 +49,31 @@ public class GameManager : MonoBehaviour {
         controlDiceDialog.SetActive(true);
     }
 
+    public void openViewPhDStudentDialog()
+    {
+        viewPhDStudentsDialog.SetActive(true);
+        viewPhDStudentsDialog.GetComponent<PhDStudentListView>().updateList();
+    }
+
     public void hirePhDStudent(PhDStudent student)
     {
-        Debug.Log("PhD student " + student.getFirstName() + " " + student.getLastName() + " has been hired by " + characters[currPlayer].name);
-        // Create a PhD student on the map
+        // Abandoned Idea: Create a PhD student on the map
         //Vector2 newPosition = new Vector2(UnityEngine.Random.Range(0.0f, 0.2f), UnityEngine.Random.Range(0.0f, 0.2f)); 
         //GameObject studentObj = Instantiate(Resources.Load<GameObject>(ResourceLibrary.characterPrefab), characters[currPlayer].transform.position, Quaternion.identity, GameObject.FindWithTag("CharacterContainer").transform);
         //studentObj.GetComponent<Character>().beAPhDStudent(student, getCurrPlayer(), getCurrPlayer().getCurrGridIdx());
         //List<Character> characterList = new List<Character>(characters);
         //characterList.Add(studentObj.GetComponent<Character>());
         //characters = characterList.ToArray();
+
+        if (getCurrPlayer().getNumPhDStudent() >= Character.maxNumPhDStudent)
+        {
+            Debug.Log(characters[currPlayer].name + " has too many PhD students to hire more.");
+            return;
+        }
+        Debug.Log("PhD student " + student.getFirstName() + " " + student.getLastName() + " has been hired by " + characters[currPlayer].name);
+
+        getCurrPlayer().addAPhDStudent(student);
+
         recruitmentDialog.SetActive(false);
         characterTurnEnds();
     }
@@ -521,6 +537,15 @@ public class GameManager : MonoBehaviour {
             characters[currPlayer].gameObject.GetComponent<SpriteRenderer>().color = new Color(c.r, c.g, c.b, 0.0f);
         }
         currPlayer = (currPlayer + 1) % characters.Length;
+        if (currPlayer == 0)
+        {
+            GameObject.FindGameObjectWithTag("ViewStudentsBtn").GetComponent<Button>().enabled = true;
+            GameObject.FindGameObjectWithTag("ControlDiceBtn").GetComponent<Button>().enabled = true;
+        } else
+        {
+            GameObject.FindGameObjectWithTag("ViewStudentsBtn").GetComponent<Button>().enabled = false;
+            GameObject.FindGameObjectWithTag("ControlDiceBtn").GetComponent<Button>().enabled = false;
+        }
         cameraController.player = characters[currPlayer].gameObject;
         if (currPlayer == 0)
         {

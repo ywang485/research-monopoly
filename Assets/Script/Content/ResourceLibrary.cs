@@ -70,6 +70,8 @@ public class ResourceLibrary
 
     public static string characterPrefab = "Prefabs/Character";
 
+    public static string phdstudentViewPrefab = "Prefabs/UI/PhDStudentView";
+
     public static string diceRollSFX = "SFX/diceRoll";
 
     public static string randomEventSFX = "SFX/event";

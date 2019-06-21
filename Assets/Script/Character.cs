@@ -10,6 +10,7 @@ public class Character : MonoBehaviour {
 
     static public readonly int maxAge = 100;
     static public readonly int minAge = 20;
+    static public readonly int maxNumPhDStudent = 5;
 
     public Vector2 characterOffset;
     public string name;
@@ -19,6 +20,7 @@ public class Character : MonoBehaviour {
     private int numPublication = 0;
     private ArrayList unpublishedFindings;
     private int numControlDice = 100;
+    private ArrayList phdstudents;
 
     private int[] movingDestSeq;
     private int currDestIdx = 0;
@@ -52,11 +54,18 @@ public class Character : MonoBehaviour {
     }
     // Use this for initialization
     void Start() {
-
         gameManager = GameManager.instance;
         unpublishedFindings = new ArrayList();
         animator = GetComponent<Animator>();
         publishedFindings = new ArrayList();
+        phdstudents = new ArrayList();
+
+        // Testing
+        phdstudents.Add(new PhDStudent("Steve", "Dampster", 10));
+        phdstudents.Add(new PhDStudent("Alice", "Dampster", 6));
+        phdstudents.Add(new PhDStudent("Bob", "Dampster", 3));
+        phdstudents.Add(new PhDStudent("Carol", "Dampster", 7));
+        phdstudents.Add(new PhDStudent("Daniel", "Dampster", 6));
     }
 
     public void updateAnimatorForAgeChange() {
@@ -82,6 +91,27 @@ public class Character : MonoBehaviour {
         }
         //animator = GetComponent<Animator>();
         animator.runtimeAnimatorController = ac;
+    }
+
+    public PhDStudent[] getListOfStudent()
+    {
+        Debug.Log((PhDStudent[])phdstudents.ToArray(typeof(PhDStudent)));
+        return (PhDStudent[])phdstudents.ToArray(typeof(PhDStudent));
+    }
+
+    public void addAPhDStudent(PhDStudent newStudent)
+    {
+        phdstudents.Add(newStudent);
+    }
+
+    public void fireAPhDStudent(PhDStudent student)
+    {
+        phdstudents.Remove(student);
+    }
+
+    public int getNumPhDStudent()
+    {
+        return phdstudents.Count;
     }
 
     public void addOneControlDice()
