@@ -377,6 +377,8 @@ public class GameManager : MonoBehaviour {
                 hypothesisGridDialog.transform.Find("YesBtn").Find("Text").GetComponent<Text>().text = "Yes, I'll dedicate " + hypothesis.numYears + " years of my life to this";
                 hypothesisGridDialog.transform.Find("ProgressIndicator").GetComponent<Text>().text = "Current Investigation Progress: " + investigationText;
                 hypothesisGridDialog.transform.Find("HotnessIndicator").GetComponent<Text>().text = "Hotness of the Topic: " + hotness[hypothesis.type].ToString();
+
+                hypothesisGridDialog.transform.Find("SelectPhDStudents").GetComponent<PhDStudentInvestView>().updateList();
             }
             else {
                 if (characters[currPlayer].CompareTag("Experiments"))
