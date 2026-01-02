@@ -584,7 +584,7 @@ function startGame() {
     document.getElementById('game-screen').style.display = 'flex';
 
     document.getElementById('entity-info').textContent =
-        `Researching: ${GameState.entity.name} (${GameState.entity.type})`;
+        `Researching: ${GameState.entity.name}`;
 
     // Setup game controls
     document.getElementById('roll-dice-btn').addEventListener('click', playerRollDice);
