@@ -36,6 +36,7 @@
     --pencil-purple: #9b59b6;
     --pencil-pink: #e91e63;
     --pencil-brown: #8d6e63;
+    --pencil-aqua: #1F77DB;
 
     /* Highlighter Colors */
     --highlight-yellow: rgba(255, 235, 59, 0.4);
@@ -600,7 +601,7 @@ body {
 }
 
 .sticker-star {
-    bottom: 100px;
+    bottom: 110px;
     right: 30px;
     transform: rotate(15deg);
     animation-delay: 0s;
@@ -840,15 +841,14 @@ select {
     padding: 16px 32px;
     width: 100%;
     margin-top: 25px;
-    background: var(--sticky-green);
-    border-color: var(--pencil-green);
-    box-shadow: 5px 5px 0 var(--pencil-green);
+
 }
 
 .sketch-btn.large:hover {
-    background: #a5d6a7;
+    background: var(--pencil-aqua);
     transform: translate(2px, 2px);
-    box-shadow: 3px 3px 0 var(--pencil-green);
+    box-shadow: 3px 3px 0 var(--pencil-aqua);
+    color: white;
 }
 
 .sketch-btn:disabled {
