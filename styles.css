@@ -724,7 +724,6 @@ select {
     width: 36px;
     height: 36px;
     border: 2px solid var(--ink-dark);
-    border-radius: 4px;
     background: var(--paper-white);
     cursor: pointer;
     font-size: 16px;
@@ -732,14 +731,14 @@ select {
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
-    box-shadow: 2px 2px 0 var(--paper-shadow);
+    box-shadow: 2px 2px 0 var(--ink-dark);
     flex-shrink: 0;
 }
 
 .randomize-name-btn:hover {
     background: var(--sticky-yellow);
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--paper-shadow);
+    box-shadow: 3px 3px 0 var(--ink-dark);
 }
 
 .randomize-name-btn:active {
