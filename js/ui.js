@@ -466,7 +466,7 @@ function initSetupScreen() {
 
     // Reset used names and randomize initial player names
     resetUsedNames();
-    const initialColors = ['#e74c3c', '#3498db'];
+    const initialColors = ['#F01AB3', '#3F1AF0'];
     const initialAI = [false, true];
 
     // Update initial player inputs with random names and randomize buttons
@@ -523,14 +523,14 @@ function initSetupScreen() {
 
             // Show loading state
             generateEntitiesBtn.disabled = true;
-            generateEntitiesBtn.textContent = '⏳ Generating...';
+            generateEntitiesBtn.innerHTML = '<p style="font-size: 20px;">⏳</p>';
             suggestionsContainer.innerHTML = '<div class="suggestion-loading">Generating suggestions...</div>';
 
             const entities = await fetchEntitySuggestions(entityType, 3);
 
             // Restore button
             generateEntitiesBtn.disabled = false;
-            generateEntitiesBtn.textContent = '🎲 Suggest Entities';
+            generateEntitiesBtn.innerHTML = '<p style="font-size: 20px;">🎲</p>';
 
             if (entities && entities.length > 0) {
                 suggestionsContainer.innerHTML = entities.map((entity, i) =>

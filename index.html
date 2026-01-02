@@ -70,26 +70,29 @@
                     </div>
                     <div class="input-group">
                         <label for="entity-name">What are we studying?:</label>
-                        <input type="text" id="entity-name" placeholder="e.g., Dark Matter, Bigfoot...">
+                        <div class="research-subject-input">
+                            <input type="text" id="entity-name" placeholder="e.g., The Existential Dust Bunny, Why cats judge our life choice...">
+                            <button id="generate-entities-btn" class="sketch-btn suggest-btn"><p style="font-size: 20px;">🎲</p></button>
+                        </div>
                     </div>
                     <div id="entity-suggestions-container" class="entity-suggestions-container" style="display: none;">
-                        <button id="generate-entities-btn" class="sketch-btn suggest-btn">🎲 Suggest Entities</button>
+    
                         <div id="entity-suggestions" class="entity-suggestions"></div>
                     </div>
                 </div>
 
                 <div class="setup-section sticky-note pink">
-                    <div class="paper-clip"></div>
+                    <div class="paper-clip">📎</div>
                     <h2>Players (2-4)</h2>
                     <div id="player-inputs">
                         <div class="player-input">
                             <input type="text" class="player-name" placeholder="Player 1 Name" value="Dr. Hypothesis">
-                            <input type="color" class="player-color" value="#e74c3c">
+                            <input type="color" class="player-color" value="#F01AB3">
                             <label class="ai-toggle"><input type="checkbox" class="player-ai"> AI</label>
                         </div>
                         <div class="player-input">
                             <input type="text" class="player-name" placeholder="Player 2 Name" value="Prof. Theory">
-                            <input type="color" class="player-color" value="#3498db">
+                            <input type="color" class="player-color" value="#3F1AF0">
                             <label class="ai-toggle"><input type="checkbox" class="player-ai" checked> AI</label>
                         </div>
                     </div>
