@@ -274,7 +274,7 @@ body {
     letter-spacing: 1px;
     position: relative;
     text-shadow:
-        3px 3px 0 var(--pencil-purple),
+        3px 3px 0 var(--pencil-grey),
         -1px -1px 0 var(--paper-white);
     image-rendering: pixelated;
 }
@@ -633,7 +633,7 @@ body {
 
 .sticker-lightbulb {
     top: 120px;
-    left: 20px;
+    left: 12px;
     transform: rotate(-10deg);
     animation-delay: 1s;
 }
@@ -1529,8 +1529,8 @@ select {
 
 .entity-suggestion-btn {
     font-family: var(--font-handwriting);
-    background: var(--sticky-green);
-    border: 2px dashed var(--pencil-green);
+    background: rgba(255,255,255,0.7);
+    border: 2px dashed transparent;
     color: var(--ink-dark);
     padding: 8px 14px;
     font-size: 14px;
@@ -1540,14 +1540,14 @@ select {
 }
 
 .entity-suggestion-btn:hover {
-    background: #a5d6a7;
+    background: rgba(255,255,255,0.5);
     transform: scale(1.05);
 }
 
 .entity-suggestion-btn.selected {
-    background: var(--pencil-green);
-    color: white;
-    border-style: solid;
+    background: rgba(255,255,255,0.3);
+    color: var(--pencil-yellow);
+    border-color: var(--pencil-yellow);
 }
 
 .suggestion-error {
