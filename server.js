@@ -49,21 +49,22 @@ Generate ONLY the addition text, starting with "..." - no quotes or extra format
 
 // System prompt for research entity suggestions
 const ENTITY_PROMPT = `You are a creative game designer suggesting mysterious research subjects for a satirical academic board game.
-Given an entity type (matter, creature, phenomenon, place, mechanism, or explanation), suggest an intriguing research subject that:
+Suggest an intriguing research subject that:
 - Is absurd but sounds like something academics might actually study
 - Has comedic potential for pseudo-scientific hypotheses
 - Is specific enough to be interesting (not too generic)
 - Could inspire humorous theories
 
+The research subject could be a matter, a creature, a phenomenon, a place, a mechanism, or a question. 
 Examples by type:
 - Matter: "Quantum Cheese", "Dark Glitter", "Ethereal Socks"
 - Creature: "Procrastinating Squirrels", "Bureaucratic Dolphins", "Passive-Aggressive Fungi"
 - Phenomenon: "Collective Coffee Addiction", "Meeting-Induced Narcolepsy", "Retroactive Embarrassment"
 - Place: "The Bermuda Parking Lot", "Atlantis Community College", "The Uncanny Valley Mall"
 - Mechanism: "Karmic Accounting", "Quantum Procrastination", "Recursive Blame Shifting"
-- Explanation: "Why I Always Lose My Car in Parking Lots", "Why Other People Look More Successful Than Me", "Why the Other Line Always Moves Faster", "Why I Can Never Remember Names", "Why Socks Disappear in the Laundry"
+- Question: "Why I Always Lose My Car in Parking Lots", "Why Other People Look More Successful Than Me", "Why the Other Line Always Moves Faster", "Why I Can Never Remember Names", "Why Socks Disappear in the Laundry"
 
-Generate ONLY the entity name (2-8 words for explanations, 2-4 words for others), no quotes or extra formatting.`;
+Generate ONLY the research subject (2-8 words), no quotes or extra formatting.`;
 
 // System prompt for generating integrated final theory
 const THEORY_PROMPT = `You are a pompous academic narrator announcing the culmination of groundbreaking research.
@@ -262,7 +263,7 @@ async function generateAdditionWithGoogle(existingHypothesis) {
 }
 
 // Generate entity suggestion using OpenAI
-async function generateEntityWithOpenAI(entityType, variationIndex = 0) {
+async function generateEntityWithOpenAI(variationIndex = 0) {
     const variations = ['unique', 'creative', 'unexpected'];
     const variation = variations[variationIndex % variations.length];
 
@@ -276,7 +277,7 @@ async function generateEntityWithOpenAI(entityType, variationIndex = 0) {
             model: 'gpt-3.5-turbo',
             messages: [
                 { role: 'system', content: ENTITY_PROMPT },
-                { role: 'user', content: `Suggest a ${variation} and funny research ${entityType} for a satirical academic game (suggestion #${variationIndex + 1}):` }
+                { role: 'user', content: `Suggest a ${variation} and funny research ${entity_type} for a satirical academic game (suggestion #${variationIndex + 1}):` }
             ],
             max_tokens: 30,
             temperature: 1.0
@@ -320,6 +321,17 @@ async function generateEntityWithGoogle(entityType, variationIndex = 0) {
     const variations = ['unique', 'creative', 'unexpected'];
     const variation = variations[variationIndex % variations.length];
 
+    const categories = [
+        'Matter',
+        'Creature',
+        'Phenomenon',
+        'Place',
+        'Mechanism',
+        'Question'
+      ];
+
+    const typeIdx = Math.floor(Math.random() * categories.length);
+
     const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
         method: 'POST',
         headers: {
@@ -328,7 +340,7 @@ async function generateEntityWithGoogle(entityType, variationIndex = 0) {
         body: JSON.stringify({
             contents: [{
                 parts: [{
-                    text: `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${entityType} for a satirical academic game (suggestion #${variationIndex + 1}):`
+                    text: `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${categories[typeIdx]} for a satirical academic game (suggestion #${variationIndex + 1}):`
                 }]
             }],
             generationConfig: {
@@ -491,7 +503,7 @@ app.post('/api/generate-entities', async (req, res) => {
             Array(count).fill().map(async (_, index) => {
                 switch (llm) {
                     case 'openai':
-                        return await generateEntityWithOpenAI(entityType, index);
+                        return await generateEntityWithOpenAI(index);
                     case 'anthropic':
                         return await generateEntityWithAnthropic(entityType, index);
                     case 'google':
