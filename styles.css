@@ -765,18 +765,14 @@ select {
 }
 
 .player-input input[type="color"] {
-    width: 45px;
-    height: 40px;
-    border: 3px solid var(--ink-light);
-    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    padding: 3px;
-    background: var(--paper-white);
     transition: transform 0.2s ease;
 }
 
 .player-input input[type="color"]:hover {
-    transform: scale(1.1);
+    transform: scale(1.2);
 }
 
 .ai-toggle {
