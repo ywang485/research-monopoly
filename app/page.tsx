@@ -178,18 +178,6 @@ export default function Home() {
 
         <div id="game-screen" className="screen" style={{ display: 'none' }}>
           <div className="notebook-spread-container">
-            {/* Spiral binding decoration */}
-            <div className="spiral-binding">
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-              <div className="spiral-ring"></div>
-            </div>
-
             {/* Paper labels for headers (stapled across top) */}
             <div className="paper-label-row">
               <div id="entity-display" className="paper-label">
@@ -210,6 +198,18 @@ export default function Home() {
             <div className="two-page-spread">
               {/* LEFT PAGE - Game Board */}
               <div className="notebook-page left-page">
+                {/* Spiral binding on left edge only */}
+                <div className="spiral-binding">
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                  <div className="spiral-ring"></div>
+                </div>
+
                 <div id="board-wrapper">
                   <div id="board-container">
                     <canvas id="game-board"></canvas>
