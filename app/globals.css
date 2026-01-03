@@ -258,7 +258,7 @@ body {
 }
 
 .page-content {
-    padding: 30px 40px 40px 20px;
+    padding: 30px 40px 40px 50px;
     position: relative;
 }
 
@@ -608,7 +608,7 @@ body {
 
 .sticker-lightbulb {
     top: 120px;
-    left: 12px;
+    left: 30px;
     transform: rotate(-10deg);
     animation-delay: 1s;
 }
@@ -879,36 +879,87 @@ select {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 40px);
+    position: relative;
+}
+
+/* Gameplay Notebook Styling */
+.gameplay-notebook {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
 }
 
 /* ============================================
-   GAME HEADER
+   PAPER LABELS (Stapled Headers)
    ============================================ */
 
-#game-header {
+.paper-label-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background: var(--paper-white);
-    border: 2px solid var(--paper-shadow);
-    border-radius: 3px;
-    margin-bottom: 15px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    padding: 20px 30px 15px;
+    gap: 20px;
+    position: relative;
+    z-index: 10;
 }
 
-.header-tag {
+.paper-label {
     font-family: var(--font-handwriting);
-    font-size: 16px;
-    padding: 5px 15px;
-    background: var(--highlight-yellow);
-    border-radius: 3px;
-    transform: rotate(-1deg);
+    font-size: 15px;
+    padding: 8px 16px;
+    background: var(--sticky-yellow);
+    border: 2px solid var(--paper-shadow);
+    border-radius: 2px;
+    box-shadow:
+        2px 2px 4px rgba(0,0,0,0.1),
+        inset 0 0 20px rgba(0,0,0,0.02);
+    position: relative;
+    transform: rotate(-0.5deg);
+    font-weight: bold;
+}
+
+.paper-label:nth-child(3) {
+    transform: rotate(0.5deg);
+}
+
+/* Staple decoration */
+.staple {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 8px;
+    background: linear-gradient(to bottom, #888 0%, #666 50%, #888 100%);
+    border-radius: 3px 3px 0 0;
+    box-shadow:
+        inset 0 1px 2px rgba(255,255,255,0.3),
+        0 2px 3px rgba(0,0,0,0.2);
+}
+
+.staple::before,
+.staple::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    width: 3px;
+    height: 6px;
+    background: #666;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.4);
+}
+
+.staple::before {
+    left: 2px;
+}
+
+.staple::after {
+    right: 2px;
 }
 
 #entity-display {
     color: var(--pencil-blue);
-    font-weight: bold;
 }
 
 #turn-display {
@@ -951,14 +1002,16 @@ select {
 }
 
 /* ============================================
-   MAIN GAME AREA
+   NOTEBOOK CONTENT AREA
    ============================================ */
 
-#main-game-area {
-    display: flex;
-    gap: 15px;
+.notebook-content {
     flex: 1;
+    position: relative;
+    padding: 0 30px 30px;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ============================================
@@ -972,6 +1025,7 @@ select {
     display: flex;
     min-width: 0;
     min-height: 0;
+    margin-bottom: 20px;
 }
 
 #board-container {
@@ -1040,7 +1094,7 @@ select {
     border-radius: 8px;
     border: 2px solid var(--paper-shadow);
     box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
-    z-index: 10;
+    z-index: 50;
     font-family: var(--font-pixel);
 }
 
@@ -1084,14 +1138,39 @@ select {
 }
 
 /* ============================================
-   SIDE PANEL
+   DRAGGABLE STICKY NOTES
    ============================================ */
 
-#side-panel {
-    width: 280px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+/* Base draggable sticky styling */
+.draggable-sticky {
+    position: fixed;
+    z-index: 30;
+    cursor: move;
+}
+
+.draggable-sticky:active {
+    cursor: grabbing;
+    z-index: 40;
+}
+
+.draggable-sticky .sticky-header {
+    user-select: none;
+}
+
+/* Players panel - initial position top right */
+#players-panel {
+    top: 120px;
+    right: 40px;
+    width: 260px;
+}
+
+/* Theories panel - initial position bottom left */
+#theories-panel {
+    bottom: 40px;
+    left: 40px;
+    width: 240px;
+    max-height: 280px;
+    overflow-y: auto;
 }
 
 /* ============================================
@@ -1234,63 +1313,115 @@ select {
 }
 
 /* ============================================
-   ACTION PANEL
+   ACTION BUTTONS (Dice Roll)
    ============================================ */
 
-#action-panel {
+#action-buttons {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
     display: flex;
-    gap: 15px;
-    margin-top: 15px;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 15;
+}
+
+.roll-btn {
+    font-size: 18px;
+    padding: 12px 20px;
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.roll-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--paper-shadow);
+}
+
+.roll-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 /* ============================================
-   GAME LOG - TORN PAPER EFFECT
+   MINI NOTEPAD (Draggable Game Log)
    ============================================ */
 
-#game-log {
-    flex: 1;
-    background: var(--paper-white);
-    border: 2px solid var(--paper-shadow);
-    padding: 15px;
-    height: 100px;
-    overflow-y: auto;
-    font-family: var(--font-handwriting);
-    font-size: 14px;
-    line-height: 1.6;
+.mini-notepad {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 450px;
+    max-height: 200px;
+    background: var(--sticky-yellow);
+    border: 3px solid var(--paper-shadow);
+    border-radius: 4px;
+    box-shadow:
+        4px 4px 12px rgba(0,0,0,0.25),
+        inset 0 0 30px rgba(0,0,0,0.03);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-50%) rotate(-0.5deg);
+}
+
+.notepad-header {
+    background: var(--sticky-orange);
+    padding: 8px 15px;
+    border-bottom: 2px solid var(--paper-shadow);
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
     position: relative;
 }
 
-.torn-paper {
-    /* Torn edge effect on top */
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'%3E%3Cpath d='M0,5 Q5,0 10,5 T20,5 T30,5 T40,5 T50,5 T60,5 T70,5 T80,5 T90,5 T100,5 L100,10 L0,10 Z' fill='black'/%3E%3C/svg%3E");
-    mask-size: 100px 10px;
-    mask-repeat: repeat-x;
-    mask-position: top;
-    padding-top: 20px;
+.notepad-header:active {
+    cursor: grabbing;
 }
 
-#game-log .log-entry {
-    margin-bottom: 6px;
-    padding: 4px 0;
-    border-bottom: 1px dotted var(--paper-shadow);
+.notepad-title {
+    font-family: var(--font-title);
+    font-size: 14px;
     color: var(--ink-dark);
 }
 
-#game-log .log-entry.important {
+.notepad-clip {
+    font-size: 20px;
+    transform: rotate(45deg);
+}
+
+.notepad-content {
+    flex: 1;
+    padding: 12px 15px;
+    overflow-y: auto;
+    font-family: var(--font-handwriting);
+    font-size: 13px;
+    line-height: 1.6;
+    background-image: repeating-linear-gradient(
+        transparent,
+        transparent 22px,
+        var(--line-blue) 22px,
+        var(--line-blue) 23px
+    );
+    background-position: 0 8px;
+}
+
+.notepad-content .log-entry {
+    margin-bottom: 6px;
+    padding: 4px 0;
+    color: var(--ink-dark);
+}
+
+.notepad-content .log-entry.important {
     color: var(--pencil-blue);
     font-weight: bold;
 }
 
-#game-log .log-entry.theory {
+.notepad-content .log-entry.theory {
     color: var(--pencil-purple);
     font-style: italic;
-}
-
-#action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
 }
 
 /* ============================================
@@ -2159,4 +2290,252 @@ select {
 .sticky-note:hover,
 .suggestion-btn:hover {
     animation: wiggle 0.3s ease-in-out;
+}
+/* ============================================
+   GAME SCREEN - TWO PAGE NOTEBOOK SPREAD
+   ============================================ */
+
+#game-screen {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    position: relative;
+}
+
+/* Notebook Spread Container */
+.notebook-spread-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    background: var(--paper-white);
+    border: 3px solid var(--paper-shadow);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.03),
+        5px 5px 20px rgba(0,0,0,0.15);
+}
+
+/* Two-Page Spread Layout */
+.two-page-spread {
+    flex: 1;
+    display: flex;
+    gap: 0;
+    min-height: 0;
+    position: relative;
+}
+
+.notebook-page {
+    flex: 1;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.left-page {
+    background: var(--paper-white);
+    border-right: none;
+}
+
+.right-page {
+    background: var(--paper-white);
+    border-left: none;
+}
+
+/* Center binding shadow */
+.center-binding {
+    width: 20px;
+    background: linear-gradient(90deg,
+        rgba(0,0,0,0.08) 0%,
+        rgba(0,0,0,0.15) 30%,
+        rgba(0,0,0,0.18) 50%,
+        rgba(0,0,0,0.15) 70%,
+        rgba(0,0,0,0.08) 100%);
+    position: relative;
+    z-index: 5;
+    flex-shrink: 0;
+}
+
+/* Right page content layout */
+.right-page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+/* ============================================
+   BOARD CONTAINER - LEFT PAGE
+   ============================================ */
+
+#board-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+}
+
+#board-container {
+    flex: 1;
+    background: var(--paper-aged);
+    border: 2px solid var(--paper-shadow);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.03),
+        3px 3px 10px rgba(0,0,0,0.1);
+    /* Hide scrollbars */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+#board-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+#board-container.zoomed {
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+#game-board {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+#game-board:active {
+    cursor: grabbing;
+}
+
+#game-board.zoomed {
+    width: auto;
+    height: auto;
+}
+
+/* Zoom Controls - Bottom right of left page */
+#zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 237, 216, 0.95);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--paper-shadow);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    z-index: 50;
+    font-family: var(--font-pixel);
+}
+
+.zoom-btn {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--ink-dark);
+    border-radius: 4px;
+    background: var(--paper-white);
+    color: var(--ink-dark);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    box-shadow: 2px 2px 0 var(--paper-shadow);
+}
+
+.zoom-btn:hover {
+    background: var(--sticky-yellow);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.zoom-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--paper-shadow);
+}
+
+#zoom-level {
+    font-size: 8px;
+    color: var(--ink-dark);
+    min-width: 40px;
+    text-align: center;
+}
+
+#zoom-reset-btn {
+    font-size: 14px;
+}
+
+/* ============================================
+   PANELS ON RIGHT PAGE
+   ============================================ */
+
+/* Players panel */
+#players-panel {
+    flex: 0 0 auto;
+    margin-bottom: 15px;
+}
+
+/* Theories panel */
+#theories-panel {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    margin-bottom: 15px;
+}
+
+/* Custom scrollbar for theories panel */
+#theories-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+#theories-panel::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+#theories-panel::-webkit-scrollbar-thumb {
+    background: var(--paper-shadow);
+    border-radius: 4px;
+}
+
+#theories-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-light);
+}
+
+/* ============================================
+   ACTION BUTTONS (Dice Roll) - Bottom of right page
+   ============================================ */
+
+#action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-top: auto;
+}
+
+.roll-btn {
+    font-size: 20px;
+    padding: 15px 40px;
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+    width: 100%;
+}
+
+.roll-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--paper-shadow);
+}
+
+.roll-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
