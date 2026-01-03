@@ -1,21 +1,12 @@
 // Make elements draggable
 
 function initDraggableNotepad() {
-    // Initialize mini notepad
+    // Initialize mini notepad (only draggable element now)
     const notepad = document.getElementById('game-log-container');
     const header = notepad?.querySelector('.notepad-header');
     if (notepad && header) {
         makeDraggable(notepad, header, true);
     }
-
-    // Initialize draggable sticky notes
-    const draggableStickies = document.querySelectorAll('.draggable-sticky');
-    draggableStickies.forEach(sticky => {
-        const stickyHeader = sticky.querySelector('.sticky-header, h3');
-        if (stickyHeader) {
-            makeDraggable(sticky, stickyHeader, false);
-        }
-    });
 }
 
 function makeDraggable(element, dragHandle, isCentered) {
