@@ -2415,6 +2415,7 @@ select {
 #game-board {
     display: block;
     cursor: grab;
+    background: transparent; /* Ensure canvas is transparent to show grid underneath */
 }
 
 #game-board:active {
