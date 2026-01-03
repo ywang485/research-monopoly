@@ -177,7 +177,7 @@ export default function Home() {
         </div>
 
         <div id="game-screen" className="screen" style={{ display: 'none' }}>
-          <div className="notebook-page gameplay-notebook">
+          <div className="notebook-spread-container">
             {/* Spiral binding decoration */}
             <div className="spiral-binding">
               <div className="spiral-ring"></div>
@@ -190,7 +190,7 @@ export default function Home() {
               <div className="spiral-ring"></div>
             </div>
 
-            {/* Paper labels for headers (stapled) */}
+            {/* Paper labels for headers (stapled across top) */}
             <div className="paper-label-row">
               <div id="entity-display" className="paper-label">
                 <div className="staple"></div>
@@ -206,43 +206,50 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="notebook-content">
-              {/* Main game board */}
-              <div id="board-wrapper">
-                <div id="board-container" className="notebook-spread">
-                  <div className="spread-binding"></div>
-                  <canvas id="game-board"></canvas>
-                </div>
-                <div id="zoom-controls">
-                  <button id="zoom-in-btn" className="zoom-btn" title="Zoom In">+</button>
-                  <span id="zoom-level">100%</span>
-                  <button id="zoom-out-btn" className="zoom-btn" title="Zoom Out">−</button>
-                  <button id="zoom-reset-btn" className="zoom-btn" title="Reset Zoom">⟲</button>
+            {/* Two-page spread */}
+            <div className="two-page-spread">
+              {/* LEFT PAGE - Game Board */}
+              <div className="notebook-page left-page">
+                <div id="board-wrapper">
+                  <div id="board-container">
+                    <canvas id="game-board"></canvas>
+                  </div>
+                  <div id="zoom-controls">
+                    <button id="zoom-in-btn" className="zoom-btn" title="Zoom In">+</button>
+                    <span id="zoom-level">100%</span>
+                    <button id="zoom-out-btn" className="zoom-btn" title="Zoom Out">−</button>
+                    <button id="zoom-reset-btn" className="zoom-btn" title="Reset Zoom">⟲</button>
+                  </div>
                 </div>
               </div>
 
-              {/* Dice button - positioned at bottom right of notebook */}
-              <div id="action-buttons">
-                <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
+              {/* CENTER BINDING */}
+              <div className="center-binding"></div>
+
+              {/* RIGHT PAGE - Info Panels */}
+              <div className="notebook-page right-page">
+                <div className="right-page-content">
+                  {/* Scientists Panel */}
+                  <div id="players-panel" className="side-sticky green">
+                    <div className="fold-corner"></div>
+                    <h3>👩‍🔬 Scientists</h3>
+                    <div id="player-stats"></div>
+                  </div>
+
+                  {/* Theories Panel */}
+                  <div id="theories-panel" className="side-sticky orange">
+                    <div className="paper-clip clip-small"></div>
+                    <h3>📜 Established Theories</h3>
+                    <div id="theories-list"></div>
+                  </div>
+
+                  {/* Dice button */}
+                  <div id="action-buttons">
+                    <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Draggable sticky notes */}
-          <div id="players-panel" className="draggable-sticky side-sticky green">
-            <div className="fold-corner"></div>
-            <div className="sticky-header">
-              <h3>👩‍🔬 Scientists</h3>
-            </div>
-            <div id="player-stats"></div>
-          </div>
-
-          <div id="theories-panel" className="draggable-sticky side-sticky orange">
-            <div className="paper-clip clip-small"></div>
-            <div className="sticky-header">
-              <h3>📜 Established Theories</h3>
-            </div>
-            <div id="theories-list"></div>
           </div>
 
           {/* Hidden underdeterminism info for tooltip */}
