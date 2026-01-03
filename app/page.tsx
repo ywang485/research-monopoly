@@ -25,7 +25,38 @@ export default function Home() {
         await loadScript('/js/rendering.js')
         await loadScript('/js/ai.js')
         await loadScript('/js/ui.js')
-        await loadScript('/game.js')
+
+        // Wait a bit for all functions to be defined
+        setTimeout(() => {
+          // Initialize the game manually since DOMContentLoaded has already fired
+          // @ts-ignore - These functions are loaded from the script files
+          if (typeof window.initSetupScreen === 'function') {
+            // @ts-ignore
+            window.initSetupScreen()
+            // @ts-ignore
+            window.initZoomControls()
+            // @ts-ignore
+            window.checkLLMAvailability()
+          }
+        }, 100)
+
+        // Set up resize handler
+        // @ts-ignore
+        const handleResize = () => {
+          // @ts-ignore
+          if (window.GameState && window.GameState.board && window.GameState.board.length > 0) {
+            // @ts-ignore
+            if (typeof window.renderBoard === 'function') {
+              // @ts-ignore
+              window.renderBoard()
+            }
+          }
+        }
+        window.addEventListener('resize', handleResize)
+
+        return () => {
+          window.removeEventListener('resize', handleResize)
+        }
       } catch (error) {
         console.error('Failed to load game scripts:', error)
       }
