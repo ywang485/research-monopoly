@@ -1041,7 +1041,7 @@ select {
 
 #board-container {
     flex: 1;
-    background: var(--paper-white);
+    background: transparent; /* Transparent to show dotted grid from parent */
     border: 2px solid var(--paper-shadow);
     border-radius: 3px;
     display: flex;
