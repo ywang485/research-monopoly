@@ -169,7 +169,7 @@ body {
 
 #game-container {
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 30px auto;
     padding: 20px;
     position: relative;
     z-index: 1;
