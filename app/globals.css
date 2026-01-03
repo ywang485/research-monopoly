@@ -2335,6 +2335,11 @@ select {
     gap: 0;
     min-height: 0;
     position: relative;
+    /* Notebook grid pattern background spanning both pages */
+    background-color: #f5edd8;
+    background-image: radial-gradient(circle, #a8a090 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0;
 }
 
 .notebook-page {
@@ -2342,16 +2347,15 @@ select {
     padding: 30px;
     position: relative;
     overflow: hidden;
+    background: transparent; /* Let the grid show through */
 }
 
 .left-page {
-    background: var(--paper-white);
     border-right: none;
     flex: 2;
 }
 
 .right-page {
-    background: var(--paper-white);
     border-left: none;
     flex: 1;
 }
