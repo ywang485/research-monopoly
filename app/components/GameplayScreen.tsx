@@ -23,18 +23,16 @@ export default function GameplayScreen() {
           <div className="two-page-spread">
             {/* LEFT PAGE - Game Board */}
             <div className="notebook-page left-page">
-              {/* Spiral binding on left edge only */}
               <div className="spiral-binding">
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-                <div className="spiral-ring"></div>
-              </div>
-
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+            </div>
               <div id="board-wrapper">
                 <div id="board-container">
                   <canvas id="game-board"></canvas>
@@ -47,9 +45,6 @@ export default function GameplayScreen() {
                 </div>
               </div>
             </div>
-
-            {/* CENTER BINDING */}
-            <div className="center-binding"></div>
 
             {/* RIGHT PAGE - Info Panels */}
             <div className="notebook-page right-page">

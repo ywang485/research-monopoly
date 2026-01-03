@@ -2347,11 +2347,13 @@ select {
 .left-page {
     background: var(--paper-white);
     border-right: none;
+    flex: 2;
 }
 
 .right-page {
     background: var(--paper-white);
     border-left: none;
+    flex: 1;
 }
 
 /* Center binding shadow */
