@@ -163,10 +163,12 @@ function getSpaceAtPosition(mouseX, mouseY) {
     const rect = canvas.getBoundingClientRect();
 
     // Convert mouse position to logical board coordinates
-    // Account for the scale applied during rendering
+    // Account for the scale and offset applied during rendering
     const scale = GameState.boardScale || 1;
-    const logicalX = (mouseX - rect.left) / scale;
-    const logicalY = (mouseY - rect.top) / scale;
+    const offsetX = GameState.boardOffsetX || 0;
+    const offsetY = GameState.boardOffsetY || 0;
+    const logicalX = (mouseX - rect.left - offsetX) / scale;
+    const logicalY = (mouseY - rect.top - offsetY) / scale;
 
     // Check each space
     for (let i = 0; i < GameState.boardPositions.length; i++) {
