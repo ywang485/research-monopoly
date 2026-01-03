@@ -25,6 +25,7 @@ export default function Home() {
         await loadScript('/js/rendering.js')
         await loadScript('/js/ai.js')
         await loadScript('/js/ui.js')
+        await loadScript('/js/draggable.js')
 
         // Wait a bit for all functions to be defined
         setTimeout(() => {
@@ -37,6 +38,8 @@ export default function Home() {
             window.initZoomControls()
             // @ts-ignore
             window.checkLLMAvailability()
+            // @ts-ignore
+            window.initDraggableNotepad()
           }
         }, 100)
 
@@ -174,34 +177,51 @@ export default function Home() {
         </div>
 
         <div id="game-screen" className="screen" style={{ display: 'none' }}>
-          <div id="game-header" className="notebook-header">
-            <div id="entity-display" className="header-tag">
-              <span id="entity-info"></span>
-            </div>
-            <div id="llm-status" className="llm-indicator">
-              <span className="llm-icon">🤖</span>
-              <span className="llm-text">Checking AI...</span>
-            </div>
-            <div id="turn-display" className="header-tag">
-              <span id="current-turn"></span>
-            </div>
-          </div>
-
-          <div id="main-game-area">
-            <div id="board-wrapper">
-              <div id="board-container" className="notebook-spread">
-                <div className="spread-binding"></div>
-                <canvas id="game-board"></canvas>
-              </div>
-              <div id="zoom-controls">
-                <button id="zoom-in-btn" className="zoom-btn" title="Zoom In">+</button>
-                <span id="zoom-level">100%</span>
-                <button id="zoom-out-btn" className="zoom-btn" title="Zoom Out">−</button>
-                <button id="zoom-reset-btn" className="zoom-btn" title="Reset Zoom">⟲</button>
-              </div>
+          <div className="notebook-page gameplay-notebook">
+            {/* Spiral binding decoration */}
+            <div className="spiral-binding">
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
+              <div className="spiral-ring"></div>
             </div>
 
-            <div id="side-panel">
+            {/* Paper labels for headers (stapled) */}
+            <div className="paper-label-row">
+              <div id="entity-display" className="paper-label">
+                <div className="staple"></div>
+                <span id="entity-info"></span>
+              </div>
+              <div id="llm-status" className="llm-indicator">
+                <span className="llm-icon">🤖</span>
+                <span className="llm-text">Checking AI...</span>
+              </div>
+              <div id="turn-display" className="paper-label">
+                <div className="staple"></div>
+                <span id="current-turn"></span>
+              </div>
+            </div>
+
+            <div className="notebook-content">
+              {/* Main game board */}
+              <div id="board-wrapper">
+                <div id="board-container" className="notebook-spread">
+                  <div className="spread-binding"></div>
+                  <canvas id="game-board"></canvas>
+                </div>
+                <div id="zoom-controls">
+                  <button id="zoom-in-btn" className="zoom-btn" title="Zoom In">+</button>
+                  <span id="zoom-level">100%</span>
+                  <button id="zoom-out-btn" className="zoom-btn" title="Zoom Out">−</button>
+                  <button id="zoom-reset-btn" className="zoom-btn" title="Reset Zoom">⟲</button>
+                </div>
+              </div>
+
+              {/* Sticky notes on notebook */}
               <div id="players-panel" className="side-sticky green">
                 <div className="fold-corner"></div>
                 <h3>👩‍🔬 Scientists</h3>
@@ -222,14 +242,21 @@ export default function Home() {
                 <h3>📜 Established Theories</h3>
                 <div id="theories-list"></div>
               </div>
+
+              {/* Action buttons in notebook */}
+              <div id="action-buttons">
+                <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
+              </div>
             </div>
           </div>
 
-          <div id="action-panel">
-            <div id="game-log" className="torn-paper"></div>
-            <div id="action-buttons">
-              <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
+          {/* Draggable mini notepad for game log */}
+          <div id="game-log-container" className="mini-notepad">
+            <div className="notepad-header">
+              <span className="notepad-title">Game Log</span>
+              <div className="notepad-clip">📎</div>
             </div>
+            <div id="game-log" className="notepad-content"></div>
           </div>
         </div>
 
