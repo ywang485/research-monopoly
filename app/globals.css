@@ -245,8 +245,8 @@ body {
         2px 2px 3px rgba(0,0,0,0.2);
 }
 
-/* Red margin line */
-.notebook-page::before {
+/* Red margin line - only on left page */
+.left-page::before {
     content: '';
     position: absolute;
     left: 50px;
