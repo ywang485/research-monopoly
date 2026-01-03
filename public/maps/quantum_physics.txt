@@ -1,0 +1,33 @@
+# Theory Investment Game - Quantum Physics Board
+# Explore the mysteries of quantum mechanics!
+#
+# Format: TYPE|NAME|EXTRA_DATA
+
+START|Classical Physics Lab|0
+HYPOTHESIS|Wave Function|3
+GRANT|CERN Funding|0
+HYPOTHESIS|Particle Duality|4
+HYPOTHESIS|Uncertainty Principle|5
+CONFERENCE|Solvay Conference|0
+HYPOTHESIS|Quantum Superposition|4
+RECRUIT|Physics Department|0
+HYPOTHESIS|Entanglement|5
+SCANDAL|Cold Fusion Fiasco|0
+HYPOTHESIS|Quantum Tunneling|3
+EUREKA|Double Slit Discovery|0
+HYPOTHESIS|Decoherence|4
+SABBATICAL|Princeton Visit|0
+HYPOTHESIS|Hidden Variables|5
+PEER_REVIEW|Physical Review|0
+HYPOTHESIS|Many Worlds|4
+COLLABORATION|Bell Labs|0
+HYPOTHESIS|Quantum Computing|5
+GRANT|DOE Grant|0
+HYPOTHESIS|Measurement Problem|4
+RECRUIT|Postdoc Program|0
+HYPOTHESIS|Quantum Field Theory|6
+SCANDAL|Data Fabrication|0
+HYPOTHESIS|String Theory|7
+CONFERENCE|APS Meeting|0
+HYPOTHESIS|Loop Quantum Gravity|6
+EUREKA|Nobel Prize Work|0
