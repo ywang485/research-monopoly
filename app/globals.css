@@ -634,6 +634,17 @@ body {
     margin: 0 auto;
 }
 
+#setup-screen::before {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--line-red);
+    opacity: 0.6;
+}
+
 .setup-section {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
