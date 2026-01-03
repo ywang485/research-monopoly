@@ -573,6 +573,13 @@ function renderBoard() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
 
+    // Set canvas to fill entire container
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = containerWidth * dpr;
+    canvas.height = containerHeight * dpr;
+    canvas.style.width = containerWidth + 'px';
+    canvas.style.height = containerHeight + 'px';
+
     // Calculate logical board dimensions
     const baseSpaceSize = 60;
     const basePadding = 20;
@@ -583,162 +590,85 @@ function renderBoard() {
     // Calculate base scale to fit board in container while maintaining aspect ratio
     const scaleX = containerWidth / logicalBoardWidth;
     const scaleY = containerHeight / logicalBoardHeight;
-    const baseScale = Math.min(scaleX, scaleY);
+    const baseScale = Math.min(scaleX, scaleY) * 0.8; // 0.8 to add some margin
 
     // Apply zoom level
     const zoomLevel = GameState.zoom.level;
     const scale = baseScale * zoomLevel;
 
-    // Set canvas dimensions based on zoom
-    const dpr = window.devicePixelRatio || 1;
-    const canvasWidth = Math.max(containerWidth, logicalBoardWidth * scale);
-    const canvasHeight = Math.max(containerHeight, logicalBoardHeight * scale);
-
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
-    canvas.style.width = canvasWidth + 'px';
-    canvas.style.height = canvasHeight + 'px';
+    // Calculate board position (centered or scrolled when zoomed)
+    const boardWidth = logicalBoardWidth * scale;
+    const boardHeight = logicalBoardHeight * scale;
+    let offsetX = (containerWidth - boardWidth) / 2;
+    let offsetY = (containerHeight - boardHeight) / 2;
 
     // Update container class for scroll behavior
     if (zoomLevel > 1) {
         container.classList.add('zoomed');
         canvas.classList.add('zoomed');
+        // When zoomed, expand canvas to accommodate board
+        const expandedWidth = Math.max(containerWidth, boardWidth);
+        const expandedHeight = Math.max(containerHeight, boardHeight);
+        canvas.width = expandedWidth * dpr;
+        canvas.height = expandedHeight * dpr;
+        canvas.style.width = expandedWidth + 'px';
+        canvas.style.height = expandedHeight + 'px';
+        offsetX = Math.max(0, offsetX);
+        offsetY = Math.max(0, offsetY);
     } else {
         container.classList.remove('zoomed');
         canvas.classList.remove('zoomed');
     }
 
-    // Apply scaling (including device pixel ratio)
-    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
-
-    // Store scale for hover detection
+    // Store scale and offset for hover detection
     GameState.boardScale = scale;
     GameState.boardBaseScale = baseScale;
+    GameState.boardOffsetX = offsetX;
+    GameState.boardOffsetY = offsetY;
 
     // Use logical dimensions for drawing
     const spaceSize = baseSpaceSize;
     const padding = basePadding;
 
+    // === DRAW FIXED BACKGROUND (fills entire canvas, not zoomable) ===
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const bgWidth = canvas.width / dpr;
+    const bgHeight = canvas.height / dpr;
+
     // Clear canvas with aged yellowish paper background
     ctx.fillStyle = '#f5edd8';
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
+    ctx.fillRect(0, 0, bgWidth, bgHeight);
 
-    // Add aged paper stains/spots
+    // Add aged paper stains/spots (scattered across full canvas)
     ctx.save();
     ctx.globalAlpha = 0.08;
     ctx.fillStyle = '#8B7750';
-    // Coffee stain spots
     ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.15, logicalBoardHeight * 0.2, 25, 20, 0, 0, Math.PI * 2);
+    ctx.ellipse(bgWidth * 0.15, bgHeight * 0.2, 25, 20, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.85, logicalBoardHeight * 0.8, 20, 25, 0.3, 0, Math.PI * 2);
+    ctx.ellipse(bgWidth * 0.85, bgHeight * 0.8, 20, 25, 0.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.5, logicalBoardHeight * 0.9, 15, 12, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(bgWidth * 0.5, bgHeight * 0.9, 15, 12, -0.2, 0, Math.PI * 2);
     ctx.fill();
-
-    // Edge darkening for worn look
-    const edgeGrad = ctx.createLinearGradient(0, 0, logicalBoardWidth, 0);
-    edgeGrad.addColorStop(0, 'rgba(139,119,80,0.15)');
-    edgeGrad.addColorStop(0.05, 'rgba(139,119,80,0)');
-    edgeGrad.addColorStop(0.95, 'rgba(139,119,80,0)');
-    edgeGrad.addColorStop(1, 'rgba(139,119,80,0.15)');
-    ctx.fillStyle = edgeGrad;
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
-
-    const edgeGradV = ctx.createLinearGradient(0, 0, 0, logicalBoardHeight);
-    edgeGradV.addColorStop(0, 'rgba(139,119,80,0.1)');
-    edgeGradV.addColorStop(0.03, 'rgba(139,119,80,0)');
-    edgeGradV.addColorStop(0.97, 'rgba(139,119,80,0)');
-    edgeGradV.addColorStop(1, 'rgba(139,119,80,0.1)');
-    ctx.fillStyle = edgeGradV;
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
-
-    // Draw subtle wrinkle lines
-    ctx.globalAlpha = 0.06;
-    ctx.strokeStyle = '#8B7750';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, logicalBoardHeight * 0.3);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.3, logicalBoardHeight * 0.28, logicalBoardWidth * 0.6, logicalBoardHeight * 0.32);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.8, logicalBoardHeight * 0.35, logicalBoardWidth, logicalBoardHeight * 0.31);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, logicalBoardHeight * 0.7);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.4, logicalBoardHeight * 0.68, logicalBoardWidth * 0.7, logicalBoardHeight * 0.72);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.9, logicalBoardHeight * 0.69, logicalBoardWidth, logicalBoardHeight * 0.71);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(logicalBoardWidth * 0.25, 0);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.23, logicalBoardHeight * 0.4, logicalBoardWidth * 0.27, logicalBoardHeight * 0.7);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.24, logicalBoardHeight * 0.9, logicalBoardWidth * 0.26, logicalBoardHeight);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(logicalBoardWidth * 0.75, 0);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.77, logicalBoardHeight * 0.3, logicalBoardWidth * 0.74, logicalBoardHeight * 0.6);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.76, logicalBoardHeight * 0.85, logicalBoardWidth * 0.75, logicalBoardHeight);
-    ctx.stroke();
     ctx.restore();
 
-    // Draw dot grid pattern (slightly faded for aged look)
+    // Draw dot grid pattern spanning entire canvas
     ctx.fillStyle = '#a8a090';
-    const dotSpacing = 15;
-    for (let dotX = dotSpacing; dotX < logicalBoardWidth; dotX += dotSpacing) {
-        for (let dotY = dotSpacing; dotY < logicalBoardHeight; dotY += dotSpacing) {
+    const dotSpacing = 20;
+    for (let dotX = dotSpacing; dotX < bgWidth; dotX += dotSpacing) {
+        for (let dotY = dotSpacing; dotY < bgHeight; dotY += dotSpacing) {
             ctx.beginPath();
-            ctx.arc(dotX, dotY, 0.8, 0, Math.PI * 2);
+            ctx.arc(dotX, dotY, 1, 0, Math.PI * 2);
             ctx.fill();
         }
     }
 
-    // Draw formula doodles in margins (seeded by board size for consistency)
-    ctx.font = '10px "Architects Daughter", cursive';
-    ctx.fillStyle = 'rgba(127, 140, 141, 0.3)';
-    const formulaPositions = [
-        { x: 12, y: 25, r: -5 },
-        { x: logicalBoardWidth - 50, y: 20, r: 8 },
-        { x: 8, y: logicalBoardHeight - 15, r: 3 },
-        { x: logicalBoardWidth - 45, y: logicalBoardHeight - 10, r: -4 },
-        { x: 15, y: logicalBoardHeight / 2, r: -90 },
-        { x: logicalBoardWidth - 15, y: logicalBoardHeight / 2 - 30, r: 90 }
-    ];
-    formulaPositions.forEach((pos, i) => {
-        ctx.save();
-        ctx.translate(pos.x, pos.y);
-        ctx.rotate(pos.r * Math.PI / 180);
-        ctx.fillText(MARGIN_FORMULAS[i % MARGIN_FORMULAS.length], 0, 0);
-        ctx.restore();
-    });
-
-    // Draw sketchy hand-drawn border with multiple pencil passes
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // First pass - main border
-    ctx.strokeStyle = 'rgba(127, 140, 141, 0.6)';
-    ctx.lineWidth = 1.5;
-    sketchyLine(ctx, 10, 12, logicalBoardWidth - 12, 10, 1001);
-    sketchyLine(ctx, logicalBoardWidth - 12, 10, logicalBoardWidth - 10, logicalBoardHeight - 12, 1002);
-    sketchyLine(ctx, logicalBoardWidth - 10, logicalBoardHeight - 12, 12, logicalBoardHeight - 10, 1003);
-    sketchyLine(ctx, 12, logicalBoardHeight - 10, 10, 12, 1004);
-
-    // Second pass - offset for pencil texture
-    ctx.strokeStyle = 'rgba(127, 140, 141, 0.3)';
-    ctx.lineWidth = 1;
-    sketchyLine(ctx, 11, 11, logicalBoardWidth - 11, 11, 1011);
-    sketchyLine(ctx, logicalBoardWidth - 11, 11, logicalBoardWidth - 11, logicalBoardHeight - 11, 1012);
-    sketchyLine(ctx, logicalBoardWidth - 11, logicalBoardHeight - 11, 11, logicalBoardHeight - 11, 1013);
-    sketchyLine(ctx, 11, logicalBoardHeight - 11, 11, 11, 1014);
-
-    // Red margin line (like notebook) - with sketchy effect
-    ctx.strokeStyle = 'rgba(229, 115, 115, 0.5)';
-    ctx.lineWidth = 1.5;
-    sketchyLine(ctx, padding - 5, 5, padding - 5, logicalBoardHeight - 5, 2001);
-    // Second pass for pencil texture
-    ctx.strokeStyle = 'rgba(229, 115, 115, 0.2)';
-    ctx.lineWidth = 1;
-    sketchyLine(ctx, padding - 4, 6, padding - 4, logicalBoardHeight - 6, 2002);
+    // === DRAW BOARD (zoomable, centered) ===
+    // Apply transform for board: scale and center
+    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, offsetX * dpr, offsetY * dpr);
 
     // Calculate positions for each space (going clockwise)
     const positions = [];
