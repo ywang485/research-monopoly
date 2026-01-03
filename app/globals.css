@@ -1094,7 +1094,7 @@ select {
     border-radius: 8px;
     border: 2px solid var(--paper-shadow);
     box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
-    z-index: 10;
+    z-index: 50;
     font-family: var(--font-pixel);
 }
 
@@ -1138,36 +1138,39 @@ select {
 }
 
 /* ============================================
-   STICKY NOTES ON NOTEBOOK (repositioned)
+   DRAGGABLE STICKY NOTES
    ============================================ */
 
-/* Players panel - top right */
+/* Base draggable sticky styling */
+.draggable-sticky {
+    position: fixed;
+    z-index: 30;
+    cursor: move;
+}
+
+.draggable-sticky:active {
+    cursor: grabbing;
+    z-index: 40;
+}
+
+.draggable-sticky .sticky-header {
+    user-select: none;
+}
+
+/* Players panel - initial position top right */
 #players-panel {
-    position: absolute;
-    top: 80px;
-    right: 30px;
+    top: 120px;
+    right: 40px;
     width: 260px;
-    z-index: 20;
 }
 
-/* Underdeterminism panel - bottom right */
-#underdeterminism-panel {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    width: 220px;
-    z-index: 20;
-}
-
-/* Theories panel - bottom left */
+/* Theories panel - initial position bottom left */
 #theories-panel {
-    position: absolute;
-    bottom: 30px;
-    left: 30px;
+    bottom: 40px;
+    left: 40px;
     width: 240px;
-    max-height: 250px;
+    max-height: 280px;
     overflow-y: auto;
-    z-index: 20;
 }
 
 /* ============================================
@@ -1310,17 +1313,33 @@ select {
 }
 
 /* ============================================
-   ACTION BUTTONS
+   ACTION BUTTONS (Dice Roll)
    ============================================ */
 
 #action-buttons {
     position: absolute;
-    top: 100px;
-    left: 30px;
+    bottom: 20px;
+    right: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     z-index: 15;
+}
+
+.roll-btn {
+    font-size: 18px;
+    padding: 12px 20px;
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+}
+
+.roll-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--paper-shadow);
+}
+
+.roll-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 /* ============================================

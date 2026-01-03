@@ -1,11 +1,24 @@
-// Make the mini notepad draggable
+// Make elements draggable
 
 function initDraggableNotepad() {
+    // Initialize mini notepad
     const notepad = document.getElementById('game-log-container');
     const header = notepad?.querySelector('.notepad-header');
+    if (notepad && header) {
+        makeDraggable(notepad, header, true);
+    }
 
-    if (!notepad || !header) return;
+    // Initialize draggable sticky notes
+    const draggableStickies = document.querySelectorAll('.draggable-sticky');
+    draggableStickies.forEach(sticky => {
+        const stickyHeader = sticky.querySelector('.sticky-header, h3');
+        if (stickyHeader) {
+            makeDraggable(sticky, stickyHeader, false);
+        }
+    });
+}
 
+function makeDraggable(element, dragHandle, isCentered) {
     let isDragging = false;
     let currentX;
     let currentY;
@@ -14,12 +27,22 @@ function initDraggableNotepad() {
     let xOffset = 0;
     let yOffset = 0;
 
-    header.addEventListener('mousedown', dragStart);
+    // Get initial position from computed style
+    const rect = element.getBoundingClientRect();
+    if (isCentered) {
+        xOffset = 0;
+        yOffset = 0;
+    } else {
+        xOffset = rect.left;
+        yOffset = rect.top;
+    }
+
+    dragHandle.addEventListener('mousedown', dragStart);
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', dragEnd);
 
     // Touch events for mobile
-    header.addEventListener('touchstart', dragStart);
+    dragHandle.addEventListener('touchstart', dragStart);
     document.addEventListener('touchmove', drag);
     document.addEventListener('touchend', dragEnd);
 
@@ -32,8 +55,9 @@ function initDraggableNotepad() {
             initialY = e.clientY - yOffset;
         }
 
-        if (e.target === header || header.contains(e.target)) {
+        if (e.target === dragHandle || dragHandle.contains(e.target)) {
             isDragging = true;
+            element.style.zIndex = 100; // Bring to front while dragging
         }
     }
 
@@ -52,7 +76,7 @@ function initDraggableNotepad() {
             xOffset = currentX;
             yOffset = currentY;
 
-            setTranslate(currentX, currentY, notepad);
+            setTranslate(currentX, currentY, element, isCentered);
         }
     }
 
@@ -60,10 +84,25 @@ function initDraggableNotepad() {
         initialX = currentX;
         initialY = currentY;
         isDragging = false;
+
+        // Reset z-index based on element type
+        if (element.classList.contains('mini-notepad')) {
+            element.style.zIndex = 100;
+        } else if (element.classList.contains('draggable-sticky')) {
+            element.style.zIndex = 30;
+        }
     }
 
-    function setTranslate(xPos, yPos, el) {
-        // Keep the slight rotation for that hand-drawn feel
-        el.style.transform = `translate(calc(-50% + ${xPos}px), ${yPos}px) rotate(-0.5deg)`;
+    function setTranslate(xPos, yPos, el, centered) {
+        if (centered) {
+            // For centered elements (notepad)
+            el.style.transform = `translate(calc(-50% + ${xPos}px), ${yPos}px) rotate(-0.5deg)`;
+        } else {
+            // For absolutely positioned elements (sticky notes)
+            el.style.left = `${xPos}px`;
+            el.style.top = `${yPos}px`;
+            el.style.right = 'auto';
+            el.style.bottom = 'auto';
+        }
     }
 }

@@ -221,33 +221,34 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Sticky notes on notebook */}
-              <div id="players-panel" className="side-sticky green">
-                <div className="fold-corner"></div>
-                <h3>👩‍🔬 Scientists</h3>
-                <div id="player-stats"></div>
-              </div>
-
-              <div id="underdeterminism-panel" className="side-sticky purple">
-                <div className="tape tape-small"></div>
-                <h3>🎲 Scientific Underdeterminism</h3>
-                <div id="underdeterminism-info">
-                  <span className="npc-icon">🎲</span>
-                  <span id="npc-position">Position: Start</span>
-                </div>
-              </div>
-
-              <div id="theories-panel" className="side-sticky orange">
-                <div className="paper-clip clip-small"></div>
-                <h3>📜 Established Theories</h3>
-                <div id="theories-list"></div>
-              </div>
-
-              {/* Action buttons in notebook */}
+              {/* Dice button - positioned at bottom right of notebook */}
               <div id="action-buttons">
                 <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
               </div>
             </div>
+          </div>
+
+          {/* Draggable sticky notes */}
+          <div id="players-panel" className="draggable-sticky side-sticky green">
+            <div className="fold-corner"></div>
+            <div className="sticky-header">
+              <h3>👩‍🔬 Scientists</h3>
+            </div>
+            <div id="player-stats"></div>
+          </div>
+
+          <div id="theories-panel" className="draggable-sticky side-sticky orange">
+            <div className="paper-clip clip-small"></div>
+            <div className="sticky-header">
+              <h3>📜 Established Theories</h3>
+            </div>
+            <div id="theories-list"></div>
+          </div>
+
+          {/* Hidden underdeterminism info for tooltip */}
+          <div id="underdeterminism-info" style={{ display: 'none' }}>
+            <span className="npc-icon">🎲</span>
+            <span id="npc-position">Position: Start</span>
           </div>
 
           {/* Draggable mini notepad for game log */}
