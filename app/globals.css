@@ -258,7 +258,7 @@ body {
 }
 
 .page-content {
-    padding: 30px 40px 40px 20px;
+    padding: 30px 40px 40px 50px;
     position: relative;
 }
 
@@ -608,7 +608,7 @@ body {
 
 .sticker-lightbulb {
     top: 120px;
-    left: 12px;
+    left: 30px;
     transform: rotate(-10deg);
     animation-delay: 1s;
 }
