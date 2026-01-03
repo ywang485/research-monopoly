@@ -630,41 +630,10 @@ function renderBoard() {
     const spaceSize = baseSpaceSize;
     const padding = basePadding;
 
-    // === DRAW FIXED BACKGROUND (fills entire canvas, not zoomable) ===
+    // === CLEAR CANVAS ===
+    // Canvas is transparent - grid background is now on .two-page-spread CSS
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const bgWidth = canvas.width / dpr;
-    const bgHeight = canvas.height / dpr;
-
-    // Clear canvas with aged yellowish paper background
-    ctx.fillStyle = '#f5edd8';
-    ctx.fillRect(0, 0, bgWidth, bgHeight);
-
-    // Add aged paper stains/spots (scattered across full canvas)
-    ctx.save();
-    ctx.globalAlpha = 0.08;
-    ctx.fillStyle = '#8B7750';
-    ctx.beginPath();
-    ctx.ellipse(bgWidth * 0.15, bgHeight * 0.2, 25, 20, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(bgWidth * 0.85, bgHeight * 0.8, 20, 25, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(bgWidth * 0.5, bgHeight * 0.9, 15, 12, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // Draw dot grid pattern spanning entire canvas
-    ctx.fillStyle = '#a8a090';
-    const dotSpacing = 20;
-    for (let dotX = dotSpacing; dotX < bgWidth; dotX += dotSpacing) {
-        for (let dotY = dotSpacing; dotY < bgHeight; dotY += dotSpacing) {
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, 1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
+    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
 
     // === DRAW BOARD (zoomable, centered) ===
     // Apply transform for board: scale and center
