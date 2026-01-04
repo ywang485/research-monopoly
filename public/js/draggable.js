@@ -1,11 +1,27 @@
 // Make elements draggable
 
 function initDraggableNotepad() {
-    // Initialize mini notepad (only draggable element now)
+    // Initialize mini notepad
     const notepad = document.getElementById('game-log-container');
-    const header = notepad?.querySelector('.notepad-header');
-    if (notepad && header) {
-        makeDraggable(notepad, header, true);
+    const notepadHeader = notepad?.querySelector('.notepad-header');
+    if (notepad && notepadHeader) {
+        makeDraggable(notepad, notepadHeader, true);
+    }
+
+    // Initialize Scientists panel
+    const playersPanel = document.getElementById('players-panel');
+    const playersHeader = playersPanel?.querySelector('h3');
+    if (playersPanel && playersHeader) {
+        playersPanel.classList.add('draggable-sticky');
+        makeDraggable(playersPanel, playersHeader, false);
+    }
+
+    // Initialize Theories panel
+    const theoriesPanel = document.getElementById('theories-panel');
+    const theoriesHeader = theoriesPanel?.querySelector('h3');
+    if (theoriesPanel && theoriesHeader) {
+        theoriesPanel.classList.add('draggable-sticky');
+        makeDraggable(theoriesPanel, theoriesHeader, false);
     }
 }
 
