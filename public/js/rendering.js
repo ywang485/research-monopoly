@@ -92,46 +92,18 @@ function drawStartIcon(ctx, cx, cy, scale) {
 function drawHypothesisIcon(ctx, cx, cy, scale) {
     // Classical alchemical retort/flask
     const s = scale;
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
+    ctx.strokeStyle = '#ddd';
+    ctx.fillStyle = '#ddd';
     ctx.lineWidth = 1.5 * s;
     ctx.lineCap = 'round';
 
-    // Flask body (round bottom)
-    ctx.beginPath();
-    ctx.arc(cx, cy + 2 * s, 8 * s, 0.3 * Math.PI, 0.7 * Math.PI, false);
-    ctx.stroke();
-
-    // Flask neck
-    ctx.beginPath();
-    ctx.moveTo(cx - 3 * s, cy - 4 * s);
-    ctx.lineTo(cx - 2 * s, cy - 12 * s);
-    ctx.lineTo(cx + 2 * s, cy - 12 * s);
-    ctx.lineTo(cx + 3 * s, cy - 4 * s);
-    ctx.stroke();
-
-    // Flask rim
-    ctx.beginPath();
-    ctx.moveTo(cx - 3 * s, cy - 12 * s);
-    ctx.lineTo(cx + 3 * s, cy - 12 * s);
-    ctx.stroke();
-
-    // Liquid level indication (wavy line)
-    ctx.beginPath();
-    ctx.moveTo(cx - 5 * s, cy + 2 * s);
-    ctx.quadraticCurveTo(cx - 2 * s, cy, cx, cy + 2 * s);
-    ctx.quadraticCurveTo(cx + 2 * s, cy + 4 * s, cx + 5 * s, cy + 2 * s);
-    ctx.stroke();
-
     // Question mark above (representing hypothesis)
-    ctx.lineWidth = 1.2 * s;
-    ctx.beginPath();
-    ctx.arc(cx + 8 * s, cy - 10 * s, 3 * s, Math.PI, 0, true);
-    ctx.lineTo(cx + 11 * s, cy - 6 * s);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(cx + 11 * s, cy - 3 * s, 1 * s, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.font = '20px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    const questionMark = '?';
+    const textX = cx;
+    const textY = cy+8;
+    ctx.fillText(questionMark, textX, textY);
 }
 
 function drawProvenIcon(ctx, cx, cy, scale) {
