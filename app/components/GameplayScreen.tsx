@@ -49,7 +49,7 @@ export default function GameplayScreen() {
                 <span className="llm-text">Checking AI...</span>
               </div>
                 {/* Theories Panel */}
-                <div id="theories-panel" className="side-sticky orange">
+                <div id="theories-panel" className="side-sticky blue">
                   <div className="paper-clip clip-small"></div>
                   <h3>Established Theories</h3>
                   <div id="theories-list"></div>

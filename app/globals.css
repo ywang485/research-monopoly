@@ -431,6 +431,11 @@ body {
     transform: rotate(-0.2deg);
 }
 
+.side-sticky.blue {
+    background: linear-gradient(135deg, var(--sticky-blue) 0%, #98c8d8 100%);
+    --note-rotation: -0.3deg;
+}
+
 .side-sticky h3 {
     font-family: var(--font-pixel);
     font-size: 12px;
@@ -874,13 +879,13 @@ select {
 .roll-btn {
     font-size: 12px;
     padding: 14px 28px;
-    background: var(--sticky-orange);
-    border-color: var(--pencil-orange);
-    box-shadow: 4px 4px 0 var(--pencil-orange);
+    background: var(--pencil-aqua);
+    border-color: var(--pencil-blue);
+    box-shadow: 4px 4px 0 var(--pencil-blue);
 }
 
 .roll-btn:hover {
-    background: #ffcc80;
+    background: var(--pencil-yellow);
 }
 
 /* ============================================
