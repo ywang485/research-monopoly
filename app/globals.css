@@ -210,12 +210,6 @@ body {
         linear-gradient(to bottom, rgba(139,119,80,0.06) 0%, transparent 3%, transparent 97%, rgba(139,119,80,0.06) 100%),
         /* Base paper color */
         var(--paper-white);
-    border: 2px solid var(--paper-shadow);
-    border-radius: 3px;
-    box-shadow:
-        4px 4px 0 var(--paper-shadow),
-        8px 8px 15px rgba(0,0,0,0.1),
-        inset 0 0 30px rgba(139,119,80,0.05);
     position: relative;
     padding-left: 60px;
 }
@@ -245,8 +239,8 @@ body {
         2px 2px 3px rgba(0,0,0,0.2);
 }
 
-/* Red margin line - only on left page */
-.left-page::before {
+/* Red margin line */
+.notebook-spread-container::before {
     content: '';
     position: absolute;
     left: 50px;
@@ -255,6 +249,7 @@ body {
     width: 2px;
     background: var(--line-red);
     opacity: 0.6;
+    z-index: 5;
 }
 
 .page-content {
@@ -1042,16 +1037,12 @@ select {
 #board-container {
     flex: 1;
     background: transparent; /* Transparent to show dotted grid from parent */
-    border: 2px solid var(--paper-shadow);
-    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: auto;
     position: relative;
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.03),
-        3px 3px 10px rgba(0,0,0,0.1);
+
 }
 
 #board-container.zoomed {
@@ -1081,6 +1072,7 @@ select {
     width: 100%;
     height: 100%;
     cursor: grab;
+    z-index: 5;
 }
 
 #game-board:active {
@@ -1363,7 +1355,7 @@ select {
     left: 50%;
     transform: translateX(-50%);
     width: 450px;
-    max-height: 200px;
+    max-height: 500px;
     background: var(--sticky-yellow);
     border: 3px solid var(--paper-shadow);
     border-radius: 4px;
@@ -1406,7 +1398,9 @@ select {
 .notepad-content {
     flex: 1;
     padding: 12px 15px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
     font-family: var(--font-handwriting);
     font-size: 13px;
     line-height: 1.6;
@@ -2309,7 +2303,7 @@ select {
 #game-screen {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px);
+    height: calc(100vh - 100px);
     position: relative;
 }
 

@@ -4,21 +4,20 @@ export default function GameplayScreen() {
       <div id="game-screen" className="screen" style={{ display: 'none' }}>
         <div className="notebook-spread-container">
           {/* Paper labels for headers (stapled across top) */}
-          <div className="paper-label-row">
-            <div id="entity-display" className="paper-label">
-              <div className="staple"></div>
-              <span id="entity-info"></span>
+            <div className="paper-label-row">
+              <div id="entity-display" className="paper-label">
+                <div className="staple"></div>
+                <span id="entity-info"></span>
+              </div>
+              <div id="llm-status" className="llm-indicator">
+                <span className="llm-icon">🤖</span>
+                <span className="llm-text">Checking AI...</span>
+              </div>
+              <div id="turn-display" className="paper-label">
+                <div className="staple"></div>
+                <span id="current-turn"></span>
+              </div>
             </div>
-            <div id="llm-status" className="llm-indicator">
-              <span className="llm-icon">🤖</span>
-              <span className="llm-text">Checking AI...</span>
-            </div>
-            <div id="turn-display" className="paper-label">
-              <div className="staple"></div>
-              <span id="current-turn"></span>
-            </div>
-          </div>
-
           {/* Two-page spread */}
           <div className="two-page-spread">
             {/* LEFT PAGE - Game Board */}
