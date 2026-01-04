@@ -924,7 +924,7 @@ select {
 
 .paper-label {
     font-family: var(--font-handwriting);
-    font-size: 40px;
+    font-size: 35px;
     padding: 8px 16px;
     background: var(--sticky-yellow);
     border: 2px solid var(--paper-shadow);
@@ -1523,7 +1523,7 @@ select {
 
 #modal-body {
     font-family: var(--font-handwriting);
-    font-size: 16px;
+    font-size: 20px;
     margin-bottom: 25px;
     line-height: 1.7;
     color: var(--ink-dark);
@@ -1536,7 +1536,7 @@ select {
 #modal-body .info-text {
     font-family: var(--font-notes);
     color: var(--ink-light);
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 10px;
     font-style: italic;
 }
@@ -1577,7 +1577,7 @@ select {
     display: block;
     font-family: var(--font-notes);
     color: var(--ink-light);
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
 }
 
@@ -1587,6 +1587,8 @@ select {
     gap: 8px;
     max-height: 180px;
     overflow-y: auto;
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
 }
 
 .suggestion-loading {
@@ -1609,7 +1611,7 @@ select {
     border: 2px dashed var(--pencil-blue);
     color: var(--ink-dark);
     padding: 10px 14px;
-    font-size: 14px;
+    font-size: 20px;
     text-align: left;
     cursor: pointer;
     transition: all 0.2s ease;

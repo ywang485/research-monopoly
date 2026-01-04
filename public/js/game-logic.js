@@ -670,7 +670,7 @@ function handleNPCTurn() {
             <span class="dice" id="npc-rolling-dice" style="font-size: 64px;">🎲</span>
             <div class="dice-result" id="npc-dice-result" style="opacity: 0; color: #7a6080;">?</div>
         </div>
-        <p style="text-align: center; color: #7a6080; font-size: 8px;">Scientific Underdeterminism moves...</p>
+        <p style="text-align: center; color: #7a6080; font-size: 18px;">Scientific Underdeterminism moves...</p>
         `,
         []
     );
