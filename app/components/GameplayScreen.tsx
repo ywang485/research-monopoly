@@ -41,6 +41,9 @@ export default function GameplayScreen() {
               </div>
             </div>
 
+            {/* CENTER BINDING */}
+            <div className="center-binding"></div>
+
             {/* RIGHT PAGE - Info Panels */}
             <div className="right-page">
               <div className="right-page-content">
