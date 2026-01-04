@@ -21,7 +21,7 @@ export default function GameplayScreen() {
           {/* Two-page spread */}
           <div className="two-page-spread">
             {/* LEFT PAGE - Game Board */}
-            <div className="notebook-page left-page">
+            <div className="notebook-page-noborder left-page">
               <div className="spiral-binding">
               <div className="spiral-ring"></div>
               <div className="spiral-ring"></div>
@@ -46,7 +46,7 @@ export default function GameplayScreen() {
             </div>
 
             {/* RIGHT PAGE - Info Panels */}
-            <div className="notebook-page right-page">
+            <div className="right-page">
               <div className="right-page-content">
                 {/* Scientists Panel */}
                 <div id="players-panel" className="side-sticky green">

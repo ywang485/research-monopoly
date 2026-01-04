@@ -212,6 +212,12 @@ body {
         var(--paper-white);
     position: relative;
     padding-left: 60px;
+    border: 2px solid var(--paper-shadow);
+    border-radius: 3px;
+    box-shadow:
+        4px 4px 0 var(--paper-shadow),
+        8px 8px 15px rgba(0,0,0,0.1),
+        inset 0 0 30px rgba(139,119,80,0.05);
 }
 
 /* Spiral Binding */
@@ -2315,11 +2321,13 @@ select {
     min-height: 0;
     position: relative;
     background: var(--paper-white);
-    border: 3px solid var(--paper-shadow);
-    border-radius: 8px;
+    border: 2px solid var(--paper-shadow);
+    border-radius: 3px;
     box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.03),
-        5px 5px 20px rgba(0,0,0,0.15);
+        4px 4px 0 var(--paper-shadow),
+        8px 8px 15px rgba(0,0,0,0.1),
+        inset 0 0 30px rgba(139,119,80,0.05);
+    
 }
 
 /* Two-Page Spread Layout */
@@ -2352,6 +2360,7 @@ select {
 .right-page {
     border-left: none;
     flex: 1;
+    overflow: visible;
 }
 
 /* Center binding shadow */
