@@ -21,7 +21,7 @@ export default function GameplayScreen() {
           {/* Two-page spread */}
           <div className="two-page-spread">
             {/* LEFT PAGE - Game Board */}
-            <div className="notebook-page-noborder left-page">
+            <div className="notebook-page left-page" style={{ border: 'none', boxShadow: 'none'}}>
               <div className="spiral-binding">
               <div className="spiral-ring"></div>
               <div className="spiral-ring"></div>
@@ -51,14 +51,14 @@ export default function GameplayScreen() {
                 {/* Scientists Panel */}
                 <div id="players-panel" className="side-sticky green">
                   <div className="fold-corner"></div>
-                  <h3>👩‍🔬 Scientists</h3>
+                  <h3>Scientists</h3>
                   <div id="player-stats"></div>
                 </div>
 
                 {/* Theories Panel */}
                 <div id="theories-panel" className="side-sticky orange">
                   <div className="paper-clip clip-small"></div>
-                  <h3>📜 Established Theories</h3>
+                  <h3>Established Theories</h3>
                   <div id="theories-list"></div>
                 </div>
 
