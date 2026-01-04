@@ -433,7 +433,7 @@ body {
 
 .side-sticky h3 {
     font-family: var(--font-pixel);
-    font-size: 8px;
+    font-size: 12px;
     color: var(--ink-dark);
     margin-bottom: 12px;
     padding-bottom: 8px;
@@ -919,7 +919,7 @@ select {
 
 .paper-label {
     font-family: var(--font-handwriting);
-    font-size: 15px;
+    font-size: 40px;
     padding: 8px 16px;
     background: var(--sticky-yellow);
     border: 2px solid var(--paper-shadow);
@@ -980,6 +980,9 @@ select {
 
 /* LLM Status Indicator */
 .llm-indicator {
+    position: absolute;
+    right:30px;
+    width: 200px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1166,17 +1169,9 @@ select {
     user-select: none;
 }
 
-/* Players panel - initial position top right */
-#players-panel {
-    top: 120px;
-    right: 40px;
-    width: 260px;
-}
-
-/* Theories panel - initial position bottom left */
 #theories-panel {
-    bottom: 40px;
-    left: 40px;
+    top: 24px;
+    left: -140px;
     width: 240px;
     max-height: 280px;
     overflow-y: auto;
@@ -1203,7 +1198,7 @@ select {
 
 .player-stat .name {
     font-family: var(--font-pixel);
-    font-size: 8px;
+    font-size: 10px;
     margin-bottom: 6px;
     color: var(--ink-dark);
 }
@@ -1212,7 +1207,7 @@ select {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
-    font-size: 12px;
+    font-size: 16px;
     color: var(--ink-light);
 }
 
@@ -1280,7 +1275,7 @@ select {
 }
 
 #theories-list {
-    font-size: 13px;
+    font-size: 16px;
 }
 
 .theory-item {
@@ -1356,9 +1351,9 @@ select {
    ============================================ */
 
 .mini-notepad {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
+    position: absolute;
+    top: 600px;
+    right:250px;
     transform: translateX(-50%);
     width: 450px;
     max-height: 500px;
@@ -1371,7 +1366,7 @@ select {
     z-index: 100;
     display: flex;
     flex-direction: column;
-    transform: translateX(-50%) rotate(-0.5deg);
+    transform: rotate(3deg);
 }
 
 .notepad-header {
@@ -1391,8 +1386,8 @@ select {
 }
 
 .notepad-title {
-    font-family: var(--font-title);
-    font-size: 14px;
+    font-family: var(--font-pixel);
+    font-size: 13px;
     color: var(--ink-dark);
 }
 
@@ -1408,7 +1403,7 @@ select {
     scrollbar-color: grey transparent;
     scrollbar-width: thin;
     font-family: var(--font-handwriting);
-    font-size: 13px;
+    font-size: 18px;
     line-height: 1.6;
     background-image: repeating-linear-gradient(
         transparent,
@@ -2491,51 +2486,41 @@ select {
 /* Players panel - draggable */
 #players-panel {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    width: 260px;
+    top: 10px;
+    left: -140px;
+    width: 300px;
     max-height: 300px;
     overflow-y: auto;
-    z-index: 30;
+    z-index: 31;
+    transform: rotate(-3deg);
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
+
 }
 
 #players-panel h3 {
     cursor: move;
+
 }
 
 /* Theories panel - draggable */
 #theories-panel {
     position: absolute;
-    bottom: 80px;
-    left: 40px;
-    width: 240px;
+    top: 50px;
+    left: 120px;
+    width: 300px;
     max-height: 280px;
     overflow-y: auto;
     z-index: 30;
+    transform: rotate(3deg);
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
 }
 
 #theories-panel h3 {
     cursor: move;
 }
 
-/* Custom scrollbar for theories panel */
-#theories-panel::-webkit-scrollbar {
-    width: 8px;
-}
-
-#theories-panel::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.05);
-    border-radius: 4px;
-}
-
-#theories-panel::-webkit-scrollbar-thumb {
-    background: var(--paper-shadow);
-    border-radius: 4px;
-}
-
-#theories-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-light);
-}
 
 /* ============================================
    ACTION BUTTONS (Dice Roll) - Bottom of right page

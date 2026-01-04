@@ -9,10 +9,6 @@ export default function GameplayScreen() {
                 <div className="staple"></div>
                 <span id="entity-info"></span>
               </div>
-              <div id="llm-status" className="llm-indicator">
-                <span className="llm-icon">🤖</span>
-                <span className="llm-text">Checking AI...</span>
-              </div>
               <div id="turn-display" className="paper-label">
                 <div className="staple"></div>
                 <span id="current-turn"></span>
@@ -48,6 +44,17 @@ export default function GameplayScreen() {
             {/* RIGHT PAGE - Info Panels */}
             <div className="right-page">
               <div className="right-page-content">
+              <div id="llm-status" className="llm-indicator">
+                <span className="llm-icon">🤖</span>
+                <span className="llm-text">Checking AI...</span>
+              </div>
+                {/* Theories Panel */}
+                <div id="theories-panel" className="side-sticky orange">
+                  <div className="paper-clip clip-small"></div>
+                  <h3>Established Theories</h3>
+                  <div id="theories-list"></div>
+                </div>
+
                 {/* Scientists Panel */}
                 <div id="players-panel" className="side-sticky green">
                   <div className="fold-corner"></div>
@@ -55,12 +62,6 @@ export default function GameplayScreen() {
                   <div id="player-stats"></div>
                 </div>
 
-                {/* Theories Panel */}
-                <div id="theories-panel" className="side-sticky orange">
-                  <div className="paper-clip clip-small"></div>
-                  <h3>Established Theories</h3>
-                  <div id="theories-list"></div>
-                </div>
 
                 {/* Dice button */}
                 <div id="action-buttons">

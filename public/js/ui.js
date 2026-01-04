@@ -79,7 +79,7 @@ function updateTheoriesList() {
     container.innerHTML = '';
 
     if (GameState.theories.length === 0) {
-        container.innerHTML = '<div style="color: #666; font-size: 8px;">No theories established yet</div>';
+        container.innerHTML = '<div style="color: #666; font-size: 16px;">No theories established yet</div>';
         return;
     }
 
