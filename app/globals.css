@@ -2539,6 +2539,8 @@ select {
     align-items: center;
     flex: 0 0 auto;
     margin-top: auto;
+    position: relative;
+    z-index: 1000; /* Always on top of draggable panels */
 }
 
 .roll-btn {
