@@ -673,36 +673,48 @@ function renderBoard() {
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, offsetX * dpr, offsetY * dpr);
 
     // Calculate positions for each space (going clockwise)
+    // Distribute spaces evenly across all four edges
     const positions = [];
     const startX = padding;
     const startY = logicalBoardHeight - padding - spaceSize;
 
+    // Calculate how many spaces go on each edge (distribute evenly)
+    const basePerEdge = Math.floor(numSpaces / 4);
+    const extras = numSpaces % 4;
+
+    // Each edge gets basePerEdge spaces, plus 1 extra for the first 'extras' edges
+    const bottomSpaces = basePerEdge + (extras > 0 ? 1 : 0);
+    const rightSpaces = basePerEdge + (extras > 1 ? 1 : 0);
+    const topSpaces = basePerEdge + (extras > 2 ? 1 : 0);
+    const leftSpaces = basePerEdge + (extras > 3 ? 1 : 0);
+
+    // Calculate edge boundaries
+    const bottomEnd = bottomSpaces - 1;
+    const rightEnd = bottomEnd + rightSpaces;
+    const topEnd = rightEnd + topSpaces;
+
     for (let i = 0; i < numSpaces; i++) {
         let x, y;
-        const perSide = Math.ceil(numSpaces / 4);
 
-        if (i < perSide) {
-            // Bottom edge (left to right) - includes bottom-left and bottom-right corners
+        if (i <= bottomEnd) {
+            // Bottom edge (left to right)
             x = startX + i * spaceSize;
             y = startY;
-        } else if (i < perSide * 2 - 1) {
+        } else if (i <= rightEnd) {
             // Right edge (bottom to top) - start one space up from bottom-right corner
-            // ends at top-right corner
-            const edgeOffset = i - perSide + 1;
-            x = startX + (perSide - 1) * spaceSize;
-            y = startY - edgeOffset * spaceSize;
-        } else if (i < perSide * 3 - 2) {
+            const edgeIndex = i - bottomSpaces;
+            x = startX + (bottomSpaces - 1) * spaceSize;
+            y = startY - (edgeIndex + 1) * spaceSize;
+        } else if (i <= topEnd) {
             // Top edge (right to left) - start one space left from top-right corner
-            // ends at top-left corner
-            const edgeOffset = i - (perSide * 2 - 1) + 1;
-            x = startX + (perSide - 1) * spaceSize - edgeOffset * spaceSize;
-            y = startY - (perSide - 1) * spaceSize;
+            const edgeIndex = i - (bottomSpaces + rightSpaces);
+            x = startX + (bottomSpaces - 1) * spaceSize - (edgeIndex + 1) * spaceSize;
+            y = startY - rightSpaces * spaceSize;
         } else {
             // Left edge (top to bottom) - start one space down from top-left corner
-            // ends one space above bottom-left corner
-            const edgeOffset = i - (perSide * 3 - 2) + 1;
+            const edgeIndex = i - (bottomSpaces + rightSpaces + topSpaces);
             x = startX;
-            y = startY - (perSide - 1) * spaceSize + edgeOffset * spaceSize;
+            y = startY - rightSpaces * spaceSize + (edgeIndex + 1) * spaceSize;
         }
 
         positions.push({ x, y });
