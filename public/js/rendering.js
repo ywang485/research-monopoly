@@ -130,6 +130,7 @@ function drawStartIcon(ctx, cx, cy, scale) {
 }
 
 function drawStartIconFallback(ctx, cx, cy, scale) {
+        console.warn('⚠️ FALLBACK DRAWING CALLED! This should not happen if icon loaded correctly');
         // Fallback: Quill pen and inkwell - classical scientific beginning
         const s = scale;
         ctx.strokeStyle = '#2c3e50';
