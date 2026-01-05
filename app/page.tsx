@@ -30,7 +30,14 @@ export default function Home() {
         await loadScript('/js/draggable.js')
 
         // Wait a bit for all functions to be defined
-        setTimeout(() => {
+        setTimeout(async () => {
+          // Load icon images first
+          // @ts-ignore - loadIconImages is loaded from rendering.js
+          if (typeof window.loadIconImages === 'function') {
+            // @ts-ignore
+            await window.loadIconImages()
+          }
+
           // Initialize the game manually since DOMContentLoaded has already fired
           // @ts-ignore - These functions are loaded from the script files
           if (typeof window.initSetupScreen === 'function') {

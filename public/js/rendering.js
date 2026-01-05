@@ -1,6 +1,49 @@
 // Theory Investment Game - Rendering Functions
 
 // ============================================
+// ICON IMAGE LOADING
+// ============================================
+const IconImages = {
+    start: null
+};
+
+// Preload icon images
+function loadIconImages() {
+    return new Promise((resolve) => {
+        const imagesToLoad = [
+            { key: 'start', src: '/icons/start.svg' }
+        ];
+
+        let loadedCount = 0;
+        const totalImages = imagesToLoad.length;
+
+        if (totalImages === 0) {
+            resolve();
+            return;
+        }
+
+        imagesToLoad.forEach(({ key, src }) => {
+            const img = new Image();
+            img.onload = () => {
+                IconImages[key] = img;
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            };
+            img.onerror = () => {
+                console.warn(`Failed to load icon: ${src}`);
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            };
+            img.src = src;
+        });
+    });
+}
+
+// ============================================
 // PIXEL ART ICONS
 // ============================================
 function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
@@ -51,42 +94,50 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
 }
 
 function drawStartIcon(ctx, cx, cy, scale) {
-    // Quill pen and inkwell - classical scientific beginning
-    const s = scale;
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    // Use custom SVG icon if loaded, otherwise fall back to procedural drawing
+    if (IconImages.start) {
+        const iconSize = 56 * scale; // Slightly smaller than space size for padding
+        const x = cx - iconSize / 2;
+        const y = cy - iconSize / 2;
+        ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
+    } else {
+        // Fallback: Quill pen and inkwell - classical scientific beginning
+        const s = scale;
+        ctx.strokeStyle = '#2c3e50';
+        ctx.fillStyle = '#2c3e50';
+        ctx.lineWidth = 1.5 * s;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
 
-    // Inkwell base
-    ctx.beginPath();
-    ctx.ellipse(cx - 4 * s, cy + 6 * s, 6 * s, 3 * s, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - 10 * s, cy + 6 * s);
-    ctx.lineTo(cx - 10 * s, cy + 2 * s);
-    ctx.quadraticCurveTo(cx - 10 * s, cy - 2 * s, cx - 4 * s, cy - 2 * s);
-    ctx.quadraticCurveTo(cx + 2 * s, cy - 2 * s, cx + 2 * s, cy + 2 * s);
-    ctx.lineTo(cx + 2 * s, cy + 6 * s);
-    ctx.stroke();
+        // Inkwell base
+        ctx.beginPath();
+        ctx.ellipse(cx - 4 * s, cy + 6 * s, 6 * s, 3 * s, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - 10 * s, cy + 6 * s);
+        ctx.lineTo(cx - 10 * s, cy + 2 * s);
+        ctx.quadraticCurveTo(cx - 10 * s, cy - 2 * s, cx - 4 * s, cy - 2 * s);
+        ctx.quadraticCurveTo(cx + 2 * s, cy - 2 * s, cx + 2 * s, cy + 2 * s);
+        ctx.lineTo(cx + 2 * s, cy + 6 * s);
+        ctx.stroke();
 
-    // Quill pen (angled)
-    ctx.beginPath();
-    ctx.moveTo(cx - 2 * s, cy);
-    ctx.quadraticCurveTo(cx + 6 * s, cy - 8 * s, cx + 12 * s, cy - 14 * s);
-    ctx.stroke();
+        // Quill pen (angled)
+        ctx.beginPath();
+        ctx.moveTo(cx - 2 * s, cy);
+        ctx.quadraticCurveTo(cx + 6 * s, cy - 8 * s, cx + 12 * s, cy - 14 * s);
+        ctx.stroke();
 
-    // Quill feather
-    ctx.beginPath();
-    ctx.moveTo(cx + 12 * s, cy - 14 * s);
-    ctx.quadraticCurveTo(cx + 8 * s, cy - 12 * s, cx + 6 * s, cy - 16 * s);
-    ctx.quadraticCurveTo(cx + 10 * s, cy - 14 * s, cx + 12 * s, cy - 14 * s);
-    ctx.fill();
-    ctx.moveTo(cx + 12 * s, cy - 14 * s);
-    ctx.quadraticCurveTo(cx + 14 * s, cy - 10 * s, cx + 10 * s, cy - 8 * s);
-    ctx.quadraticCurveTo(cx + 14 * s, cy - 12 * s, cx + 12 * s, cy - 14 * s);
-    ctx.fill();
+        // Quill feather
+        ctx.beginPath();
+        ctx.moveTo(cx + 12 * s, cy - 14 * s);
+        ctx.quadraticCurveTo(cx + 8 * s, cy - 12 * s, cx + 6 * s, cy - 16 * s);
+        ctx.quadraticCurveTo(cx + 10 * s, cy - 14 * s, cx + 12 * s, cy - 14 * s);
+        ctx.fill();
+        ctx.moveTo(cx + 12 * s, cy - 14 * s);
+        ctx.quadraticCurveTo(cx + 14 * s, cy - 10 * s, cx + 10 * s, cy - 8 * s);
+        ctx.quadraticCurveTo(cx + 14 * s, cy - 12 * s, cx + 12 * s, cy - 14 * s);
+        ctx.fill();
+    }
 }
 
 function drawHypothesisIcon(ctx, cx, cy, scale) {
