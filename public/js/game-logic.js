@@ -271,9 +271,10 @@ function handleStartSpace(player) {
     player.addFame(2);
     showModal(
         'New Academic Year',
-        `<p>You passed the start of a new academic year!</p>
-        <p>+2 fame for your continued contributions.</p>`,
-        [{ text: 'Onward!', action: () => { updatePlayerStats(); endTurn(); } }]
+        `<p>Congratulations! You've survived another trip around the sun without quitting academia.</p>
+        <p>+2 fame for your unrelenting stubbornness</p>
+        <p class="info-text">Your family still doesn't understand what you do for a living.</p>`,
+        [{ text: 'Yay...', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -288,9 +289,10 @@ function handleConferenceSpace(player) {
             <span class="dice">🎲</span>
             <div class="dice-result">+${fameGain} Fame!</div>
         </div>
-        <p>You presented your work at a prestigious conference and gained recognition!</p>
+        <p>You traveled across the country to present a 15-minute talk in a windowless room to 6 people (3 were asleep).</p>
+        <p class="info-text">At least the hotel breakfast was mediocre!</p>
         `,
-        [{ text: 'Great!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -300,11 +302,11 @@ function handleSabbaticalSpace(player) {
     showModal(
         'Sabbatical Leave',
         `
-        <p>You took a well-deserved sabbatical!</p>
-        <p>You feel 2 years younger and more energized!</p>
-        <p class="info-text">Sometimes stepping back helps you move forward.</p>
+        <p>You escaped to "write a book" (really just avoided emails for 6 months).</p>
+        <p>-2 years of aging from not attending meetings!</p>
+        <p class="info-text">You'll definitely finish that book chapter... eventually.</p>
         `,
-        [{ text: 'Refreshed!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -320,11 +322,12 @@ function handleGrantSpace(player) {
             <span class="dice">🎲🎲</span>
             <div class="dice-result">Grant Approved!</div>
         </div>
-        <p>You received a major research grant!</p>
-        <p>The reduced stress makes you feel ${grantSize} years younger!</p>
-        <p>+2 fame for securing funding</p>
+        <p>After only 47 revisions and 3 panel reviews, they actually gave you money!</p>
+        <p>-${grantSize} years of stress-induced aging!</p>
+        <p>+2 fame (mostly from other academics jealous of your funding)</p>
+        <p class="info-text">Time to hire grad students to do all the work!</p>
         `,
-        [{ text: 'Excellent!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -337,11 +340,11 @@ function handleScandalSpace(player) {
     showModal(
         'Academic Scandal!',
         `
-        <p style="color: #a86060;">Your research has been called into question!</p>
-        <p>You lost ${fameLoss} fame points due to controversy.</p>
-        <p class="info-text">Perhaps a methodology issue was discovered...</p>
+        <p style="color: #a86060;">Someone actually read your paper and found... issues.</p>
+        <p>-${fameLoss} fame from the Twitter mob and anonymous blog posts</p>
+        <p class="info-text">Maybe you should have checked those p-values more carefully...</p>
         `,
-        [{ text: 'Unfortunate...', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -357,16 +360,18 @@ function handleCollaborationSpace(player) {
         showModal(
             'Research Collaboration',
             `
-            <p>You formed a research collaboration with ${collaborator.name}!</p>
-            <p>Both of you gained ${bonus} fame from the joint publication.</p>
+            <p>You and ${collaborator.name} are now co-authors!</p>
+            <p>Both +${bonus} fame (now you have to decide authorship order...)</p>
+            <p class="info-text">May the most passive-aggressive email win.</p>
             `,
-            [{ text: 'Teamwork!', action: () => { updatePlayerStats(); endTurn(); } }]
+            [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
         );
     } else {
         showModal(
             'Research Collaboration',
-            `<p>No other researchers available to collaborate with.</p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            `<p>You wanted to collaborate but everyone else is dead or has better things to do.</p>
+            <p class="info-text">Solo authorship it is!</p>`,
+            [{ text: 'Forever alone', action: () => endTurn() }]
         );
     }
 }
@@ -381,12 +386,13 @@ function handleEurekaSpace(player) {
     showModal(
         'EUREKA! 💡',
         `
-        <p style="color: #c8b070; font-size: 12px;">A moment of brilliance!</p>
-        <p>You had a breakthrough insight about ${GameState.entity.name}!</p>
-        <p>The excitement makes you feel ${bonusYears} years younger!</p>
-        <p>+${bonusFame} fame from the scientific community</p>
+        <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
+        <p>You figured out something important about ${GameState.entity.name} (probably)!</p>
+        <p>The dopamine rush feels like -${bonusYears} years of aging!</p>
+        <p>+${bonusFame} fame (assuming you can actually prove it later)</p>
+        <p class="info-text">Quick, write it down before you forget!</p>
         `,
-        [{ text: 'Amazing!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Genius!', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -439,20 +445,20 @@ async function handleHypothesisSpace(player, space) {
         showModal(
             'New Research Opportunity!',
             `
-            <p>You've discovered an unexplored research area about <strong>${GameState.entity.name}</strong>!</p>
-            <p>You can formulate a hypothesis and invest ${space.investmentCost} years of life.</p>
+            <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
+            <p>Invest ${space.investmentCost} years to claim this territory before someone else does.</p>
             <div class="suggestions-container">
-                <label>Suggested hypotheses (click to use):</label>
+                <label>AI-generated hypotheses (because originality is hard):</label>
                 <div id="hypothesis-suggestions" class="hypothesis-suggestions">
                     <div class="suggestion-loading">Generating suggestions...</div>
                 </div>
             </div>
             <div class="input-group">
-                <label>Or write your own:</label>
+                <label>Or pretend to have original thoughts:</label>
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
-            <p class="info-text">Available life years: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">Warning: You don\'t have enough life years!</p>' : ''}
+            <p class="info-text">Life years remaining: ${availableYears}</p>
+            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this hypothesis.</p>' : ''}
             `,
             [
                 {
@@ -511,15 +517,15 @@ async function handleHypothesisSpace(player, space) {
         showModal(
             'Active Hypothesis',
             `
-            <p><strong>Hypothesis:</strong> "${space.hypothesis}"</p>
-            <p>Current investments:</p>
+            <p><strong>Current Hypothesis:</strong> "${space.hypothesis}"</p>
+            <p>People who've already sacrificed years of their life:</p>
             ${investmentsHTML}
             <div class="input-group" style="margin-top: 10px;">
-                <label>Add to hypothesis (requires investment):</label>
-                <input type="text" id="hypothesis-addition" placeholder="Expand or refine the hypothesis...">
+                <label>Add unnecessary complexity (costs more life):</label>
+                <input type="text" id="hypothesis-addition" placeholder="Make it sound more academic...">
             </div>
-            <p>Investment cost: ${space.investmentCost} years</p>
-            <p class="info-text">Available life years: ${availableYears}</p>
+            <p>Cost: ${space.investmentCost} more years you'll never get back</p>
+            <p class="info-text">Life years remaining: ${availableYears}</p>
             `,
             [
                 {
@@ -559,9 +565,10 @@ async function handleHypothesisSpace(player, space) {
         // Already proven - just info
         showModal(
             'Established Theory',
-            `<p>This hypothesis has already been proven and established as a theory.</p>
-            <p><strong>"${space.hypothesis}"</strong></p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            `<p>This is settled science now. You're too late to the party.</p>
+            <p><strong>"${space.hypothesis}"</strong></p>
+            <p class="info-text">Should've worked faster.</p>`,
+            [{ text: 'Damn', action: () => endTurn() }]
         );
     }
 }
@@ -583,13 +590,13 @@ function handleRecruitSpace(player) {
     showModal(
         'Graduate Recruitment',
         `
-        <p>Recruit students to help with your research!</p>
-        <p>Available fame: ${availableFame}</p>
-        <p>Current students: ${player.students.length}</p>
+        <p>Trade your fame points for indentured servants... I mean, research assistants!</p>
+        <p>Fame available: ${availableFame}</p>
+        <p>Current exploitation victims: ${player.students.length}</p>
         ${studentsHTML}
-        <p class="info-text">Click on a student type to hire</p>
+        <p class="info-text">They'll do all the work while you take all the credit!</p>
         `,
-        [{ text: 'Leave', action: () => endTurn() }]
+        [{ text: 'Perfect', action: () => endTurn() }]
     );
 
     // Add click handlers
@@ -624,28 +631,29 @@ async function handlePeerReviewSpace(player) {
             showModal(
                 'Peer Review',
                 `
-                <p><strong>Reviewer #2 comments on your work:</strong></p>
+                <p><strong>Reviewer #2 has entered the chat:</strong></p>
                 <p class="peer-review-text">"${review}"</p>
-                <p class="info-text" style="margin-top: 15px;">Despite the harsh review, you survived! +${bonus} fame</p>
+                <p class="info-text" style="margin-top: 15px;">You somehow survived their passive aggression. +${bonus} fame for emotional resilience</p>
                 `,
-                [{ text: 'Whatever...', action: () => { updatePlayerStats(); endTurn(); } }]
+                [{ text: 'Deep breaths', action: () => { updatePlayerStats(); endTurn(); } }]
             );
         } else {
             showModal(
                 'Peer Review',
                 `
-                <p>Your published work underwent peer review!</p>
-                <p>The reviewers were impressed. +${bonus} fame!</p>
+                <p>Miracle of miracles: Reviewer #2 was actually constructive!</p>
+                <p>+${bonus} fame for dodging that bullet</p>
+                <p class="info-text">This never happens.</p>
                 `,
-                [{ text: 'OK', action: () => { updatePlayerStats(); endTurn(); } }]
+                [{ text: 'Suspicious', action: () => { updatePlayerStats(); endTurn(); } }]
             );
         }
     } else {
         showModal(
             'Peer Review',
-            `<p>You have no published theories to review yet.</p>
-            <p>Keep researching!</p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            `<p>Can't get peer reviewed if you haven't published anything.</p>
+            <p class="info-text">*taps forehead*</p>`,
+            [{ text: 'Fair', action: () => endTurn() }]
         );
     }
 }
