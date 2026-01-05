@@ -271,13 +271,40 @@ function handleStartSpace(player) {
     player.addFame(2);
     showModal(
         'New Academic Year',
-        `<p>You passed the start of a new academic year!</p>
-        <p>+2 fame for your continued contributions.</p>`,
-        [{ text: 'Onward!', action: () => { updatePlayerStats(); endTurn(); } }]
+        `<p>Congratulations! You've survived another trip around the sun without quitting academia.</p>
+        <p>+2 fame for your unrelenting stubbornness</p>
+        <p class="info-text">Your family still doesn't understand what you do for a living.</p>`,
+        [{ text: 'Yay...', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleConferenceSpace(player) {
+    // Check if player has any publications
+    if (player.theoriesPublished.length === 0) {
+        // Small fame gain for just attending
+        const smallFameGain = 1;
+        player.addFame(smallFameGain);
+
+        showModal(
+            'Academic Conference',
+            `
+            <div class="dice-container">
+                <span class="dice">🎲</span>
+                <div class="dice-result">+${smallFameGain} Fame</div>
+            </div>
+            <p>You showed up to the conference, but realized you have nothing to present.</p>
+            <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
+            <p class="info-text">At least someone remembered your name tag!</p>
+            `,
+            [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
+        );
+        return;
+    }
+
+    // Randomly select one of player's published hypotheses
+    const randomIndex = Math.floor(Math.random() * player.theoriesPublished.length);
+    const selectedHypothesis = player.theoriesPublished[randomIndex];
+
     const fameGain = rollDice() + 2;
     player.addFame(fameGain);
 
@@ -288,9 +315,10 @@ function handleConferenceSpace(player) {
             <span class="dice">🎲</span>
             <div class="dice-result">+${fameGain} Fame!</div>
         </div>
-        <p>You presented your work at a prestigious conference and gained recognition!</p>
+        <p>You traveled across the country to present your groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
+        <p class="info-text">At least the hotel breakfast was mediocre!</p>
         `,
-        [{ text: 'Great!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -300,31 +328,29 @@ function handleSabbaticalSpace(player) {
     showModal(
         'Sabbatical Leave',
         `
-        <p>You took a well-deserved sabbatical!</p>
-        <p>You feel 2 years younger and more energized!</p>
-        <p class="info-text">Sometimes stepping back helps you move forward.</p>
+        <p>You escaped to "write a book" (really just avoided emails for 6 months).</p>
+        <p>-2 years of aging from not attending meetings!</p>
+        <p class="info-text">You'll definitely finish that book chapter... eventually.</p>
         `,
-        [{ text: 'Refreshed!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleGrantSpace(player) {
-    const grantSize = rollDice() + rollDice();
-    player.rejuvenate(grantSize);
     player.addFame(2);
 
     showModal(
         'Research Grant!',
         `
         <div class="dice-container">
-            <span class="dice">🎲🎲</span>
-            <div class="dice-result">Grant Approved!</div>
+            <span class="dice">💰</span>
+            <div class="dice-result">+2 Fame!</div>
         </div>
-        <p>You received a major research grant!</p>
-        <p>The reduced stress makes you feel ${grantSize} years younger!</p>
-        <p>+2 fame for securing funding</p>
+        <p>After only 47 revisions and 3 panel reviews, they actually gave you money!</p>
+        <p>+2 fame (mostly from other academics jealous of your funding)</p>
+        <p class="info-text">Now if only the grant actually covered your students' stipends...</p>
         `,
-        [{ text: 'Excellent!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -337,11 +363,11 @@ function handleScandalSpace(player) {
     showModal(
         'Academic Scandal!',
         `
-        <p style="color: #a86060;">Your research has been called into question!</p>
-        <p>You lost ${fameLoss} fame points due to controversy.</p>
-        <p class="info-text">Perhaps a methodology issue was discovered...</p>
+        <p style="color: #a86060;">Someone actually read your paper and found... issues.</p>
+        <p>-${fameLoss} fame from the Twitter mob and anonymous blog posts</p>
+        <p class="info-text">Maybe you should have checked those p-values more carefully...</p>
         `,
-        [{ text: 'Unfortunate...', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
@@ -357,37 +383,120 @@ function handleCollaborationSpace(player) {
         showModal(
             'Research Collaboration',
             `
-            <p>You formed a research collaboration with ${collaborator.name}!</p>
-            <p>Both of you gained ${bonus} fame from the joint publication.</p>
+            <p>You and ${collaborator.name} are now co-authors!</p>
+            <p>Both +${bonus} fame (now you have to decide authorship order...)</p>
+            <p class="info-text">May the most passive-aggressive email win.</p>
             `,
-            [{ text: 'Teamwork!', action: () => { updatePlayerStats(); endTurn(); } }]
+            [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
         );
     } else {
         showModal(
             'Research Collaboration',
-            `<p>No other researchers available to collaborate with.</p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            `<p>You wanted to collaborate but everyone else is dead or has better things to do.</p>
+            <p class="info-text">Solo authorship it is!</p>`,
+            [{ text: 'Forever alone', action: () => endTurn() }]
         );
     }
 }
 
-function handleEurekaSpace(player) {
+async function handleEurekaSpace(player) {
     playSound('eureka');
-    const bonusYears = 3;
-    const bonusFame = 5;
-    player.rejuvenate(bonusYears);
-    player.addFame(bonusFame);
 
+    // Find the closest uninvested hypothesis space
+    const boardSize = GameState.board.length;
+    let closestSpace = null;
+    let closestDistance = boardSize;
+
+    for (let i = 1; i < boardSize; i++) {
+        const checkIndex = (player.position + i) % boardSize;
+        const space = GameState.board[checkIndex];
+
+        if (space.type === SPACE_TYPES.HYPOTHESIS && !space.hypothesis) {
+            closestSpace = space;
+            closestDistance = i;
+            break;
+        }
+    }
+
+    if (!closestSpace) {
+        // No uninvested hypothesis spaces available
+        showModal(
+            'EUREKA! 💡',
+            `
+            <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
+            <p>You had a brilliant idea about ${GameState.entity.name}!</p>
+            <p class="info-text">But... every hypothesis space is already claimed. Your genius goes to waste.</p>
+            <p style="color: #888; font-size: 11px;">Should've thought of this sooner!</p>
+            `,
+            [{ text: 'Tragic', action: () => { updatePlayerStats(); endTurn(); } }]
+        );
+        return;
+    }
+
+    // Show modal to claim the closest hypothesis for free
     showModal(
         'EUREKA! 💡',
         `
-        <p style="color: #c8b070; font-size: 12px;">A moment of brilliance!</p>
-        <p>You had a breakthrough insight about ${GameState.entity.name}!</p>
-        <p>The excitement makes you feel ${bonusYears} years younger!</p>
-        <p>+${bonusFame} fame from the scientific community</p>
+        <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
+        <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit you!</p>
+        <p>You can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
+        <div class="suggestions-container">
+            <label>AI-generated hypotheses (because originality is hard):</label>
+            <div id="hypothesis-suggestions" class="hypothesis-suggestions">
+                <div class="suggestion-loading">Generating suggestions...</div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Or formulate your eureka moment:</label>
+            <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
+        </div>
+        <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
         `,
-        [{ text: 'Amazing!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [
+            {
+                text: 'Claim it!',
+                action: () => {
+                    const hypothesis = document.getElementById('hypothesis-input').value.trim();
+                    if (hypothesis) {
+                        closestSpace.hypothesis = hypothesis;
+                        closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
+                        closestSpace.investments.push({ player: player.name, years: 0, playerIndex: player.index });
+                        log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
+                        renderBoard();
+                        updatePlayerStats();
+                        checkGameEnd();
+                        if (!GameState.gameOver) endTurn();
+                    }
+                }
+            },
+            {
+                text: 'Skip',
+                action: () => endTurn()
+            }
+        ]
     );
+
+    // Fetch suggestions asynchronously and update the modal
+    const suggestions = await fetchHypothesisSuggestions(3);
+
+    if (suggestions && suggestions.length > 0) {
+        const suggestionsHtml = suggestions.map(s =>
+            `<div class="suggestion-item" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
+        ).join('');
+
+        const suggestionsContainer = document.getElementById('hypothesis-suggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.innerHTML = suggestionsHtml;
+
+            // Add click handlers for suggestions
+            suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const suggestion = item.getAttribute('data-suggestion');
+                    document.getElementById('hypothesis-input').value = suggestion;
+                });
+            });
+        }
+    }
 }
 
 function handleSpaceLanding(player, space) {
@@ -410,8 +519,8 @@ function handleSpaceLanding(player, space) {
         case SPACE_TYPES.SABBATICAL:
             handleSabbaticalSpace(player);
             break;
-        case SPACE_TYPES.PEER_REVIEW:
-            handlePeerReviewSpace(player);
+        case SPACE_TYPES.COMMUNITY_SERVICE:
+            handleCommunityServiceSpace(player);
             break;
         case SPACE_TYPES.GRANT:
             handleGrantSpace(player);
@@ -439,20 +548,20 @@ async function handleHypothesisSpace(player, space) {
         showModal(
             'New Research Opportunity!',
             `
-            <p>You've discovered an unexplored research area about <strong>${GameState.entity.name}</strong>!</p>
-            <p>You can formulate a hypothesis and invest ${space.investmentCost} years of life.</p>
+            <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
+            <p>Invest ${space.investmentCost} years to claim this territory before someone else does.</p>
             <div class="suggestions-container">
-                <label>Suggested hypotheses (click to use):</label>
+                <label>AI-generated hypotheses (because originality is hard):</label>
                 <div id="hypothesis-suggestions" class="hypothesis-suggestions">
                     <div class="suggestion-loading">Generating suggestions...</div>
                 </div>
             </div>
             <div class="input-group">
-                <label>Or write your own:</label>
+                <label>Or pretend to have original thoughts:</label>
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
-            <p class="info-text">Available life years: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">Warning: You don\'t have enough life years!</p>' : ''}
+            <p class="info-text">Life years remaining: ${availableYears}</p>
+            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this hypothesis.</p>' : ''}
             `,
             [
                 {
@@ -511,15 +620,15 @@ async function handleHypothesisSpace(player, space) {
         showModal(
             'Active Hypothesis',
             `
-            <p><strong>Hypothesis:</strong> "${space.hypothesis}"</p>
-            <p>Current investments:</p>
+            <p><strong>Current Hypothesis:</strong> "${space.hypothesis}"</p>
+            <p>People who've already sacrificed years of their life:</p>
             ${investmentsHTML}
             <div class="input-group" style="margin-top: 10px;">
-                <label>Add to hypothesis (requires investment):</label>
-                <input type="text" id="hypothesis-addition" placeholder="Expand or refine the hypothesis...">
+                <label>Add unnecessary complexity (costs more life):</label>
+                <input type="text" id="hypothesis-addition" placeholder="Make it sound more academic...">
             </div>
-            <p>Investment cost: ${space.investmentCost} years</p>
-            <p class="info-text">Available life years: ${availableYears}</p>
+            <p>Cost: ${space.investmentCost} more years you'll never get back</p>
+            <p class="info-text">Life years remaining: ${availableYears}</p>
             `,
             [
                 {
@@ -559,9 +668,10 @@ async function handleHypothesisSpace(player, space) {
         // Already proven - just info
         showModal(
             'Established Theory',
-            `<p>This hypothesis has already been proven and established as a theory.</p>
-            <p><strong>"${space.hypothesis}"</strong></p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            `<p>This is settled science now. You're too late to the party.</p>
+            <p><strong>"${space.hypothesis}"</strong></p>
+            <p class="info-text">Should've worked faster.</p>`,
+            [{ text: 'Damn', action: () => endTurn() }]
         );
     }
 }
@@ -583,13 +693,13 @@ function handleRecruitSpace(player) {
     showModal(
         'Graduate Recruitment',
         `
-        <p>Recruit students to help with your research!</p>
-        <p>Available fame: ${availableFame}</p>
-        <p>Current students: ${player.students.length}</p>
+        <p>Trade your fame points for indentured servants... I mean, research assistants!</p>
+        <p>Fame available: ${availableFame}</p>
+        <p>Current exploitation victims: ${player.students.length}</p>
         ${studentsHTML}
-        <p class="info-text">Click on a student type to hire</p>
+        <p class="info-text">They'll do all the work while you take all the credit!</p>
         `,
-        [{ text: 'Leave', action: () => endTurn() }]
+        [{ text: 'Perfect', action: () => endTurn() }]
     );
 
     // Add click handlers
@@ -607,45 +717,73 @@ function handleRecruitSpace(player) {
     }, 100);
 }
 
-async function handlePeerReviewSpace(player) {
-    if (player.theoriesPublished.length > 0) {
-        const bonus = rollDice();
-        player.addFame(bonus);
+function handleCommunityServiceSpace(player) {
+    const serviceCost = 3; // Years of life spent on community service
 
-        // Pick a random published theory to review
-        const randomTheory = player.theoriesPublished[
-            Math.floor(Math.random() * player.theoriesPublished.length)
-        ];
+    if (player.students.length > 0) {
+        // Player has students - offer choice to sacrifice one
+        const studentType = player.students[0];
+        const studentName = STUDENT_TYPES[studentType].name;
 
-        // Try to get LLM-generated review
-        const review = await fetchPeerReview(randomTheory);
-
-        if (review) {
-            showModal(
-                'Peer Review',
-                `
-                <p><strong>Reviewer #2 comments on your work:</strong></p>
-                <p class="peer-review-text">"${review}"</p>
-                <p class="info-text" style="margin-top: 15px;">Despite the harsh review, you survived! +${bonus} fame</p>
-                `,
-                [{ text: 'Whatever...', action: () => { updatePlayerStats(); endTurn(); } }]
-            );
-        } else {
-            showModal(
-                'Peer Review',
-                `
-                <p>Your published work underwent peer review!</p>
-                <p>The reviewers were impressed. +${bonus} fame!</p>
-                `,
-                [{ text: 'OK', action: () => { updatePlayerStats(); endTurn(); } }]
-            );
-        }
-    } else {
         showModal(
-            'Peer Review',
-            `<p>You have no published theories to review yet.</p>
-            <p>Keep researching!</p>`,
-            [{ text: 'OK', action: () => endTurn() }]
+            'Community Service',
+            `
+            <p>Oh no! You've been assigned mandatory community service work.</p>
+            <p>This will cost you <strong>${serviceCost} years</strong> of your precious research time.</p>
+            <p class="info-text">BUT WAIT... you have a ${studentName} who could take your place!</p>
+            <p>What will you do?</p>
+            `,
+            [
+                {
+                    text: `Sacrifice ${studentName} 😈`,
+                    action: () => {
+                        // Remove the first student
+                        const sacrificedStudent = player.students.shift();
+                        const sacrificedName = STUDENT_TYPES[sacrificedStudent].name;
+
+                        log(`${player.name} sacrificed their ${sacrificedName} to avoid community service!`, 'important');
+
+                        showModal(
+                            'Student Sacrificed',
+                            `
+                            <p>You threw your ${sacrificedName} under the bus!</p>
+                            <p>They're now spending their days picking up litter instead of doing research.</p>
+                            <p class="info-text">Academia: where we build character by crushing dreams!</p>
+                            `,
+                            [{ text: 'No regrets', action: () => { updatePlayerStats(); endTurn(); } }]
+                        );
+                    }
+                },
+                {
+                    text: 'Do it myself 😔',
+                    action: () => {
+                        player.age += serviceCost;
+
+                        showModal(
+                            'Community Service',
+                            `
+                            <p>You nobly chose to do the community service yourself.</p>
+                            <p>+${serviceCost} years of aging from mindless bureaucratic tasks.</p>
+                            <p class="info-text">Your student is grateful... for now.</p>
+                            `,
+                            [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
+                        );
+                    }
+                }
+            ]
+        );
+    } else {
+        // No students - forced to do community service
+        player.age += serviceCost;
+
+        showModal(
+            'Community Service',
+            `
+            <p>You've been assigned mandatory community service work!</p>
+            <p>+${serviceCost} years of aging from filling out forms and attending sensitivity training.</p>
+            <p class="info-text">If only you had a grad student to dump this on...</p>
+            `,
+            [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
         );
     }
 }
@@ -670,7 +808,7 @@ function handleNPCTurn() {
             <span class="dice" id="npc-rolling-dice" style="font-size: 64px;">🎲</span>
             <div class="dice-result" id="npc-dice-result" style="opacity: 0; color: #7a6080;">?</div>
         </div>
-        <p style="text-align: center; color: #7a6080; font-size: 8px;">Scientific Underdeterminism moves...</p>
+        <p style="text-align: center; color: #7a6080; font-size: 18px;">Scientific Underdeterminism moves...</p>
         `,
         []
     );

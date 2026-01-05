@@ -79,7 +79,7 @@ function updateTheoriesList() {
     container.innerHTML = '';
 
     if (GameState.theories.length === 0) {
-        container.innerHTML = '<div style="color: #666; font-size: 8px;">No theories established yet</div>';
+        container.innerHTML = '<div style="color: #666; font-size: 16px;">No theories established yet</div>';
         return;
     }
 
@@ -163,10 +163,12 @@ function getSpaceAtPosition(mouseX, mouseY) {
     const rect = canvas.getBoundingClientRect();
 
     // Convert mouse position to logical board coordinates
-    // Account for the scale applied during rendering
+    // Account for the scale and offset applied during rendering
     const scale = GameState.boardScale || 1;
-    const logicalX = (mouseX - rect.left) / scale;
-    const logicalY = (mouseY - rect.top) / scale;
+    const offsetX = GameState.boardOffsetX || 0;
+    const offsetY = GameState.boardOffsetY || 0;
+    const logicalX = (mouseX - rect.left - offsetX) / scale;
+    const logicalY = (mouseY - rect.top - offsetY) / scale;
 
     // Check each space
     for (let i = 0; i < GameState.boardPositions.length; i++) {

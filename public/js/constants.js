@@ -62,7 +62,7 @@ const SPACE_TYPES = {
     RECRUIT: 'recruit',
     CONFERENCE: 'conference',
     SABBATICAL: 'sabbatical',
-    PEER_REVIEW: 'peer_review',
+    COMMUNITY_SERVICE: 'community_service',
     GRANT: 'grant',
     SCANDAL: 'scandal',
     COLLABORATION: 'collaboration',
@@ -76,7 +76,7 @@ const SPACE_COLORS = {
     [SPACE_TYPES.RECRUIT]: '#3498db',    // Pencil blue
     [SPACE_TYPES.CONFERENCE]: '#9b59b6', // Pencil purple
     [SPACE_TYPES.SABBATICAL]: '#1abc9c', // Pencil teal
-    [SPACE_TYPES.PEER_REVIEW]: '#e74c3c', // Pencil red
+    [SPACE_TYPES.COMMUNITY_SERVICE]: '#e74c3c', // Pencil red
     [SPACE_TYPES.GRANT]: '#2ecc71',      // Pencil bright green
     [SPACE_TYPES.SCANDAL]: '#c0392b',    // Pencil dark red
     [SPACE_TYPES.COLLABORATION]: '#e67e22', // Pencil orange
@@ -96,14 +96,14 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.RECRUIT]: 'Graduate recruitment center. Spend fame points to hire students who extend your available research years.',
     [SPACE_TYPES.CONFERENCE]: 'Present your work and gain recognition! Earn 3 fame points for attending.',
     [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break. Rejuvenate by 3 years of life.',
-    [SPACE_TYPES.PEER_REVIEW]: 'Your work is under scrutiny. Lose 2 years to the review process, but if you have students, one will help (and graduate).',
-    [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant that rejuvenates you by 5 years.',
+    [SPACE_TYPES.COMMUNITY_SERVICE]: 'Forced to do community service! Lose years to service work, but you can sacrifice a student to get away with it.',
+    [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
     [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
-    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Make a breakthrough discovery and gain 5 fame points.'
+    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).'
 };
 
-const MAX_AGE = 90;
+const MAX_AGE = 80;
 const STARTING_AGE = 30;
 
 // ============================================
@@ -151,7 +151,7 @@ RECRUIT|Graduate School|0
 HYPOTHESIS|Research Question 3|4
 CONFERENCE|Annual Symposium|0
 HYPOTHESIS|Research Question 4|3
-PEER_REVIEW|Journal Review|0
+COMMUNITY_SERVICE|Community Service|0
 HYPOTHESIS|Research Question 5|2
 SABBATICAL|Research Leave|0
 HYPOTHESIS|Research Question 6|5

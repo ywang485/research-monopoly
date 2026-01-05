@@ -1,11 +1,33 @@
 // Make elements draggable
 
+// Track z-index for stacking order
+let highestZIndex = 50;
+
 function initDraggableNotepad() {
-    // Initialize mini notepad (only draggable element now)
+    // Initialize mini notepad
     const notepad = document.getElementById('game-log-container');
-    const header = notepad?.querySelector('.notepad-header');
-    if (notepad && header) {
-        makeDraggable(notepad, header, true);
+    const notepadHeader = notepad?.querySelector('.notepad-header');
+    if (notepad && notepadHeader) {
+        notepad.style.zIndex = highestZIndex++;
+        makeDraggable(notepad, notepadHeader, true);
+    }
+
+    // Initialize Scientists panel
+    const playersPanel = document.getElementById('players-panel');
+    const playersHeader = playersPanel?.querySelector('h3');
+    if (playersPanel && playersHeader) {
+        playersPanel.classList.add('draggable-sticky');
+        playersPanel.style.zIndex = highestZIndex++;
+        makeDraggable(playersPanel, playersHeader, false);
+    }
+
+    // Initialize Theories panel
+    const theoriesPanel = document.getElementById('theories-panel');
+    const theoriesHeader = theoriesPanel?.querySelector('h3');
+    if (theoriesPanel && theoriesHeader) {
+        theoriesPanel.classList.add('draggable-sticky');
+        theoriesPanel.style.zIndex = highestZIndex++;
+        makeDraggable(theoriesPanel, theoriesHeader, false);
     }
 }
 
@@ -48,7 +70,8 @@ function makeDraggable(element, dragHandle, isCentered) {
 
         if (e.target === dragHandle || dragHandle.contains(e.target)) {
             isDragging = true;
-            element.style.zIndex = 100; // Bring to front while dragging
+            // Bring to front by giving it the highest z-index
+            element.style.zIndex = highestZIndex++;
         }
     }
 
@@ -75,13 +98,7 @@ function makeDraggable(element, dragHandle, isCentered) {
         initialX = currentX;
         initialY = currentY;
         isDragging = false;
-
-        // Reset z-index based on element type
-        if (element.classList.contains('mini-notepad')) {
-            element.style.zIndex = 100;
-        } else if (element.classList.contains('draggable-sticky')) {
-            element.style.zIndex = 30;
-        }
+        // Don't reset z-index - keep the stacking order
     }
 
     function setTranslate(xPos, yPos, el, centered) {

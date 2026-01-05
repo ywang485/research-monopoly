@@ -30,8 +30,8 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
         case SPACE_TYPES.SABBATICAL:
             drawSabbaticalIcon(ctx, centerX, centerY, scale);
             break;
-        case SPACE_TYPES.PEER_REVIEW:
-            drawPeerReviewIcon(ctx, centerX, centerY, scale);
+        case SPACE_TYPES.COMMUNITY_SERVICE:
+            drawCommunityServiceIcon(ctx, centerX, centerY, scale);
             break;
         case SPACE_TYPES.GRANT:
             drawGrantIcon(ctx, centerX, centerY, scale);
@@ -92,46 +92,18 @@ function drawStartIcon(ctx, cx, cy, scale) {
 function drawHypothesisIcon(ctx, cx, cy, scale) {
     // Classical alchemical retort/flask
     const s = scale;
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
+    ctx.strokeStyle = '#ddd';
+    ctx.fillStyle = '#ddd';
     ctx.lineWidth = 1.5 * s;
     ctx.lineCap = 'round';
 
-    // Flask body (round bottom)
-    ctx.beginPath();
-    ctx.arc(cx, cy + 2 * s, 8 * s, 0.3 * Math.PI, 0.7 * Math.PI, false);
-    ctx.stroke();
-
-    // Flask neck
-    ctx.beginPath();
-    ctx.moveTo(cx - 3 * s, cy - 4 * s);
-    ctx.lineTo(cx - 2 * s, cy - 12 * s);
-    ctx.lineTo(cx + 2 * s, cy - 12 * s);
-    ctx.lineTo(cx + 3 * s, cy - 4 * s);
-    ctx.stroke();
-
-    // Flask rim
-    ctx.beginPath();
-    ctx.moveTo(cx - 3 * s, cy - 12 * s);
-    ctx.lineTo(cx + 3 * s, cy - 12 * s);
-    ctx.stroke();
-
-    // Liquid level indication (wavy line)
-    ctx.beginPath();
-    ctx.moveTo(cx - 5 * s, cy + 2 * s);
-    ctx.quadraticCurveTo(cx - 2 * s, cy, cx, cy + 2 * s);
-    ctx.quadraticCurveTo(cx + 2 * s, cy + 4 * s, cx + 5 * s, cy + 2 * s);
-    ctx.stroke();
-
     // Question mark above (representing hypothesis)
-    ctx.lineWidth = 1.2 * s;
-    ctx.beginPath();
-    ctx.arc(cx + 8 * s, cy - 10 * s, 3 * s, Math.PI, 0, true);
-    ctx.lineTo(cx + 11 * s, cy - 6 * s);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(cx + 11 * s, cy - 3 * s, 1 * s, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.font = '20px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    const questionMark = '?';
+    const textX = cx;
+    const textY = cy+8;
+    ctx.fillText(questionMark, textX, textY);
 }
 
 function drawProvenIcon(ctx, cx, cy, scale) {
@@ -312,8 +284,8 @@ function drawSabbaticalIcon(ctx, cx, cy, scale) {
     ctx.fill();
 }
 
-function drawPeerReviewIcon(ctx, cx, cy, scale) {
-    // Period spectacles examining a document
+function drawCommunityServiceIcon(ctx, cx, cy, scale) {
+    // Document with spectacles (repurposed from peer review)
     const s = scale;
     ctx.strokeStyle = '#2c3e50';
     ctx.fillStyle = '#2c3e50';
@@ -573,6 +545,13 @@ function renderBoard() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
 
+    // Set canvas to fill entire container
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = containerWidth * dpr;
+    canvas.height = containerHeight * dpr;
+    canvas.style.width = containerWidth + 'px';
+    canvas.style.height = containerHeight + 'px';
+
     // Calculate logical board dimensions
     const baseSpaceSize = 60;
     const basePadding = 20;
@@ -583,162 +562,54 @@ function renderBoard() {
     // Calculate base scale to fit board in container while maintaining aspect ratio
     const scaleX = containerWidth / logicalBoardWidth;
     const scaleY = containerHeight / logicalBoardHeight;
-    const baseScale = Math.min(scaleX, scaleY);
+    const baseScale = Math.min(scaleX, scaleY) * 0.8; // 0.8 to add some margin
 
     // Apply zoom level
     const zoomLevel = GameState.zoom.level;
     const scale = baseScale * zoomLevel;
 
-    // Set canvas dimensions based on zoom
-    const dpr = window.devicePixelRatio || 1;
-    const canvasWidth = Math.max(containerWidth, logicalBoardWidth * scale);
-    const canvasHeight = Math.max(containerHeight, logicalBoardHeight * scale);
-
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
-    canvas.style.width = canvasWidth + 'px';
-    canvas.style.height = canvasHeight + 'px';
+    // Calculate board position (centered or scrolled when zoomed)
+    const boardWidth = logicalBoardWidth * scale;
+    const boardHeight = logicalBoardHeight * scale;
+    let offsetX = (containerWidth - boardWidth) / 2;
+    let offsetY = (containerHeight - boardHeight) / 2;
 
     // Update container class for scroll behavior
     if (zoomLevel > 1) {
         container.classList.add('zoomed');
         canvas.classList.add('zoomed');
+        // When zoomed, expand canvas to accommodate board
+        const expandedWidth = Math.max(containerWidth, boardWidth);
+        const expandedHeight = Math.max(containerHeight, boardHeight);
+        canvas.width = expandedWidth * dpr;
+        canvas.height = expandedHeight * dpr;
+        canvas.style.width = expandedWidth + 'px';
+        canvas.style.height = expandedHeight + 'px';
+        offsetX = Math.max(0, offsetX);
+        offsetY = Math.max(0, offsetY);
     } else {
         container.classList.remove('zoomed');
         canvas.classList.remove('zoomed');
     }
 
-    // Apply scaling (including device pixel ratio)
-    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
-
-    // Store scale for hover detection
+    // Store scale and offset for hover detection
     GameState.boardScale = scale;
     GameState.boardBaseScale = baseScale;
+    GameState.boardOffsetX = offsetX;
+    GameState.boardOffsetY = offsetY;
 
     // Use logical dimensions for drawing
     const spaceSize = baseSpaceSize;
     const padding = basePadding;
 
-    // Clear canvas with aged yellowish paper background
-    ctx.fillStyle = '#f5edd8';
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
+    // === CLEAR CANVAS ===
+    // Canvas is transparent - grid background is now on .two-page-spread CSS
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
 
-    // Add aged paper stains/spots
-    ctx.save();
-    ctx.globalAlpha = 0.08;
-    ctx.fillStyle = '#8B7750';
-    // Coffee stain spots
-    ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.15, logicalBoardHeight * 0.2, 25, 20, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.85, logicalBoardHeight * 0.8, 20, 25, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(logicalBoardWidth * 0.5, logicalBoardHeight * 0.9, 15, 12, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Edge darkening for worn look
-    const edgeGrad = ctx.createLinearGradient(0, 0, logicalBoardWidth, 0);
-    edgeGrad.addColorStop(0, 'rgba(139,119,80,0.15)');
-    edgeGrad.addColorStop(0.05, 'rgba(139,119,80,0)');
-    edgeGrad.addColorStop(0.95, 'rgba(139,119,80,0)');
-    edgeGrad.addColorStop(1, 'rgba(139,119,80,0.15)');
-    ctx.fillStyle = edgeGrad;
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
-
-    const edgeGradV = ctx.createLinearGradient(0, 0, 0, logicalBoardHeight);
-    edgeGradV.addColorStop(0, 'rgba(139,119,80,0.1)');
-    edgeGradV.addColorStop(0.03, 'rgba(139,119,80,0)');
-    edgeGradV.addColorStop(0.97, 'rgba(139,119,80,0)');
-    edgeGradV.addColorStop(1, 'rgba(139,119,80,0.1)');
-    ctx.fillStyle = edgeGradV;
-    ctx.fillRect(0, 0, logicalBoardWidth, logicalBoardHeight);
-
-    // Draw subtle wrinkle lines
-    ctx.globalAlpha = 0.06;
-    ctx.strokeStyle = '#8B7750';
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, logicalBoardHeight * 0.3);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.3, logicalBoardHeight * 0.28, logicalBoardWidth * 0.6, logicalBoardHeight * 0.32);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.8, logicalBoardHeight * 0.35, logicalBoardWidth, logicalBoardHeight * 0.31);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, logicalBoardHeight * 0.7);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.4, logicalBoardHeight * 0.68, logicalBoardWidth * 0.7, logicalBoardHeight * 0.72);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.9, logicalBoardHeight * 0.69, logicalBoardWidth, logicalBoardHeight * 0.71);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(logicalBoardWidth * 0.25, 0);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.23, logicalBoardHeight * 0.4, logicalBoardWidth * 0.27, logicalBoardHeight * 0.7);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.24, logicalBoardHeight * 0.9, logicalBoardWidth * 0.26, logicalBoardHeight);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(logicalBoardWidth * 0.75, 0);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.77, logicalBoardHeight * 0.3, logicalBoardWidth * 0.74, logicalBoardHeight * 0.6);
-    ctx.quadraticCurveTo(logicalBoardWidth * 0.76, logicalBoardHeight * 0.85, logicalBoardWidth * 0.75, logicalBoardHeight);
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw dot grid pattern (slightly faded for aged look)
-    ctx.fillStyle = '#a8a090';
-    const dotSpacing = 15;
-    for (let dotX = dotSpacing; dotX < logicalBoardWidth; dotX += dotSpacing) {
-        for (let dotY = dotSpacing; dotY < logicalBoardHeight; dotY += dotSpacing) {
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, 0.8, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    // Draw formula doodles in margins (seeded by board size for consistency)
-    ctx.font = '10px "Architects Daughter", cursive';
-    ctx.fillStyle = 'rgba(127, 140, 141, 0.3)';
-    const formulaPositions = [
-        { x: 12, y: 25, r: -5 },
-        { x: logicalBoardWidth - 50, y: 20, r: 8 },
-        { x: 8, y: logicalBoardHeight - 15, r: 3 },
-        { x: logicalBoardWidth - 45, y: logicalBoardHeight - 10, r: -4 },
-        { x: 15, y: logicalBoardHeight / 2, r: -90 },
-        { x: logicalBoardWidth - 15, y: logicalBoardHeight / 2 - 30, r: 90 }
-    ];
-    formulaPositions.forEach((pos, i) => {
-        ctx.save();
-        ctx.translate(pos.x, pos.y);
-        ctx.rotate(pos.r * Math.PI / 180);
-        ctx.fillText(MARGIN_FORMULAS[i % MARGIN_FORMULAS.length], 0, 0);
-        ctx.restore();
-    });
-
-    // Draw sketchy hand-drawn border with multiple pencil passes
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // First pass - main border
-    ctx.strokeStyle = 'rgba(127, 140, 141, 0.6)';
-    ctx.lineWidth = 1.5;
-    sketchyLine(ctx, 10, 12, logicalBoardWidth - 12, 10, 1001);
-    sketchyLine(ctx, logicalBoardWidth - 12, 10, logicalBoardWidth - 10, logicalBoardHeight - 12, 1002);
-    sketchyLine(ctx, logicalBoardWidth - 10, logicalBoardHeight - 12, 12, logicalBoardHeight - 10, 1003);
-    sketchyLine(ctx, 12, logicalBoardHeight - 10, 10, 12, 1004);
-
-    // Second pass - offset for pencil texture
-    ctx.strokeStyle = 'rgba(127, 140, 141, 0.3)';
-    ctx.lineWidth = 1;
-    sketchyLine(ctx, 11, 11, logicalBoardWidth - 11, 11, 1011);
-    sketchyLine(ctx, logicalBoardWidth - 11, 11, logicalBoardWidth - 11, logicalBoardHeight - 11, 1012);
-    sketchyLine(ctx, logicalBoardWidth - 11, logicalBoardHeight - 11, 11, logicalBoardHeight - 11, 1013);
-    sketchyLine(ctx, 11, logicalBoardHeight - 11, 11, 11, 1014);
-
-    // Red margin line (like notebook) - with sketchy effect
-    ctx.strokeStyle = 'rgba(229, 115, 115, 0.5)';
-    ctx.lineWidth = 1.5;
-    sketchyLine(ctx, padding - 5, 5, padding - 5, logicalBoardHeight - 5, 2001);
-    // Second pass for pencil texture
-    ctx.strokeStyle = 'rgba(229, 115, 115, 0.2)';
-    ctx.lineWidth = 1;
-    sketchyLine(ctx, padding - 4, 6, padding - 4, logicalBoardHeight - 6, 2002);
+    // === DRAW BOARD (zoomable, centered) ===
+    // Apply transform for board: scale and center
+    ctx.setTransform(scale * dpr, 0, 0, scale * dpr, offsetX * dpr, offsetY * dpr);
 
     // Calculate positions for each space (going clockwise)
     const positions = [];
@@ -907,97 +778,131 @@ function renderBoard() {
         const basePos = animPos || positions[player.position];
         if (!basePos) return;
 
-        const offsetX = (pIndex % 2) * 25 + 8;
-        const offsetY = Math.floor(pIndex / 2) * 20 + 8;
+        // Position pencils above the space, arranged horizontally
+        const offsetX = (pIndex % 2) * 20 + 25;
+        const offsetY = Math.floor(pIndex / 2) * 15 + 25; // Above the space
 
         const drawX = basePos.x + offsetX;
         const drawY = basePos.y + offsetY;
-        const tokenSeed = pIndex * 500 + 1000;
 
-        // Draw shadow when bouncing
+        // Calculate pencil length based on remaining years
+        const maxYears = 50; // Approximate max available years
+        const minLength = 10;
+        const maxLength = 35;
+        const yearsRatio = Math.min(player.availableYears / maxYears, 1);
+        const pencilLength = minLength + (maxLength - minLength) * yearsRatio;
+
+        const pencilWidth = 5;
+        const tipLength = 6;
+        const eraserLength = 4;
+
+        ctx.save();
+
+        // Add small random rotation (1-3 degrees) for natural look
+        const rotationSeed = pIndex * 123 + 456;
+        const magnitude = seededRandom(rotationSeed) * 2 + 1; // 1-3 degrees
+        const direction = seededRandom(rotationSeed + 100) < 0.5 ? -1 : 1; // Random direction
+        const randomRotation = magnitude * direction;
+        const totalRotation = 190 + randomRotation;
+
+        // Translate to the drawing position and rotate
+        ctx.translate(drawX, drawY);
+        ctx.rotate(totalRotation * Math.PI / 180);
+
+        // Draw shadow when bouncing (positioned at tip)
         if (animPos && GameState.animation.bounceHeight > 0) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.beginPath();
-            ctx.ellipse(drawX, basePos.y + offsetY + GameState.animation.bounceHeight * 0.3,
-                       9, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(tipLength / 2, -GameState.animation.bounceHeight * 0.3,
+                       pencilWidth * 0.8, 2, 0, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // Draw sketchy circle token with multiple passes
-        ctx.save();
-
-        // Main fill
-        ctx.fillStyle = player.color;
+        // PENCIL TIP (wooden point) - drawing at origin after rotation
+        ctx.fillStyle = '#d4a574'; // Wood color
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        // Draw slightly wobbly circle
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.2) {
-            const wobble = (seededRandom(tokenSeed + angle * 10) - 0.5) * 1.5;
-            const r = 9 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
+        ctx.moveTo(0, 0); // Tip point at origin
+        ctx.lineTo(-pencilWidth / 2, tipLength);
+        ctx.lineTo(pencilWidth / 2, tipLength);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Graphite core at tip
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.moveTo(0, 1);
+        ctx.lineTo(-1, tipLength - 1);
+        ctx.lineTo(1, tipLength - 1);
         ctx.closePath();
         ctx.fill();
 
-        // Multiple pencil stroke outlines
-        ctx.lineWidth = 1.5;
-        ctx.lineCap = 'round';
-
-        // First outline pass
-        ctx.strokeStyle = 'rgba(44, 62, 80, 0.8)';
+        // PENCIL BODY (colored paint)
+        ctx.fillStyle = player.color;
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.15) {
-            const wobble = (seededRandom(tokenSeed + angle * 10) - 0.5) * 1.2;
-            const r = 9 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
+        ctx.rect(-pencilWidth / 2, tipLength, pencilWidth, pencilLength);
+        ctx.fill();
         ctx.stroke();
 
-        // Second outline pass (offset for texture)
-        ctx.strokeStyle = 'rgba(44, 62, 80, 0.3)';
+        // Pencil body highlight (shiny paint)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.2) {
-            const wobble = (seededRandom(tokenSeed + 50 + angle * 10) - 0.5) * 1;
-            const r = 9.5 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
+        ctx.moveTo(-pencilWidth / 2 + 1, tipLength + 2);
+        ctx.lineTo(-pencilWidth / 2 + 1, tipLength + pencilLength - 2);
         ctx.stroke();
 
-        // Inner pencil highlight scribble
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.lineWidth = 1.5;
+        // Metal ferrule (band holding eraser)
+        const ferruleY = tipLength + pencilLength;
+        ctx.fillStyle = '#c0c0c0'; // Silver
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(drawX - 2, drawY - 2, 3, Math.PI * 0.8, Math.PI * 1.8);
+        ctx.rect(-pencilWidth / 2, ferruleY, pencilWidth, 2);
+        ctx.fill();
         ctx.stroke();
 
-        ctx.restore();
+        // ERASER (pink/red)
+        ctx.fillStyle = '#e67e8e'; // Pink eraser
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(-pencilWidth / 2, ferruleY + 2, pencilWidth, eraserLength);
+        ctx.fill();
+        ctx.stroke();
 
-        // Player number (pixel style)
+        // Eraser highlight
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(-pencilWidth / 2 + 1, ferruleY + 3);
+        ctx.lineTo(-pencilWidth / 2 + 1, ferruleY + 2 + eraserLength - 1);
+        ctx.stroke();
+
+        // Player number on pencil body (rotated back for readability)
+        ctx.save();
+        ctx.translate(0, tipLength + pencilLength / 2);
+        ctx.rotate(-totalRotation * Math.PI / 180); // Counter-rotate the text
         ctx.fillStyle = '#fff';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText((pIndex + 1).toString(), drawX, drawY + 1);
-        ctx.textBaseline = 'alphabetic';
+        ctx.fillText((pIndex + 1).toString(), 0, 0);
+        ctx.restore();
+
+        ctx.restore();
     });
 
     // Draw NPC (Scientific Underdeterminism - pencil-sketch diamond shape)
     const animNpcPos = getAnimatedPosition('npc', null, positions, spaceSize);
     const npcBasePos = animNpcPos || positions[GameState.npc.position];
     if (npcBasePos) {
-        const npcX = npcBasePos.x + spaceSize/2;
-        const npcY = npcBasePos.y + spaceSize/2;
+        const npcX = npcBasePos.x + spaceSize/2 - 10;
+        const npcY = npcBasePos.y + spaceSize/2 + 10;
         const npcSeed = 9999;
 
         // Draw shadow when bouncing

@@ -210,14 +210,14 @@ body {
         linear-gradient(to bottom, rgba(139,119,80,0.06) 0%, transparent 3%, transparent 97%, rgba(139,119,80,0.06) 100%),
         /* Base paper color */
         var(--paper-white);
+    position: relative;
+    padding-left: 60px;
     border: 2px solid var(--paper-shadow);
     border-radius: 3px;
     box-shadow:
         4px 4px 0 var(--paper-shadow),
         8px 8px 15px rgba(0,0,0,0.1),
         inset 0 0 30px rgba(139,119,80,0.05);
-    position: relative;
-    padding-left: 60px;
 }
 
 /* Spiral Binding */
@@ -236,17 +236,13 @@ body {
 .spiral-ring {
     width: 20px;
     height: 20px;
-    border: 3px solid #666;
+    border: none;
     border-radius: 50%;
-    background: linear-gradient(135deg, #888 0%, #aaa 50%, #888 100%);
-    box-shadow:
-        inset 2px 2px 3px rgba(255,255,255,0.3),
-        inset -1px -1px 2px rgba(0,0,0,0.2),
-        2px 2px 3px rgba(0,0,0,0.2);
+    background: radial-gradient(#88806b 50%, #666051 70%, #666051 100%);
 }
 
 /* Red margin line */
-.notebook-page::before {
+.notebook-spread-container::before {
     content: '';
     position: absolute;
     left: 50px;
@@ -255,6 +251,7 @@ body {
     width: 2px;
     background: var(--line-red);
     opacity: 0.6;
+    z-index: 5;
 }
 
 .page-content {
@@ -430,9 +427,14 @@ body {
     transform: rotate(-0.2deg);
 }
 
+.side-sticky.blue {
+    background: linear-gradient(135deg, var(--sticky-blue) 0%, #98c8d8 100%);
+    --note-rotation: -0.3deg;
+}
+
 .side-sticky h3 {
     font-family: var(--font-pixel);
-    font-size: 8px;
+    font-size: 12px;
     color: var(--ink-dark);
     margin-bottom: 12px;
     padding-bottom: 8px;
@@ -632,6 +634,17 @@ body {
 #setup-screen {
     max-width: 650px;
     margin: 0 auto;
+}
+
+#setup-screen::before {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--line-red);
+    opacity: 0.6;
 }
 
 .setup-section {
@@ -862,13 +875,14 @@ select {
 .roll-btn {
     font-size: 12px;
     padding: 14px 28px;
-    background: var(--sticky-orange);
-    border-color: var(--pencil-orange);
-    box-shadow: 4px 4px 0 var(--pencil-orange);
+    background: var(--pencil-aqua);
+    border-color: var(--pencil-blue);
+    box-shadow: 4px 4px 0 var(--pencil-blue);
+
 }
 
 .roll-btn:hover {
-    background: #ffcc80;
+    background: var(--pencil-yellow);
 }
 
 /* ============================================
@@ -907,7 +921,7 @@ select {
 
 .paper-label {
     font-family: var(--font-handwriting);
-    font-size: 15px;
+    font-size: 35px;
     padding: 8px 16px;
     background: var(--sticky-yellow);
     border: 2px solid var(--paper-shadow);
@@ -968,6 +982,9 @@ select {
 
 /* LLM Status Indicator */
 .llm-indicator {
+    position: absolute;
+    right:30px;
+    width: 200px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1015,129 +1032,6 @@ select {
 }
 
 /* ============================================
-   BOARD CONTAINER - NOTEBOOK SPREAD
-   ============================================ */
-
-/* Board wrapper - contains scrollable board and fixed zoom controls */
-#board-wrapper {
-    flex: 1;
-    position: relative;
-    display: flex;
-    min-width: 0;
-    min-height: 0;
-    margin-bottom: 20px;
-}
-
-#board-container {
-    flex: 1;
-    background: var(--paper-white);
-    border: 2px solid var(--paper-shadow);
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: auto;
-    position: relative;
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.03),
-        3px 3px 10px rgba(0,0,0,0.1);
-}
-
-#board-container.zoomed {
-    align-items: flex-start;
-    justify-content: flex-start;
-}
-
-/* Center binding shadow effect */
-.spread-binding {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 20px;
-    transform: translateX(-50%);
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(0,0,0,0.08) 30%,
-        rgba(0,0,0,0.12) 50%,
-        rgba(0,0,0,0.08) 70%,
-        transparent 100%);
-    pointer-events: none;
-    z-index: 5;
-}
-
-#game-board {
-    width: 100%;
-    height: 100%;
-    cursor: grab;
-}
-
-#game-board:active {
-    cursor: grabbing;
-}
-
-#game-board.zoomed {
-    width: auto;
-    height: auto;
-}
-
-/* Zoom Controls */
-#zoom-controls {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(245, 237, 216, 0.95);
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 2px solid var(--paper-shadow);
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
-    z-index: 50;
-    font-family: var(--font-pixel);
-}
-
-.zoom-btn {
-    width: 28px;
-    height: 28px;
-    border: 2px solid var(--ink-dark);
-    border-radius: 4px;
-    background: var(--paper-white);
-    color: var(--ink-dark);
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-.zoom-btn:hover {
-    background: var(--sticky-yellow);
-    transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--paper-shadow);
-}
-
-.zoom-btn:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 var(--paper-shadow);
-}
-
-#zoom-level {
-    font-size: 8px;
-    color: var(--ink-dark);
-    min-width: 40px;
-    text-align: center;
-}
-
-#zoom-reset-btn {
-    font-size: 14px;
-}
-
-/* ============================================
    DRAGGABLE STICKY NOTES
    ============================================ */
 
@@ -1155,22 +1049,6 @@ select {
 
 .draggable-sticky .sticky-header {
     user-select: none;
-}
-
-/* Players panel - initial position top right */
-#players-panel {
-    top: 120px;
-    right: 40px;
-    width: 260px;
-}
-
-/* Theories panel - initial position bottom left */
-#theories-panel {
-    bottom: 40px;
-    left: 40px;
-    width: 240px;
-    max-height: 280px;
-    overflow-y: auto;
 }
 
 /* ============================================
@@ -1194,7 +1072,7 @@ select {
 
 .player-stat .name {
     font-family: var(--font-pixel);
-    font-size: 8px;
+    font-size: 10px;
     margin-bottom: 6px;
     color: var(--ink-dark);
 }
@@ -1203,7 +1081,7 @@ select {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
-    font-size: 12px;
+    font-size: 16px;
     color: var(--ink-light);
 }
 
@@ -1262,16 +1140,11 @@ select {
 }
 
 /* ============================================
-   THEORIES PANEL
+   THEORIES PANEL CONTENT
    ============================================ */
 
-#theories-panel {
-    flex: 1;
-    overflow-y: auto;
-}
-
 #theories-list {
-    font-size: 13px;
+    font-size: 16px;
 }
 
 .theory-item {
@@ -1313,46 +1186,16 @@ select {
 }
 
 /* ============================================
-   ACTION BUTTONS (Dice Roll)
-   ============================================ */
-
-#action-buttons {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 15;
-}
-
-.roll-btn {
-    font-size: 18px;
-    padding: 12px 20px;
-    box-shadow: 3px 3px 0 var(--paper-shadow);
-}
-
-.roll-btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 var(--paper-shadow);
-}
-
-.roll-btn:active {
-    transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 var(--paper-shadow);
-}
-
-/* ============================================
    MINI NOTEPAD (Draggable Game Log)
    ============================================ */
 
 .mini-notepad {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
+    position: absolute;
+    top: 600px;
+    right:250px;
     transform: translateX(-50%);
     width: 450px;
-    max-height: 200px;
+    max-height: 500px;
     background: var(--sticky-yellow);
     border: 3px solid var(--paper-shadow);
     border-radius: 4px;
@@ -1362,7 +1205,7 @@ select {
     z-index: 100;
     display: flex;
     flex-direction: column;
-    transform: translateX(-50%) rotate(-0.5deg);
+    transform: rotate(3deg);
 }
 
 .notepad-header {
@@ -1382,8 +1225,8 @@ select {
 }
 
 .notepad-title {
-    font-family: var(--font-title);
-    font-size: 14px;
+    font-family: var(--font-pixel);
+    font-size: 13px;
     color: var(--ink-dark);
 }
 
@@ -1395,9 +1238,11 @@ select {
 .notepad-content {
     flex: 1;
     padding: 12px 15px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
     font-family: var(--font-handwriting);
-    font-size: 13px;
+    font-size: 18px;
     line-height: 1.6;
     background-image: repeating-linear-gradient(
         transparent,
@@ -1512,7 +1357,7 @@ select {
 
 #modal-body {
     font-family: var(--font-handwriting);
-    font-size: 16px;
+    font-size: 20px;
     margin-bottom: 25px;
     line-height: 1.7;
     color: var(--ink-dark);
@@ -1525,7 +1370,7 @@ select {
 #modal-body .info-text {
     font-family: var(--font-notes);
     color: var(--ink-light);
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 10px;
     font-style: italic;
 }
@@ -1566,7 +1411,7 @@ select {
     display: block;
     font-family: var(--font-notes);
     color: var(--ink-light);
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
 }
 
@@ -1576,6 +1421,8 @@ select {
     gap: 8px;
     max-height: 180px;
     overflow-y: auto;
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
 }
 
 .suggestion-loading {
@@ -1598,7 +1445,7 @@ select {
     border: 2px dashed var(--pencil-blue);
     color: var(--ink-dark);
     padding: 10px 14px;
-    font-size: 14px;
+    font-size: 20px;
     text-align: left;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2298,7 +2145,7 @@ select {
 #game-screen {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px);
+    height: calc(100vh - 100px);
     position: relative;
 }
 
@@ -2310,11 +2157,13 @@ select {
     min-height: 0;
     position: relative;
     background: var(--paper-white);
-    border: 3px solid var(--paper-shadow);
-    border-radius: 8px;
+    border: 2px solid var(--paper-shadow);
+    border-radius: 3px;
     box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.03),
-        5px 5px 20px rgba(0,0,0,0.15);
+        4px 4px 0 var(--paper-shadow),
+        8px 8px 15px rgba(0,0,0,0.1),
+        inset 0 0 30px rgba(139,119,80,0.05);
+    
 }
 
 /* Two-Page Spread Layout */
@@ -2324,6 +2173,11 @@ select {
     gap: 0;
     min-height: 0;
     position: relative;
+    /* Notebook grid pattern background spanning both pages */
+    background-color: #f5edd8;
+    background-image: radial-gradient(circle, #a8a090 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0;
 }
 
 .notebook-page {
@@ -2331,16 +2185,18 @@ select {
     padding: 30px;
     position: relative;
     overflow: hidden;
+    background: transparent; /* Let the grid show through */
 }
 
 .left-page {
-    background: var(--paper-white);
     border-right: none;
+    flex: 2;
 }
 
 .right-page {
-    background: var(--paper-white);
     border-left: none;
+    flex: 1;
+    overflow: visible;
 }
 
 /* Center binding shadow */
@@ -2359,9 +2215,8 @@ select {
 
 /* Right page content layout */
 .right-page-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    position: relative;
+    width: 100%;
     height: 100%;
 }
 
@@ -2370,25 +2225,18 @@ select {
    ============================================ */
 
 #board-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 #board-container {
-    flex: 1;
-    background: var(--paper-aged);
-    border: 2px solid var(--paper-shadow);
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: auto;
+    width: 100%;
+    height: 100%;
     position: relative;
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,0.03),
-        3px 3px 10px rgba(0,0,0,0.1);
+    overflow: auto;
     /* Hide scrollbars */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
@@ -2399,14 +2247,13 @@ select {
 }
 
 #board-container.zoomed {
-    align-items: flex-start;
-    justify-content: flex-start;
+    overflow: auto;
 }
 
 #game-board {
-    width: 100%;
-    height: 100%;
+    display: block;
     cursor: grab;
+    background: transparent; /* Ensure canvas is transparent to show grid underneath */
 }
 
 #game-board:active {
@@ -2414,8 +2261,7 @@ select {
 }
 
 #game-board.zoomed {
-    width: auto;
-    height: auto;
+    cursor: grab;
 }
 
 /* Zoom Controls - Bottom right of left page */
@@ -2478,49 +2324,59 @@ select {
    PANELS ON RIGHT PAGE
    ============================================ */
 
-/* Players panel */
+/* Players panel - draggable */
 #players-panel {
-    flex: 0 0 auto;
-    margin-bottom: 15px;
-}
-
-/* Theories panel */
-#theories-panel {
-    flex: 1 1 auto;
+    position: absolute;
+    top: 10px;
+    left: -140px;
+    width: 300px;
+    max-height: 300px;
     overflow-y: auto;
-    min-height: 0;
-    margin-bottom: 15px;
+    z-index: 31;
+    transform: rotate(-3deg);
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
+
 }
 
-/* Custom scrollbar for theories panel */
-#theories-panel::-webkit-scrollbar {
-    width: 8px;
+#players-panel h3 {
+    cursor: move;
+
 }
 
-#theories-panel::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.05);
-    border-radius: 4px;
+/* Theories panel - draggable */
+#theories-panel {
+    position: absolute;
+    top: 50px;
+    left: 120px;
+    width: 300px;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 30;
+    transform: rotate(3deg);
+    scrollbar-color: grey transparent;
+    scrollbar-width: thin;
 }
 
-#theories-panel::-webkit-scrollbar-thumb {
-    background: var(--paper-shadow);
-    border-radius: 4px;
+#theories-panel h3 {
+    cursor: move;
 }
 
-#theories-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-light);
-}
 
 /* ============================================
    ACTION BUTTONS (Dice Roll) - Bottom of right page
    ============================================ */
 
 #action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 0 0 auto;
-    margin-top: auto;
+    width: 350px;
+    justify-content: right;
+    align-items: right;
+    position: relative;
+    margin: auto 30 auto auto ;
+    z-index: 1000; /* Always on top of draggable panels */
+    bottom: 100px;
+    right: 0px;
+    transform: rotate(-1deg);
 }
 
 .roll-btn {
