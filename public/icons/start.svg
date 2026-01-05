@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Pixodesk SVG (https://pixodesk.com) -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" fill="none" stroke-width="9">
-  <rect fill="#f8f4e8" width="200" height="200"/>
-  <rect fill="none" stroke="#999999" stroke-width="2" x="1" y="1" width="198" height="198"/>
+  <!-- Background removed for transparency -->
   <path fill="none" stroke="#777777" stroke-width="9" d="M123.1076,3.4887C123.1076,10.3905,123.9498,17.4931,122.7674,24.3341C118.0329,51.726,101.5384,75.7634,75.2857,90.5456C69.7109,93.6846,64.3008,97.4338,57.9839,99.3553C47.4187,102.569,35.0721,105.6964,24.0294,106.9148C16.9809,107.6924,9.893,106.9593,2.8719,107.8111"/>
   <path fill="none" stroke="#777777" d="M27.82,140.0982C28.3108,145.0914,30.6396,149.8488,32.1059,154.5977C34.0953,161.0407,35.5827,167.504,38.7538,173.4743"/>
   <path fill="none" stroke="#777777" d="M95.2078,101.9581C102.9563,109.7609,112.1085,115.5567,121.4288,121.2526C124.6715,123.2342,128.0267,126.2492,131.7754,127.0737"/>
