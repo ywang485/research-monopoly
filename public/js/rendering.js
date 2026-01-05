@@ -688,15 +688,15 @@ function renderBoard() {
         } else if (i < perSide * 2) {
             // Right edge (bottom to top)
             x = startX + (perSide - 1) * spaceSize;
-            y = startY - (i - perSide + 1) * spaceSize;
+            y = startY - (i - perSide) * spaceSize;
         } else if (i < perSide * 3) {
             // Top edge (right to left)
-            x = startX + (perSide - 1 - (i - perSide * 2 + 1)) * spaceSize;
+            x = startX + (perSide - 1 - (i - perSide * 2)) * spaceSize;
             y = startY - (perSide - 1) * spaceSize;
         } else {
             // Left edge (top to bottom)
             x = startX;
-            y = startY - (perSide - 1 - (i - perSide * 3 + 1)) * spaceSize;
+            y = startY - (perSide - 1 - (i - perSide * 3)) * spaceSize;
         }
 
         positions.push({ x, y });
