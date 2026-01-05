@@ -1,14 +1,57 @@
-Library
-Temp
-.vs
-.DS_Store
-project.sublime-workspace
-*.booproj
-*.csproj
-*.sln
-*.userprefs
-.tags
-.tags_sorted_by_file
-*.unityproj
-obj
+# filepath: .gitignore
+# Package manager files and dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
+# Build outputs and compiled files
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# Environment configuration files
+.env*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Runtime and temporary files
+*.pid
+*.tmp
+.cache/
+temp/
+
+# Test coverage and reports
+coverage/
+.nyc_output/
+test-results/
+
+# Development tools cache
+.eslintcache
+.parcel-cache/
+.turbo/
+
+# Database files (if using local DB)
+*.sqlite
+*.db
+
+# Uploads and user content
+uploads/
+static/user-content/
+
+# Backup files
+*.backup
+*.bak

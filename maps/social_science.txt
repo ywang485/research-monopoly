@@ -1,0 +1,29 @@
+# Theory Investment Game - Social Science Board
+# Investigate human behavior and society
+#
+# Format: TYPE|NAME|EXTRA_DATA
+
+START|University Campus|0
+HYPOTHESIS|Social Structure|2
+HYPOTHESIS|Cultural Norms|3
+RECRUIT|Sociology Department|0
+HYPOTHESIS|Class Consciousness|4
+GRANT|Ford Foundation|0
+HYPOTHESIS|Social Mobility|3
+CONFERENCE|ASA Annual Meeting|0
+HYPOTHESIS|Symbolic Interaction|4
+SCANDAL|Zimbardo Ethics|0
+HYPOTHESIS|Role Theory|3
+SABBATICAL|Field Research|0
+HYPOTHESIS|Social Capital|4
+COLLABORATION|Research Network|0
+HYPOTHESIS|Collective Behavior|3
+PEER_REVIEW|American Sociological Review|0
+HYPOTHESIS|Institutional Theory|5
+EUREKA|Paradigm Shift|0
+HYPOTHESIS|Network Theory|4
+GRANT|NSF Social Science|0
+HYPOTHESIS|Rational Choice|3
+RECRUIT|Research Assistants|0
+HYPOTHESIS|Constructivism|4
+CONFERENCE|Global Sociology Forum|0

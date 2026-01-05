@@ -1,0 +1,36 @@
+# Theory Investment Game - Philosophy of Science Board
+# A thematic board exploring the philosophy of scientific discovery
+#
+# Format: TYPE|NAME|EXTRA_DATA
+# Types: START, HYPOTHESIS, RECRUIT, CONFERENCE, SABBATICAL,
+#        PEER_REVIEW, GRANT, SCANDAL, COLLABORATION, EUREKA
+# EXTRA_DATA for HYPOTHESIS: investment cost in years
+
+START|The Academy|0
+HYPOTHESIS|Observation Thesis|2
+HYPOTHESIS|Falsifiability Claim|3
+CONFERENCE|Vienna Circle Meeting|0
+HYPOTHESIS|Verification Principle|4
+RECRUIT|Philosophy Department|0
+HYPOTHESIS|Theory-Laden Observation|3
+GRANT|National Science Foundation|0
+HYPOTHESIS|Paradigm Structure|5
+SCANDAL|Replication Crisis|0
+HYPOTHESIS|Normal Science Claim|3
+SABBATICAL|Research Sabbatical|0
+HYPOTHESIS|Revolutionary Science|4
+COLLABORATION|Interdisciplinary Center|0
+HYPOTHESIS|Incommensurability|3
+PEER_REVIEW|Journal of Philosophy|0
+HYPOTHESIS|Research Programme|4
+EUREKA|Epistemological Breakthrough|0
+HYPOTHESIS|Underdetermination|5
+GRANT|Private Foundation|0
+HYPOTHESIS|Social Construction|3
+RECRUIT|Graduate School|0
+HYPOTHESIS|Scientific Realism|4
+CONFERENCE|International Congress|0
+HYPOTHESIS|Instrumentalism|3
+SCANDAL|Priority Dispute|0
+HYPOTHESIS|Epistemic Values|4
+SABBATICAL|Visiting Scholar|0
