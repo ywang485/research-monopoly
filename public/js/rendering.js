@@ -98,63 +98,19 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
 }
 
 function drawStartIcon(ctx, cx, cy, scale) {
-    // TEMPORARY DEBUG: Draw obvious test pattern to verify drawing location
-    console.log('🎨 drawStartIcon called with cx:', cx, 'cy:', cy, 'scale:', scale);
-
-    // Draw a HUGE bright magenta circle at the center point
-    ctx.fillStyle = 'magenta';
-    ctx.beginPath();
-    ctx.arc(cx, cy, 30 * scale, 0, Math.PI * 2);
-    ctx.fill();
-    console.log('✅ Drew magenta circle at center:', cx, cy);
-
-    // Draw a bright cyan square
-    const iconSize = 56 * scale;
-    const x = cx - iconSize / 2;
-    const y = cy - iconSize / 2;
-    ctx.fillStyle = 'cyan';
-    ctx.fillRect(x, y, iconSize, iconSize);
-    console.log('✅ Drew cyan square at:', x, y, iconSize);
-
-    // Draw bright yellow border
-    ctx.strokeStyle = 'yellow';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(x, y, iconSize, iconSize);
-    console.log('✅ Drew yellow border');
-
-    return; // Skip icon drawing for now
-
     // Use custom SVG icon if loaded, otherwise fall back to procedural drawing
     if (IconImages.start) {
-        const iconSize = 56 * scale; // Slightly smaller than space size for padding
+        const iconSize = 56 * scale;
         const x = cx - iconSize / 2;
         const y = cy - iconSize / 2;
 
-        // Debug: Log drawing parameters once
-        if (!window._startIconDebugLogged) {
-            console.log('✓ Drawing custom START icon with params:', {
-                image: IconImages.start,
-                imageWidth: IconImages.start.width,
-                imageHeight: IconImages.start.height,
-                x, y, iconSize, scale,
-                canvasCoords: { cx, cy }
-            });
-            window._startIconDebugLogged = true;
-        }
+        console.log('🎨 Attempting to draw START icon with drawImage at:', x, y, iconSize);
 
         try {
-            console.log('🎨 CALLING ctx.drawImage NOW with:', { x, y, iconSize });
             ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
-            console.log('✅ ctx.drawImage completed successfully!');
-
-            // Draw a bright green border around where we drew the icon (for debugging)
-            ctx.strokeStyle = 'lime';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(x, y, iconSize, iconSize);
-            console.log('✅ Drew debug green border at:', { x, y, iconSize });
+            console.log('✅ drawImage call completed (but may not be visible)');
         } catch (e) {
             console.error('❌ FAILED to draw START icon:', e);
-            // Fall back to procedural drawing
             drawStartIconFallback(ctx, cx, cy, scale);
         }
     } else {
@@ -863,6 +819,35 @@ function renderBoard() {
 
         // Draw space type icon (hand-drawn style) - grey for non-hypothesis
         drawSpaceIcon(ctx, space.type, pos.x, pos.y, spaceSize - 2, space.isProven);
+
+        // DEBUG: For START space, draw obvious shapes ON TOP of everything
+        if (space.type === SPACE_TYPES.START) {
+            const centerX = pos.x + (spaceSize - 2) / 2;
+            const centerY = pos.y + (spaceSize - 2) / 2;
+            const scale = (spaceSize - 2) / 60;
+            const iconSize = 56 * scale;
+            const sx = centerX - iconSize / 2;
+            const sy = centerY - iconSize / 2;
+
+            console.log('🔥 DRAWING DEBUG SHAPES ON TOP - START space at:', pos.x, pos.y);
+
+            // Magenta circle
+            ctx.fillStyle = 'magenta';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30 * scale, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cyan square
+            ctx.fillStyle = 'cyan';
+            ctx.fillRect(sx, sy, iconSize, iconSize);
+
+            // Yellow border
+            ctx.strokeStyle = 'yellow';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(sx, sy, iconSize, iconSize);
+
+            console.log('✅ Drew debug shapes at:', centerX, centerY, sx, sy);
+        }
 
         // Draw investment cost for hypothesis (pixel font with hand-drawn underline)
         if (isHypothesis && space.investmentCost > 0) {
