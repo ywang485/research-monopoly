@@ -100,14 +100,36 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
 function drawStartIcon(ctx, cx, cy, scale) {
     // Use custom SVG icon if loaded, otherwise fall back to procedural drawing
     if (IconImages.start) {
-        console.log('✓ Using custom START icon!', IconImages.start);
         const iconSize = 56 * scale; // Slightly smaller than space size for padding
         const x = cx - iconSize / 2;
         const y = cy - iconSize / 2;
-        ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
+
+        // Debug: Log drawing parameters once
+        if (!window._startIconDebugLogged) {
+            console.log('✓ Drawing custom START icon with params:', {
+                image: IconImages.start,
+                imageWidth: IconImages.start.width,
+                imageHeight: IconImages.start.height,
+                x, y, iconSize, scale,
+                canvasCoords: { cx, cy }
+            });
+            window._startIconDebugLogged = true;
+        }
+
+        try {
+            ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
+        } catch (e) {
+            console.error('Failed to draw START icon:', e);
+            // Fall back to procedural drawing
+            drawStartIconFallback(ctx, cx, cy, scale);
+        }
     } else {
         console.log('⚠️ IconImages.start is not loaded, using fallback drawing');
-        console.log('⚠️ IconImages object:', IconImages);
+        drawStartIconFallback(ctx, cx, cy, scale);
+    }
+}
+
+function drawStartIconFallback(ctx, cx, cy, scale) {
         // Fallback: Quill pen and inkwell - classical scientific beginning
         const s = scale;
         ctx.strokeStyle = '#2c3e50';
@@ -144,7 +166,6 @@ function drawStartIcon(ctx, cx, cy, scale) {
         ctx.quadraticCurveTo(cx + 14 * s, cy - 10 * s, cx + 10 * s, cy - 8 * s);
         ctx.quadraticCurveTo(cx + 14 * s, cy - 12 * s, cx + 12 * s, cy - 14 * s);
         ctx.fill();
-    }
 }
 
 function drawHypothesisIcon(ctx, cx, cy, scale) {
