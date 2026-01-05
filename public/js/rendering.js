@@ -117,9 +117,17 @@ function drawStartIcon(ctx, cx, cy, scale) {
         }
 
         try {
+            console.log('🎨 CALLING ctx.drawImage NOW with:', { x, y, iconSize });
             ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
+            console.log('✅ ctx.drawImage completed successfully!');
+
+            // Draw a bright green border around where we drew the icon (for debugging)
+            ctx.strokeStyle = 'lime';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y, iconSize, iconSize);
+            console.log('✅ Drew debug green border at:', { x, y, iconSize });
         } catch (e) {
-            console.error('Failed to draw START icon:', e);
+            console.error('❌ FAILED to draw START icon:', e);
             // Fall back to procedural drawing
             drawStartIconFallback(ctx, cx, cy, scale);
         }
