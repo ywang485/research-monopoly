@@ -103,7 +103,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Make a breakthrough discovery and gain 5 fame points.'
 };
 
-const MAX_AGE = 90;
+const MAX_AGE = 80;
 const STARTING_AGE = 30;
 
 // ============================================

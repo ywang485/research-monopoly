@@ -61,6 +61,16 @@ export default function GameplayScreen() {
                   <div id="player-stats"></div>
                 </div>
 
+                {/* Draggable mini notepad for game log */}
+                <div id="game-log-container" className="mini-notepad">
+                  <div className="notepad-header">
+                    <span className="notepad-title">Game Log</span>
+                    <div className="notepad-clip">📎</div>
+                  </div>
+                  <div id="game-log" className="notepad-content"></div>
+                </div>
+              </div>
+
 
                 {/* Dice button */}
                 <div id="action-buttons">
@@ -76,16 +86,6 @@ export default function GameplayScreen() {
           <span className="npc-icon">🎲</span>
           <span id="npc-position">Position: Start</span>
         </div>
-
-        {/* Draggable mini notepad for game log */}
-        <div id="game-log-container" className="mini-notepad">
-          <div className="notepad-header">
-            <span className="notepad-title">Game Log</span>
-            <div className="notepad-clip">📎</div>
-          </div>
-          <div id="game-log" className="notepad-content"></div>
-        </div>
-      </div>
 
       {/* Modal for actions */}
       <div id="modal" className="modal" style={{ display: 'none' }}>

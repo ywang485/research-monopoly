@@ -236,13 +236,9 @@ body {
 .spiral-ring {
     width: 20px;
     height: 20px;
-    border: 3px solid #666;
+    border: none;
     border-radius: 50%;
-    background: linear-gradient(135deg, #888 0%, #aaa 50%, #888 100%);
-    box-shadow:
-        inset 2px 2px 3px rgba(255,255,255,0.3),
-        inset -1px -1px 2px rgba(0,0,0,0.2),
-        2px 2px 3px rgba(0,0,0,0.2);
+    background: radial-gradient(#88806b 50%, #666051 70%, #666051 100%);
 }
 
 /* Red margin line */
@@ -882,6 +878,7 @@ select {
     background: var(--pencil-aqua);
     border-color: var(--pencil-blue);
     box-shadow: 4px 4px 0 var(--pencil-blue);
+
 }
 
 .roll-btn:hover {
@@ -1332,7 +1329,7 @@ select {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    z-index: 15;
+    z-index: 50;
 }
 
 .roll-btn {
