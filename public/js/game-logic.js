@@ -279,6 +279,24 @@ function handleStartSpace(player) {
 }
 
 function handleConferenceSpace(player) {
+    // Check if player has any publications
+    if (player.theoriesPublished.length === 0) {
+        showModal(
+            'Academic Conference',
+            `
+            <p>You showed up to the conference, but realized you have nothing to present.</p>
+            <p class="info-text">Awkwardly attended other people's talks and ate free cookies instead.</p>
+            <p>No fame gained (you need at least one publication to present!).</p>
+            `,
+            [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
+        );
+        return;
+    }
+
+    // Randomly select one of player's published hypotheses
+    const randomIndex = Math.floor(Math.random() * player.theoriesPublished.length);
+    const selectedHypothesis = player.theoriesPublished[randomIndex];
+
     const fameGain = rollDice() + 2;
     player.addFame(fameGain);
 
@@ -289,7 +307,7 @@ function handleConferenceSpace(player) {
             <span class="dice">🎲</span>
             <div class="dice-result">+${fameGain} Fame!</div>
         </div>
-        <p>You traveled across the country to present a 15-minute talk in a windowless room to 6 people (3 were asleep).</p>
+        <p>You traveled across the country to present your groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
         <p class="info-text">At least the hotel breakfast was mediocre!</p>
         `,
         [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
