@@ -9,7 +9,6 @@ const IconImages = {
 
 // Preload icon images
 function loadIconImages() {
-    console.log('🎨 Starting to load icon images...');
     return new Promise((resolve) => {
         const imagesToLoad = [
             { key: 'start', src: '/icons/start.svg' }
@@ -28,15 +27,12 @@ function loadIconImages() {
             img.onload = () => {
                 IconImages[key] = img;
                 loadedCount++;
-                console.log(`✓ Loaded icon: ${key} from ${src}`, img);
-                console.log(`📊 IconImages.start is now:`, IconImages.start);
                 if (loadedCount === totalImages) {
-                    console.log('✓ All icons loaded successfully!');
                     resolve();
                 }
             };
             img.onerror = () => {
-                console.warn(`✗ Failed to load icon: ${src}`);
+                console.warn(`Failed to load icon: ${src}`);
                 loadedCount++;
                 if (loadedCount === totalImages) {
                     resolve();
@@ -104,23 +100,18 @@ function drawStartIcon(ctx, cx, cy, scale) {
         const x = cx - iconSize / 2;
         const y = cy - iconSize / 2;
 
-        console.log('🎨 Attempting to draw START icon with drawImage at:', x, y, iconSize);
-
         try {
             ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
-            console.log('✅ drawImage call completed (but may not be visible)');
         } catch (e) {
-            console.error('❌ FAILED to draw START icon:', e);
+            console.error('Failed to draw START icon:', e);
             drawStartIconFallback(ctx, cx, cy, scale);
         }
     } else {
-        console.log('⚠️ IconImages.start is not loaded, using fallback drawing');
         drawStartIconFallback(ctx, cx, cy, scale);
     }
 }
 
 function drawStartIconFallback(ctx, cx, cy, scale) {
-        console.warn('⚠️ FALLBACK DRAWING CALLED! This should not happen if icon loaded correctly');
         // Fallback: Quill pen and inkwell - classical scientific beginning
         const s = scale;
         ctx.strokeStyle = '#2c3e50';
@@ -819,35 +810,6 @@ function renderBoard() {
 
         // Draw space type icon (hand-drawn style) - grey for non-hypothesis
         drawSpaceIcon(ctx, space.type, pos.x, pos.y, spaceSize - 2, space.isProven);
-
-        // DEBUG: For START space, draw obvious shapes ON TOP of everything
-        if (space.type === SPACE_TYPES.START) {
-            const centerX = pos.x + (spaceSize - 2) / 2;
-            const centerY = pos.y + (spaceSize - 2) / 2;
-            const scale = (spaceSize - 2) / 60;
-            const iconSize = 56 * scale;
-            const sx = centerX - iconSize / 2;
-            const sy = centerY - iconSize / 2;
-
-            console.log('🔥 DRAWING DEBUG SHAPES ON TOP - START space at:', pos.x, pos.y);
-
-            // Magenta circle
-            ctx.fillStyle = 'magenta';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 30 * scale, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Cyan square
-            ctx.fillStyle = 'cyan';
-            ctx.fillRect(sx, sy, iconSize, iconSize);
-
-            // Yellow border
-            ctx.strokeStyle = 'yellow';
-            ctx.lineWidth = 8;
-            ctx.strokeRect(sx, sy, iconSize, iconSize);
-
-            console.log('✅ Drew debug shapes at:', centerX, centerY, sx, sy);
-        }
 
         // Draw investment cost for hypothesis (pixel font with hand-drawn underline)
         if (isHypothesis && space.investmentCost > 0) {
