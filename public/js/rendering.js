@@ -798,9 +798,16 @@ function renderBoard() {
 
         ctx.save();
 
-        // Translate to the drawing position and rotate 185 degrees
+        // Add small random rotation (1-3 degrees) for natural look
+        const rotationSeed = pIndex * 123 + 456;
+        const magnitude = seededRandom(rotationSeed) * 2 + 1; // 1-3 degrees
+        const direction = seededRandom(rotationSeed + 100) < 0.5 ? -1 : 1; // Random direction
+        const randomRotation = magnitude * direction;
+        const totalRotation = 190 + randomRotation;
+
+        // Translate to the drawing position and rotate
         ctx.translate(drawX, drawY);
-        ctx.rotate(190 * Math.PI / 180);
+        ctx.rotate(totalRotation * Math.PI / 180);
 
         // Draw shadow when bouncing (positioned at tip)
         if (animPos && GameState.animation.bounceHeight > 0) {
@@ -879,7 +886,7 @@ function renderBoard() {
         // Player number on pencil body (rotated back for readability)
         ctx.save();
         ctx.translate(0, tipLength + pencilLength / 2);
-        ctx.rotate(-185 * Math.PI / 180); // Counter-rotate the text
+        ctx.rotate(-totalRotation * Math.PI / 180); // Counter-rotate the text
         ctx.fillStyle = '#fff';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
