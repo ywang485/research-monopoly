@@ -9,6 +9,7 @@ const IconImages = {
 
 // Preload icon images
 function loadIconImages() {
+    console.log('🎨 Starting to load icon images...');
     return new Promise((resolve) => {
         const imagesToLoad = [
             { key: 'start', src: '/icons/start.svg' }
@@ -27,12 +28,15 @@ function loadIconImages() {
             img.onload = () => {
                 IconImages[key] = img;
                 loadedCount++;
+                console.log(`✓ Loaded icon: ${key} from ${src}`, img);
+                console.log(`📊 IconImages.start is now:`, IconImages.start);
                 if (loadedCount === totalImages) {
+                    console.log('✓ All icons loaded successfully!');
                     resolve();
                 }
             };
             img.onerror = () => {
-                console.warn(`Failed to load icon: ${src}`);
+                console.warn(`✗ Failed to load icon: ${src}`);
                 loadedCount++;
                 if (loadedCount === totalImages) {
                     resolve();
@@ -96,11 +100,14 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
 function drawStartIcon(ctx, cx, cy, scale) {
     // Use custom SVG icon if loaded, otherwise fall back to procedural drawing
     if (IconImages.start) {
+        console.log('✓ Using custom START icon!', IconImages.start);
         const iconSize = 56 * scale; // Slightly smaller than space size for padding
         const x = cx - iconSize / 2;
         const y = cy - iconSize / 2;
         ctx.drawImage(IconImages.start, x, y, iconSize, iconSize);
     } else {
+        console.log('⚠️ IconImages.start is not loaded, using fallback drawing');
+        console.log('⚠️ IconImages object:', IconImages);
         // Fallback: Quill pen and inkwell - classical scientific beginning
         const s = scale;
         ctx.strokeStyle = '#2c3e50';
