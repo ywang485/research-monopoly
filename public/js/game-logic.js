@@ -442,8 +442,8 @@ function handleSpaceLanding(player, space) {
         case SPACE_TYPES.SABBATICAL:
             handleSabbaticalSpace(player);
             break;
-        case SPACE_TYPES.PEER_REVIEW:
-            handlePeerReviewSpace(player);
+        case SPACE_TYPES.COMMUNITY_SERVICE:
+            handleCommunityServiceSpace(player);
             break;
         case SPACE_TYPES.GRANT:
             handleGrantSpace(player);
@@ -640,46 +640,73 @@ function handleRecruitSpace(player) {
     }, 100);
 }
 
-async function handlePeerReviewSpace(player) {
-    if (player.theoriesPublished.length > 0) {
-        const bonus = rollDice();
-        player.addFame(bonus);
+function handleCommunityServiceSpace(player) {
+    const serviceCost = 3; // Years of life spent on community service
 
-        // Pick a random published theory to review
-        const randomTheory = player.theoriesPublished[
-            Math.floor(Math.random() * player.theoriesPublished.length)
-        ];
+    if (player.students.length > 0) {
+        // Player has students - offer choice to sacrifice one
+        const studentType = player.students[0];
+        const studentName = STUDENT_TYPES[studentType].name;
 
-        // Try to get LLM-generated review
-        const review = await fetchPeerReview(randomTheory);
-
-        if (review) {
-            showModal(
-                'Peer Review',
-                `
-                <p><strong>Reviewer #2 has entered the chat:</strong></p>
-                <p class="peer-review-text">"${review}"</p>
-                <p class="info-text" style="margin-top: 15px;">You somehow survived their passive aggression. +${bonus} fame for emotional resilience</p>
-                `,
-                [{ text: 'Deep breaths', action: () => { updatePlayerStats(); endTurn(); } }]
-            );
-        } else {
-            showModal(
-                'Peer Review',
-                `
-                <p>Miracle of miracles: Reviewer #2 was actually constructive!</p>
-                <p>+${bonus} fame for dodging that bullet</p>
-                <p class="info-text">This never happens.</p>
-                `,
-                [{ text: 'Suspicious', action: () => { updatePlayerStats(); endTurn(); } }]
-            );
-        }
-    } else {
         showModal(
-            'Peer Review',
-            `<p>Can't get peer reviewed if you haven't published anything.</p>
-            <p class="info-text">*taps forehead*</p>`,
-            [{ text: 'Fair', action: () => endTurn() }]
+            'Community Service',
+            `
+            <p>Oh no! You've been assigned mandatory community service work.</p>
+            <p>This will cost you <strong>${serviceCost} years</strong> of your precious research time.</p>
+            <p class="info-text">BUT WAIT... you have a ${studentName} who could take your place!</p>
+            <p>What will you do?</p>
+            `,
+            [
+                {
+                    text: `Sacrifice ${studentName} 😈`,
+                    action: () => {
+                        // Remove the first student
+                        const sacrificedStudent = player.students.shift();
+                        const sacrificedName = STUDENT_TYPES[sacrificedStudent].name;
+
+                        log(`${player.name} sacrificed their ${sacrificedName} to avoid community service!`, 'important');
+
+                        showModal(
+                            'Student Sacrificed',
+                            `
+                            <p>You threw your ${sacrificedName} under the bus!</p>
+                            <p>They're now spending their days picking up litter instead of doing research.</p>
+                            <p class="info-text">Academia: where we build character by crushing dreams!</p>
+                            `,
+                            [{ text: 'No regrets', action: () => { updatePlayerStats(); endTurn(); } }]
+                        );
+                    }
+                },
+                {
+                    text: 'Do it myself 😔',
+                    action: () => {
+                        player.age += serviceCost;
+
+                        showModal(
+                            'Community Service',
+                            `
+                            <p>You nobly chose to do the community service yourself.</p>
+                            <p>+${serviceCost} years of aging from mindless bureaucratic tasks.</p>
+                            <p class="info-text">Your student is grateful... for now.</p>
+                            `,
+                            [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
+                        );
+                    }
+                }
+            ]
+        );
+    } else {
+        // No students - forced to do community service
+        player.age += serviceCost;
+
+        showModal(
+            'Community Service',
+            `
+            <p>You've been assigned mandatory community service work!</p>
+            <p>+${serviceCost} years of aging from filling out forms and attending sensitivity training.</p>
+            <p class="info-text">If only you had a grad student to dump this on...</p>
+            `,
+            [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
         );
     }
 }

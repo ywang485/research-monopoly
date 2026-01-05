@@ -30,8 +30,8 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
         case SPACE_TYPES.SABBATICAL:
             drawSabbaticalIcon(ctx, centerX, centerY, scale);
             break;
-        case SPACE_TYPES.PEER_REVIEW:
-            drawPeerReviewIcon(ctx, centerX, centerY, scale);
+        case SPACE_TYPES.COMMUNITY_SERVICE:
+            drawCommunityServiceIcon(ctx, centerX, centerY, scale);
             break;
         case SPACE_TYPES.GRANT:
             drawGrantIcon(ctx, centerX, centerY, scale);
@@ -284,8 +284,8 @@ function drawSabbaticalIcon(ctx, cx, cy, scale) {
     ctx.fill();
 }
 
-function drawPeerReviewIcon(ctx, cx, cy, scale) {
-    // Period spectacles examining a document
+function drawCommunityServiceIcon(ctx, cx, cy, scale) {
+    // Document with spectacles (repurposed from peer review)
     const s = scale;
     ctx.strokeStyle = '#2c3e50';
     ctx.fillStyle = '#2c3e50';

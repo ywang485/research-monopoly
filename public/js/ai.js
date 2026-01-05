@@ -393,8 +393,8 @@ function handleAISpaceLanding(player, space) {
             case SPACE_TYPES.SABBATICAL:
                 handleSabbaticalSpace(player);
                 break;
-            case SPACE_TYPES.PEER_REVIEW:
-                handlePeerReviewSpace(player);
+            case SPACE_TYPES.COMMUNITY_SERVICE:
+                handleCommunityServiceSpace(player);
                 break;
             case SPACE_TYPES.GRANT:
                 handleGrantSpace(player);
