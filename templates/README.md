@@ -1,63 +1,79 @@
-# Research Monopoly - Game Board Space Icon Templates
+# Research Monopoly - Game Space Icon Templates
 
-This folder contains SVG templates for creating custom icons for the special game board spaces.
+This folder contains templates for creating custom icons for the game board spaces.
 
-## Space Types
+## About the Game
 
-### 1. Bargain Grid (160x160 px)
-- **Purpose**: Evil Bargain Shop where players can make special deals
-- **Player Access**: Human players only
-- **File**: `1-BargainGrid-template.svg`
+This is a **web-based** research monopoly game that uses **HTML Canvas** to draw the game board. Currently, all icons are drawn procedurally using canvas drawing commands.
 
-### 2. Publication Grid (160x160 px)
-- **Purpose**: Publishing venue for submitting unpublished research findings
-- **Player Access**: All players
-- **File**: `2-PublicationGrid-template.svg`
+## Space Types (Excluding Hypothesis)
 
-### 3. Random Event Grid (160x160 px)
-- **Purpose**: Triggers random events during gameplay
-- **Player Access**: All players except AI "Experiments" players
-- **File**: `3-RandomEventGrid-template.svg`
+Based on the code in `public/js/rendering.js` and `public/js/constants.js`:
 
-### 4. Recruitment Grid (240x240 px)
-- **Purpose**: PhD student recruitment station
-- **Player Access**: Human players only
-- **File**: `4-RecruitmentGrid-template.svg`
-- **Note**: This icon is **50% larger** (1.5x) than the other space icons
+1. **START** - Academic Career Begins
+   - Current icon: Quill pen and inkwell
+   - Effect: Passing gives +2 fame (rejuvenates by 2 years in messages)
 
-## How to Use These Templates
+2. **RECRUIT** - Graduate School / Faculty Hiring
+   - Current icon: Scholar with scroll and wig
+   - Effect: Hire students (undergraduate, master, PhD) for fame points
 
-1. **Open the SVG files** in your preferred graphics editor (Inkscape, Adobe Illustrator, Figma, etc.)
-2. **Draw your icon design** within the blue dashed box area
-3. **Keep your design centered** using the crosshair guides
-4. **Export as PNG** with the same dimensions (160x160 or 240x240)
-5. **Name your exported files**:
-   - `BargainGrid-icon.png`
-   - `PublicationGrid-icon.png`
-   - `RandomEventGrid-icon.png`
-   - `RecruitmentGrid-icon.png`
+3. **CONFERENCE** - Academic Conference
+   - Current icon: Lectern with open book
+   - Effect: Present work and gain recognition (+3 fame base)
 
-## Design Guidelines
+4. **SABBATICAL** - Research Leave
+   - Current icon: Stack of books with candle
+   - Effect: Rejuvenate by 2 years (rest and contemplation)
 
-- **Simple and clear**: Icons should be recognizable at small sizes
-- **Stay within the guide area**: The blue dashed box shows the safe drawing area
-- **Use the center guides**: The crosshairs help you center your design
-- **Consider the theme**: This is a research/academic themed monopoly game
-- **Transparent backgrounds**: Export with transparency (alpha channel)
+5. **COMMUNITY_SERVICE** - Community Service
+   - Current icon: Document with spectacles
+   - Effect: Lose years to service work (or sacrifice a student)
 
-## Upload Location
+6. **GRANT** - Research Grant / Major Funding
+   - Current icon: Royal coin purse with coins
+   - Effect: Receive funding and gain 2 fame
 
-Once you've created your icons, upload them to:
-```
-/Assets/Resources/Sprites/
-```
+7. **SCANDAL** - Academic Scandal
+   - Current icon: Broken quill and spilled ink
+   - Effect: Lose fame points due to academic misconduct
 
-The integration will replace sprites in the existing `MapGrid-SpecialGrid.png` sprite sheet.
+8. **COLLABORATION** - Research Network
+   - Current icon: Two hands shaking with period sleeve cuffs
+   - Effect: Team up with colleague, gain fame and rejuvenate
 
-## Technical Details
+9. **EUREKA** - Breakthrough Moment
+   - Current icon: Newton's apple with enlightenment rays
+   - Effect: Claim nearest uninvested hypothesis FOR FREE!
 
-- **Standard icon size**: 0.16 x 0.16 Unity units (rendered at 1.6 x 1.6)
-- **Recruitment icon size**: 0.24 x 0.24 Unity units (rendered at 2.4 x 2.4)
-- **Scaling**: 10x transform scale applied in-game
-- **Format**: PNG with transparency
-- **Color**: Full color support, white default tint applied in-game
+## Current Implementation
+
+The game currently draws all icons **procedurally** using JavaScript canvas drawing functions. Each icon is rendered at:
+- **Base size**: 60x60 pixels
+- **Drawing area**: Centered within the space, typically using ±20px from center
+- **Style**: Hand-drawn, sketchy, classical/period scientific aesthetic
+
+## Template Format
+
+I've created **200x200 pixel PNG templates** for each space type:
+- Higher resolution for easier drawing
+- Will need to be loaded as images in the game code
+- Clear center guidelines
+- Space type labeled
+
+## How to Use
+
+1. **Draw your icons** on the template images using your preferred image editor
+2. **Save as PNG** with transparency
+3. **Upload** the completed icons back to the repository
+4. **Integration**: The code in `public/js/rendering.js` will need to be updated to:
+   - Load images instead of using procedural drawing functions
+   - Apply the images to each space type
+
+## Technical Notes
+
+- Game board is rendered on an HTML Canvas element
+- Current icons use a sketchy, hand-drawn style with pencil aesthetics
+- The notebook/academic theme should be preserved in custom icons
+- Icons should be recognizable at small sizes (60px)
+- Consider transparent backgrounds for better integration
