@@ -100,7 +100,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
     [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
-    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Make a breakthrough discovery and gain 5 fame points.'
+    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).'
 };
 
 const MAX_AGE = 80;

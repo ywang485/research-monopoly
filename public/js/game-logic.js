@@ -399,24 +399,104 @@ function handleCollaborationSpace(player) {
     }
 }
 
-function handleEurekaSpace(player) {
+async function handleEurekaSpace(player) {
     playSound('eureka');
-    const bonusYears = 3;
-    const bonusFame = 5;
-    player.rejuvenate(bonusYears);
-    player.addFame(bonusFame);
 
+    // Find the closest uninvested hypothesis space
+    const boardSize = GameState.board.length;
+    let closestSpace = null;
+    let closestDistance = boardSize;
+
+    for (let i = 1; i < boardSize; i++) {
+        const checkIndex = (player.position + i) % boardSize;
+        const space = GameState.board[checkIndex];
+
+        if (space.type === SPACE_TYPES.HYPOTHESIS && !space.hypothesis) {
+            closestSpace = space;
+            closestDistance = i;
+            break;
+        }
+    }
+
+    if (!closestSpace) {
+        // No uninvested hypothesis spaces available
+        showModal(
+            'EUREKA! 💡',
+            `
+            <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
+            <p>You had a brilliant idea about ${GameState.entity.name}!</p>
+            <p class="info-text">But... every hypothesis space is already claimed. Your genius goes to waste.</p>
+            <p style="color: #888; font-size: 11px;">Should've thought of this sooner!</p>
+            `,
+            [{ text: 'Tragic', action: () => { updatePlayerStats(); endTurn(); } }]
+        );
+        return;
+    }
+
+    // Show modal to claim the closest hypothesis for free
     showModal(
         'EUREKA! 💡',
         `
         <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
-        <p>You figured out something important about ${GameState.entity.name} (probably)!</p>
-        <p>The dopamine rush feels like -${bonusYears} years of aging!</p>
-        <p>+${bonusFame} fame (assuming you can actually prove it later)</p>
-        <p class="info-text">Quick, write it down before you forget!</p>
+        <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit you!</p>
+        <p>You can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
+        <div class="suggestions-container">
+            <label>AI-generated hypotheses (because originality is hard):</label>
+            <div id="hypothesis-suggestions" class="hypothesis-suggestions">
+                <div class="suggestion-loading">Generating suggestions...</div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Or formulate your eureka moment:</label>
+            <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
+        </div>
+        <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
         `,
-        [{ text: 'Genius!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [
+            {
+                text: 'Claim it!',
+                action: () => {
+                    const hypothesis = document.getElementById('hypothesis-input').value.trim();
+                    if (hypothesis) {
+                        closestSpace.hypothesis = hypothesis;
+                        closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
+                        closestSpace.investments.push({ player: player.name, years: 0, playerIndex: player.index });
+                        log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
+                        renderBoard();
+                        updatePlayerStats();
+                        checkGameEnd();
+                        if (!GameState.gameOver) endTurn();
+                    }
+                }
+            },
+            {
+                text: 'Skip',
+                action: () => endTurn()
+            }
+        ]
     );
+
+    // Fetch suggestions asynchronously and update the modal
+    const suggestions = await fetchHypothesisSuggestions(3);
+
+    if (suggestions && suggestions.length > 0) {
+        const suggestionsHtml = suggestions.map(s =>
+            `<div class="suggestion-item" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
+        ).join('');
+
+        const suggestionsContainer = document.getElementById('hypothesis-suggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.innerHTML = suggestionsHtml;
+
+            // Add click handlers for suggestions
+            suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const suggestion = item.getAttribute('data-suggestion');
+                    document.getElementById('hypothesis-input').value = suggestion;
+                });
+            });
+        }
+    }
 }
 
 function handleSpaceLanding(player, space) {
