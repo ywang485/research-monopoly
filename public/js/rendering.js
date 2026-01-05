@@ -778,8 +778,9 @@ function renderBoard() {
         const basePos = animPos || positions[player.position];
         if (!basePos) return;
 
-        const offsetX = (pIndex % 2) * 15 + 8;
-        const offsetY = Math.floor(pIndex / 2) * 30 + 5;
+        // Position pencils above the space, arranged horizontally
+        const offsetX = (pIndex % 2) * 20 + 15;
+        const offsetY = Math.floor(pIndex / 2) * 15 - 25; // Above the space
 
         const drawX = basePos.x + offsetX;
         const drawY = basePos.y + offsetY;
@@ -797,23 +798,27 @@ function renderBoard() {
 
         ctx.save();
 
-        // Draw shadow when bouncing
+        // Translate to the drawing position and rotate 185 degrees
+        ctx.translate(drawX, drawY);
+        ctx.rotate(185 * Math.PI / 180);
+
+        // Draw shadow when bouncing (positioned at tip)
         if (animPos && GameState.animation.bounceHeight > 0) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.beginPath();
-            ctx.ellipse(drawX, basePos.y + offsetY + pencilLength + GameState.animation.bounceHeight * 0.3,
+            ctx.ellipse(tipLength / 2, -GameState.animation.bounceHeight * 0.3,
                        pencilWidth * 0.8, 2, 0, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // PENCIL TIP (wooden point)
+        // PENCIL TIP (wooden point) - drawing at origin after rotation
         ctx.fillStyle = '#d4a574'; // Wood color
         ctx.strokeStyle = '#2c3e50';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(drawX, drawY); // Tip point
-        ctx.lineTo(drawX - pencilWidth / 2, drawY + tipLength);
-        ctx.lineTo(drawX + pencilWidth / 2, drawY + tipLength);
+        ctx.moveTo(0, 0); // Tip point at origin
+        ctx.lineTo(-pencilWidth / 2, tipLength);
+        ctx.lineTo(pencilWidth / 2, tipLength);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
@@ -821,9 +826,9 @@ function renderBoard() {
         // Graphite core at tip
         ctx.fillStyle = '#333';
         ctx.beginPath();
-        ctx.moveTo(drawX, drawY + 1);
-        ctx.lineTo(drawX - 1, drawY + tipLength - 1);
-        ctx.lineTo(drawX + 1, drawY + tipLength - 1);
+        ctx.moveTo(0, 1);
+        ctx.lineTo(-1, tipLength - 1);
+        ctx.lineTo(1, tipLength - 1);
         ctx.closePath();
         ctx.fill();
 
@@ -832,7 +837,7 @@ function renderBoard() {
         ctx.strokeStyle = '#2c3e50';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.rect(drawX - pencilWidth / 2, drawY + tipLength, pencilWidth, pencilLength);
+        ctx.rect(-pencilWidth / 2, tipLength, pencilWidth, pencilLength);
         ctx.fill();
         ctx.stroke();
 
@@ -840,17 +845,17 @@ function renderBoard() {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(drawX - pencilWidth / 2 + 1, drawY + tipLength + 2);
-        ctx.lineTo(drawX - pencilWidth / 2 + 1, drawY + tipLength + pencilLength - 2);
+        ctx.moveTo(-pencilWidth / 2 + 1, tipLength + 2);
+        ctx.lineTo(-pencilWidth / 2 + 1, tipLength + pencilLength - 2);
         ctx.stroke();
 
         // Metal ferrule (band holding eraser)
-        const ferruleY = drawY + tipLength + pencilLength;
+        const ferruleY = tipLength + pencilLength;
         ctx.fillStyle = '#c0c0c0'; // Silver
         ctx.strokeStyle = '#2c3e50';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.rect(drawX - pencilWidth / 2, ferruleY, pencilWidth, 2);
+        ctx.rect(-pencilWidth / 2, ferruleY, pencilWidth, 2);
         ctx.fill();
         ctx.stroke();
 
@@ -859,7 +864,7 @@ function renderBoard() {
         ctx.strokeStyle = '#2c3e50';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.rect(drawX - pencilWidth / 2, ferruleY + 2, pencilWidth, eraserLength);
+        ctx.rect(-pencilWidth / 2, ferruleY + 2, pencilWidth, eraserLength);
         ctx.fill();
         ctx.stroke();
 
@@ -867,19 +872,22 @@ function renderBoard() {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.lineWidth = 0.8;
         ctx.beginPath();
-        ctx.moveTo(drawX - pencilWidth / 2 + 1, ferruleY + 3);
-        ctx.lineTo(drawX - pencilWidth / 2 + 1, ferruleY + 2 + eraserLength - 1);
+        ctx.moveTo(-pencilWidth / 2 + 1, ferruleY + 3);
+        ctx.lineTo(-pencilWidth / 2 + 1, ferruleY + 2 + eraserLength - 1);
         ctx.stroke();
 
-        ctx.restore();
-
-        // Player number on pencil body
+        // Player number on pencil body (rotated back for readability)
+        ctx.save();
+        ctx.translate(0, tipLength + pencilLength / 2);
+        ctx.rotate(-185 * Math.PI / 180); // Counter-rotate the text
         ctx.fillStyle = '#fff';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText((pIndex + 1).toString(), drawX, drawY + tipLength + pencilLength / 2);
-        ctx.textBaseline = 'alphabetic';
+        ctx.fillText((pIndex + 1).toString(), 0, 0);
+        ctx.restore();
+
+        ctx.restore();
     });
 
     // Draw NPC (Scientific Underdeterminism - pencil-sketch diamond shape)
