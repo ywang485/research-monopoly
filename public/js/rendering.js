@@ -711,6 +711,11 @@ function renderBoard() {
         const pos = positions[i];
         if (!pos) return;
 
+        // DEBUG: Log first 3 spaces
+        if (i < 3) {
+            console.log(`Drawing space ${i}: ${space.type} "${space.name}" at position (${pos.x}, ${pos.y})`);
+        }
+
         // Draw space with sketchy pencil-drawn style
         const radius = 5;
         const w = spaceSize - 4;
