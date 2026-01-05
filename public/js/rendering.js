@@ -778,88 +778,107 @@ function renderBoard() {
         const basePos = animPos || positions[player.position];
         if (!basePos) return;
 
-        const offsetX = (pIndex % 2) * 25 + 8;
-        const offsetY = Math.floor(pIndex / 2) * 20 + 8;
+        const offsetX = (pIndex % 2) * 15 + 8;
+        const offsetY = Math.floor(pIndex / 2) * 30 + 5;
 
         const drawX = basePos.x + offsetX;
         const drawY = basePos.y + offsetY;
-        const tokenSeed = pIndex * 500 + 1000;
+
+        // Calculate pencil length based on remaining years
+        const maxYears = 50; // Approximate max available years
+        const minLength = 10;
+        const maxLength = 35;
+        const yearsRatio = Math.min(player.availableYears / maxYears, 1);
+        const pencilLength = minLength + (maxLength - minLength) * yearsRatio;
+
+        const pencilWidth = 5;
+        const tipLength = 6;
+        const eraserLength = 4;
+
+        ctx.save();
 
         // Draw shadow when bouncing
         if (animPos && GameState.animation.bounceHeight > 0) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.beginPath();
-            ctx.ellipse(drawX, basePos.y + offsetY + GameState.animation.bounceHeight * 0.3,
-                       9, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(drawX, basePos.y + offsetY + pencilLength + GameState.animation.bounceHeight * 0.3,
+                       pencilWidth * 0.8, 2, 0, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // Draw sketchy circle token with multiple passes
-        ctx.save();
-
-        // Main fill
-        ctx.fillStyle = player.color;
+        // PENCIL TIP (wooden point)
+        ctx.fillStyle = '#d4a574'; // Wood color
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        // Draw slightly wobbly circle
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.2) {
-            const wobble = (seededRandom(tokenSeed + angle * 10) - 0.5) * 1.5;
-            const r = 9 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
+        ctx.moveTo(drawX, drawY); // Tip point
+        ctx.lineTo(drawX - pencilWidth / 2, drawY + tipLength);
+        ctx.lineTo(drawX + pencilWidth / 2, drawY + tipLength);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Graphite core at tip
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.moveTo(drawX, drawY + 1);
+        ctx.lineTo(drawX - 1, drawY + tipLength - 1);
+        ctx.lineTo(drawX + 1, drawY + tipLength - 1);
         ctx.closePath();
         ctx.fill();
 
-        // Multiple pencil stroke outlines
-        ctx.lineWidth = 1.5;
-        ctx.lineCap = 'round';
-
-        // First outline pass
-        ctx.strokeStyle = 'rgba(44, 62, 80, 0.8)';
+        // PENCIL BODY (colored paint)
+        ctx.fillStyle = player.color;
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.15) {
-            const wobble = (seededRandom(tokenSeed + angle * 10) - 0.5) * 1.2;
-            const r = 9 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
+        ctx.rect(drawX - pencilWidth / 2, drawY + tipLength, pencilWidth, pencilLength);
+        ctx.fill();
         ctx.stroke();
 
-        // Second outline pass (offset for texture)
-        ctx.strokeStyle = 'rgba(44, 62, 80, 0.3)';
+        // Pencil body highlight (shiny paint)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        for (let angle = 0; angle <= Math.PI * 2; angle += 0.2) {
-            const wobble = (seededRandom(tokenSeed + 50 + angle * 10) - 0.5) * 1;
-            const r = 9.5 + wobble;
-            const px = drawX + Math.cos(angle) * r;
-            const py = drawY + Math.sin(angle) * r;
-            if (angle === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
+        ctx.moveTo(drawX - pencilWidth / 2 + 1, drawY + tipLength + 2);
+        ctx.lineTo(drawX - pencilWidth / 2 + 1, drawY + tipLength + pencilLength - 2);
         ctx.stroke();
 
-        // Inner pencil highlight scribble
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.lineWidth = 1.5;
+        // Metal ferrule (band holding eraser)
+        const ferruleY = drawY + tipLength + pencilLength;
+        ctx.fillStyle = '#c0c0c0'; // Silver
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(drawX - 2, drawY - 2, 3, Math.PI * 0.8, Math.PI * 1.8);
+        ctx.rect(drawX - pencilWidth / 2, ferruleY, pencilWidth, 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // ERASER (pink/red)
+        ctx.fillStyle = '#e67e8e'; // Pink eraser
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(drawX - pencilWidth / 2, ferruleY + 2, pencilWidth, eraserLength);
+        ctx.fill();
+        ctx.stroke();
+
+        // Eraser highlight
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(drawX - pencilWidth / 2 + 1, ferruleY + 3);
+        ctx.lineTo(drawX - pencilWidth / 2 + 1, ferruleY + 2 + eraserLength - 1);
         ctx.stroke();
 
         ctx.restore();
 
-        // Player number (pixel style)
+        // Player number on pencil body
         ctx.fillStyle = '#fff';
         ctx.font = '6px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText((pIndex + 1).toString(), drawX, drawY + 1);
+        ctx.fillText((pIndex + 1).toString(), drawX, drawY + tipLength + pencilLength / 2);
         ctx.textBaseline = 'alphabetic';
     });
 
