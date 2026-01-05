@@ -337,21 +337,18 @@ function handleSabbaticalSpace(player) {
 }
 
 function handleGrantSpace(player) {
-    const grantSize = rollDice() + rollDice();
-    player.rejuvenate(grantSize);
     player.addFame(2);
 
     showModal(
         'Research Grant!',
         `
         <div class="dice-container">
-            <span class="dice">🎲🎲</span>
-            <div class="dice-result">Grant Approved!</div>
+            <span class="dice">💰</span>
+            <div class="dice-result">+2 Fame!</div>
         </div>
         <p>After only 47 revisions and 3 panel reviews, they actually gave you money!</p>
-        <p>-${grantSize} years of stress-induced aging!</p>
         <p>+2 fame (mostly from other academics jealous of your funding)</p>
-        <p class="info-text">Time to hire grad students to do all the work!</p>
+        <p class="info-text">Now if only the grant actually covered your students' stipends...</p>
         `,
         [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
     );

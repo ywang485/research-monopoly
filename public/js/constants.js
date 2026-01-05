@@ -97,7 +97,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.CONFERENCE]: 'Present your work and gain recognition! Earn 3 fame points for attending.',
     [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break. Rejuvenate by 3 years of life.',
     [SPACE_TYPES.COMMUNITY_SERVICE]: 'Forced to do community service! Lose years to service work, but you can sacrifice a student to get away with it.',
-    [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant that rejuvenates you by 5 years.',
+    [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
     [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
     [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Make a breakthrough discovery and gain 5 fame points.'
