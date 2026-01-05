@@ -98,6 +98,32 @@ function drawSpaceIcon(ctx, type, x, y, size, isProven = false) {
 }
 
 function drawStartIcon(ctx, cx, cy, scale) {
+    // TEMPORARY DEBUG: Draw obvious test pattern to verify drawing location
+    console.log('🎨 drawStartIcon called with cx:', cx, 'cy:', cy, 'scale:', scale);
+
+    // Draw a HUGE bright magenta circle at the center point
+    ctx.fillStyle = 'magenta';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 30 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    console.log('✅ Drew magenta circle at center:', cx, cy);
+
+    // Draw a bright cyan square
+    const iconSize = 56 * scale;
+    const x = cx - iconSize / 2;
+    const y = cy - iconSize / 2;
+    ctx.fillStyle = 'cyan';
+    ctx.fillRect(x, y, iconSize, iconSize);
+    console.log('✅ Drew cyan square at:', x, y, iconSize);
+
+    // Draw bright yellow border
+    ctx.strokeStyle = 'yellow';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(x, y, iconSize, iconSize);
+    console.log('✅ Drew yellow border');
+
+    return; // Skip icon drawing for now
+
     // Use custom SVG icon if loaded, otherwise fall back to procedural drawing
     if (IconImages.start) {
         const iconSize = 56 * scale; // Slightly smaller than space size for padding
