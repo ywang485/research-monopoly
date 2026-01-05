@@ -779,8 +779,8 @@ function renderBoard() {
         if (!basePos) return;
 
         // Position pencils above the space, arranged horizontally
-        const offsetX = (pIndex % 2) * 20 + 15;
-        const offsetY = Math.floor(pIndex / 2) * 15 - 25; // Above the space
+        const offsetX = (pIndex % 2) * 20 + 25;
+        const offsetY = Math.floor(pIndex / 2) * 15 + 25; // Above the space
 
         const drawX = basePos.x + offsetX;
         const drawY = basePos.y + offsetY;
@@ -800,7 +800,7 @@ function renderBoard() {
 
         // Translate to the drawing position and rotate 185 degrees
         ctx.translate(drawX, drawY);
-        ctx.rotate(185 * Math.PI / 180);
+        ctx.rotate(190 * Math.PI / 180);
 
         // Draw shadow when bouncing (positioned at tip)
         if (animPos && GameState.animation.bounceHeight > 0) {
@@ -894,8 +894,8 @@ function renderBoard() {
     const animNpcPos = getAnimatedPosition('npc', null, positions, spaceSize);
     const npcBasePos = animNpcPos || positions[GameState.npc.position];
     if (npcBasePos) {
-        const npcX = npcBasePos.x + spaceSize/2;
-        const npcY = npcBasePos.y + spaceSize/2;
+        const npcX = npcBasePos.x + spaceSize/2 - 10;
+        const npcY = npcBasePos.y + spaceSize/2 + 10;
         const npcSeed = 9999;
 
         // Draw shadow when bouncing

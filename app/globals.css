@@ -2368,13 +2368,15 @@ select {
    ============================================ */
 
 #action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 0 0 auto;
-    margin-top: auto;
+    width: 350px;
+    justify-content: right;
+    align-items: right;
     position: relative;
+    margin: auto 30 auto auto ;
     z-index: 1000; /* Always on top of draggable panels */
+    bottom: 100px;
+    right: 0px;
+    transform: rotate(-1deg);
 }
 
 .roll-btn {
