@@ -616,7 +616,18 @@ function renderBoard() {
     // Calculate logical board dimensions
     const baseSpaceSize = 60;
     const basePadding = 20;
-    const sideLength = Math.ceil(numSpaces / 4);
+    // Calculate space distribution across edges (with corner sharing like Monopoly)
+    // Total edge spaces needed: numSpaces + 3 (because 3 corners are shared)
+    const totalWithCorners = numSpaces + 3;
+    const basePerEdge = Math.floor(totalWithCorners / 4);
+    const edgeExtras = totalWithCorners % 4;
+    const bottomSpaces = basePerEdge + (edgeExtras > 0 ? 1 : 0);
+    const rightSpaces = basePerEdge + (edgeExtras > 1 ? 1 : 0);
+    const topSpaces = basePerEdge + (edgeExtras > 2 ? 1 : 0);
+    const leftSpaces = basePerEdge + (edgeExtras > 3 ? 1 : 0);
+
+    // Board size is based on the maximum edge (to keep it square)
+    const sideLength = Math.max(bottomSpaces, rightSpaces, topSpaces, leftSpaces);
     const logicalBoardWidth = sideLength * baseSpaceSize + basePadding * 2;
     const logicalBoardHeight = sideLength * baseSpaceSize + basePadding * 2;
 
@@ -677,46 +688,35 @@ function renderBoard() {
     const positions = [];
     const startX = padding;
     const startY = logicalBoardHeight - padding - spaceSize;
-
-    // Calculate how many spaces go on each edge (distribute evenly)
-    const basePerEdge = Math.floor(numSpaces / 4);
-    const extras = numSpaces % 4;
-
-    // Each edge gets basePerEdge spaces, plus 1 extra for the first 'extras' edges
-    const bottomSpaces = basePerEdge + (extras > 0 ? 1 : 0);
-    const rightSpaces = basePerEdge + (extras > 1 ? 1 : 0);
-    const topSpaces = basePerEdge + (extras > 2 ? 1 : 0);
-    const leftSpaces = basePerEdge + (extras > 3 ? 1 : 0);
-
-    // Calculate edge boundaries
+ 
+    // Calculate edge boundaries (edges share corners, so we subtract when transitioning)
     const bottomEnd = bottomSpaces - 1;
-    const rightEnd = bottomEnd + rightSpaces;
-    const topEnd = rightEnd + topSpaces;
+    const rightEnd = bottomEnd + rightSpaces - 1;  // -1 because we share bottom-right corner
+    const topEnd = rightEnd + topSpaces - 1;        // -1 because we share top-right corner
+
 
     for (let i = 0; i < numSpaces; i++) {
         let x, y;
-
         if (i <= bottomEnd) {
-            // Bottom edge (left to right)
+            // Bottom edge (left to right, includes both corners)
             x = startX + i * spaceSize;
             y = startY;
         } else if (i <= rightEnd) {
-            // Right edge (bottom to top) - start one space up from bottom-right corner
-            const edgeIndex = i - bottomSpaces;
+            // Right edge (bottom to top, shares bottom-right corner with bottom edge)
+            const edgeIndex = i - bottomEnd;  // Start from 1 (skip shared corner)
             x = startX + (bottomSpaces - 1) * spaceSize;
-            y = startY - (edgeIndex + 1) * spaceSize;
+            y = startY - edgeIndex * spaceSize;
         } else if (i <= topEnd) {
-            // Top edge (right to left) - start one space left from top-right corner
-            const edgeIndex = i - (bottomSpaces + rightSpaces);
-            x = startX + (bottomSpaces - 1) * spaceSize - (edgeIndex + 1) * spaceSize;
-            y = startY - rightSpaces * spaceSize;
+            // Top edge (right to left, shares top-right corner with right edge)
+            const edgeIndex = i - rightEnd;  // Start from 1 (skip shared corner)
+            x = startX + (bottomSpaces - 1) * spaceSize - edgeIndex * spaceSize;
+            y = startY - (rightSpaces - 1) * spaceSize;
         } else {
-            // Left edge (top to bottom) - start one space down from top-left corner
-            const edgeIndex = i - (bottomSpaces + rightSpaces + topSpaces);
+            // Left edge (top to bottom, shares top-left corner with top edge)
+            const edgeIndex = i - topEnd;  // Start from 1 (skip shared corner)
             x = startX;
-            y = startY - rightSpaces * spaceSize + (edgeIndex + 1) * spaceSize;
+            y = startY - (rightSpaces - 1) * spaceSize + edgeIndex * spaceSize;
         }
-
         positions.push({ x, y });
     }
 
