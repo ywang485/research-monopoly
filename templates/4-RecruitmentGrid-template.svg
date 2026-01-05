@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="240" height="240" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+
+  <!-- Center circle guide -->
+  <circle cx="120" cy="120" r="105" fill="none" stroke="#ccc" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- Crosshair guides -->
+  <line x1="120" y1="15" x2="120" y2="225" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="15" y1="120" x2="225" y2="120" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Label -->
+  <text x="120" y="35" font-family="Arial" font-size="14" fill="#666" text-anchor="middle">RECRUITMENT GRID</text>
+  <text x="120" y="52" font-family="Arial" font-size="10" fill="#999" text-anchor="middle">PhD Student Recruitment</text>
+  <text x="120" y="67" font-family="Arial" font-size="9" fill="#c66" text-anchor="middle">(Note: This icon is 50% LARGER)</text>
+
+  <!-- Instructions -->
+  <text x="120" y="215" font-family="Arial" font-size="9" fill="#999" text-anchor="middle">Draw your icon design here</text>
+  <text x="120" y="230" font-family="Arial" font-size="9" fill="#999" text-anchor="middle">240x240 pixels (1.5x larger than others)</text>
+
+  <!-- Draw area indicator -->
+  <rect x="45" y="80" width="150" height="105" fill="none" stroke="#aaf" stroke-width="2" stroke-dasharray="5,5"/>
+</svg>
