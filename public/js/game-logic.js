@@ -281,12 +281,20 @@ function handleStartSpace(player) {
 function handleConferenceSpace(player) {
     // Check if player has any publications
     if (player.theoriesPublished.length === 0) {
+        // Small fame gain for just attending
+        const smallFameGain = 1;
+        player.addFame(smallFameGain);
+
         showModal(
             'Academic Conference',
             `
+            <div class="dice-container">
+                <span class="dice">🎲</span>
+                <div class="dice-result">+${smallFameGain} Fame</div>
+            </div>
             <p>You showed up to the conference, but realized you have nothing to present.</p>
-            <p class="info-text">Awkwardly attended other people's talks and ate free cookies instead.</p>
-            <p>No fame gained (you need at least one publication to present!).</p>
+            <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
+            <p class="info-text">At least someone remembered your name tag!</p>
             `,
             [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
         );
