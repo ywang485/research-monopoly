@@ -137,7 +137,12 @@ function drawIcon(ctx, iconType, cx, cy, scale) {
         case SPACE_TYPES.SCANDAL:
             drawScandalFallback(ctx, cx, cy, s);
             break;
-        // COLLABORATION and EUREKA only have SVG versions, no fallback
+        case SPACE_TYPES.COLLABORATION:
+            drawCollaborationFallback(ctx, cx, cy, s);
+            break;
+        case SPACE_TYPES.EUREKA:
+            drawEurekaFallback(ctx, cx, cy, s);
+            break;
     }
 }
 
@@ -189,6 +194,14 @@ function drawGrantFallback(ctx, cx, cy, s) {
 
 function drawScandalFallback(ctx, cx, cy, s) {
     drawTextFallback(ctx, cx, cy, s, 'SCANDAL');
+}
+
+function drawCollaborationFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'COLLAB');
+}
+
+function drawEurekaFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'EUREKA');
 }
 
 // ============================================
