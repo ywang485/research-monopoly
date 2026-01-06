@@ -137,369 +137,71 @@ function drawIcon(ctx, iconType, cx, cy, scale) {
         case SPACE_TYPES.SCANDAL:
             drawScandalFallback(ctx, cx, cy, s);
             break;
-        // COLLABORATION and EUREKA only have SVG versions, no fallback
+        case SPACE_TYPES.COLLABORATION:
+            drawCollaborationFallback(ctx, cx, cy, s);
+            break;
+        case SPACE_TYPES.EUREKA:
+            drawEurekaFallback(ctx, cx, cy, s);
+            break;
     }
 }
 
-// Fallback drawing functions
-function drawStartFallback(ctx, cx, cy, s) {
-    // Quill pen and inkwell - classical scientific beginning
-    ctx.strokeStyle = '#2c3e50';
+// Fallback drawing functions - draw text labels
+function drawTextFallback(ctx, cx, cy, s, text) {
     ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.font = `${Math.floor(12 * s)}px "Press Start 2P", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, cx, cy);
+}
 
-    // Inkwell base
-    ctx.beginPath();
-    ctx.ellipse(cx - 4 * s, cy + 6 * s, 6 * s, 3 * s, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - 10 * s, cy + 6 * s);
-    ctx.lineTo(cx - 10 * s, cy + 2 * s);
-    ctx.quadraticCurveTo(cx - 10 * s, cy - 2 * s, cx - 4 * s, cy - 2 * s);
-    ctx.quadraticCurveTo(cx + 2 * s, cy - 2 * s, cx + 2 * s, cy + 2 * s);
-    ctx.lineTo(cx + 2 * s, cy + 6 * s);
-    ctx.stroke();
-
-    // Quill pen (angled)
-    ctx.beginPath();
-    ctx.moveTo(cx - 2 * s, cy);
-    ctx.quadraticCurveTo(cx + 6 * s, cy - 8 * s, cx + 12 * s, cy - 14 * s);
-    ctx.stroke();
-
-    // Quill feather
-    ctx.beginPath();
-    ctx.moveTo(cx + 12 * s, cy - 14 * s);
-    ctx.quadraticCurveTo(cx + 8 * s, cy - 12 * s, cx + 6 * s, cy - 16 * s);
-    ctx.quadraticCurveTo(cx + 10 * s, cy - 14 * s, cx + 12 * s, cy - 14 * s);
-    ctx.fill();
-    ctx.moveTo(cx + 12 * s, cy - 14 * s);
-    ctx.quadraticCurveTo(cx + 14 * s, cy - 10 * s, cx + 10 * s, cy - 8 * s);
-    ctx.quadraticCurveTo(cx + 14 * s, cy - 12 * s, cx + 12 * s, cy - 14 * s);
-    ctx.fill();
+function drawStartFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'START');
 }
 
 function drawHypothesisFallback(ctx, cx, cy, s) {
-    // Classical alchemical retort/flask
-    ctx.strokeStyle = '#ddd';
-    ctx.fillStyle = '#ddd';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Question mark above (representing hypothesis)
-    ctx.font = '20px "Press Start 2P", monospace';
+    // Larger question mark for hypothesis spaces
+    ctx.fillStyle = '#dddddd';
+    ctx.font = `${Math.floor(20 * s)}px "Press Start 2P", monospace`;
     ctx.textAlign = 'center';
-    const questionMark = '?';
-    const textX = cx+3;
-    const textY = cy+8;
-    ctx.fillText(questionMark, textX, textY);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', cx, cy);
 }
 
 function drawProvenFallback(ctx, cx, cy, s) {
-    // Laurel wreath - symbol of established achievement
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#4a5a4d';
-    ctx.lineWidth = 1.2 * s;
-    ctx.lineCap = 'round';
-
-    // Left branch of laurel
-    for (let i = 0; i < 5; i++) {
-        const angle = -0.4 - i * 0.25;
-        const leafX = cx - 6 * s + i * 1.5 * s;
-        const leafY = cy - 6 * s + i * 3 * s;
-        ctx.beginPath();
-        ctx.ellipse(leafX, leafY, 4 * s, 2 * s, angle, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-    }
-
-    // Right branch of laurel
-    for (let i = 0; i < 5; i++) {
-        const angle = 0.4 + i * 0.25;
-        const leafX = cx + 6 * s - i * 1.5 * s;
-        const leafY = cy - 6 * s + i * 3 * s;
-        ctx.beginPath();
-        ctx.ellipse(leafX, leafY, 4 * s, 2 * s, angle, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-    }
-
-    // Central stem/ribbon at bottom
-    ctx.strokeStyle = '#a89458';
-    ctx.lineWidth = 2 * s;
-    ctx.beginPath();
-    ctx.moveTo(cx - 4 * s, cy + 8 * s);
-    ctx.quadraticCurveTo(cx, cy + 6 * s, cx + 4 * s, cy + 8 * s);
-    ctx.stroke();
+    drawTextFallback(ctx, cx, cy, s, 'PROVEN');
 }
 
 function drawRecruitFallback(ctx, cx, cy, s) {
-    // Classical scholar with scroll - period appropriate student
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Scholar's head (with period wig suggestion)
-    ctx.beginPath();
-    ctx.arc(cx, cy - 8 * s, 5 * s, 0, Math.PI * 2);
-    ctx.stroke();
-    // Curly wig sides
-    ctx.beginPath();
-    ctx.arc(cx - 5 * s, cy - 6 * s, 2 * s, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(cx + 5 * s, cy - 6 * s, 2 * s, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Scholarly robe/gown
-    ctx.beginPath();
-    ctx.moveTo(cx - 4 * s, cy - 3 * s);
-    ctx.lineTo(cx - 6 * s, cy + 10 * s);
-    ctx.lineTo(cx + 6 * s, cy + 10 * s);
-    ctx.lineTo(cx + 4 * s, cy - 3 * s);
-    ctx.closePath();
-    ctx.stroke();
-
-    // Scroll being held
-    ctx.lineWidth = 1.2 * s;
-    ctx.beginPath();
-    ctx.ellipse(cx + 10 * s, cy + 2 * s, 2 * s, 5 * s, 0.2, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx + 8 * s, cy - 2 * s);
-    ctx.lineTo(cx + 5 * s, cy + 2 * s);
-    ctx.stroke();
+    drawTextFallback(ctx, cx, cy, s, 'RECRUIT');
 }
 
 function drawConferenceFallback(ctx, cx, cy, s) {
-    // Royal Society style lectern with open book
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Lectern stand
-    ctx.beginPath();
-    ctx.moveTo(cx, cy + 10 * s);
-    ctx.lineTo(cx - 6 * s, cy + 10 * s);
-    ctx.lineTo(cx + 6 * s, cy + 10 * s);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx, cy + 10 * s);
-    ctx.lineTo(cx, cy - 2 * s);
-    ctx.stroke();
-
-    // Lectern top surface (angled)
-    ctx.beginPath();
-    ctx.moveTo(cx - 8 * s, cy - 4 * s);
-    ctx.lineTo(cx + 8 * s, cy - 4 * s);
-    ctx.lineTo(cx + 6 * s, cy);
-    ctx.lineTo(cx - 6 * s, cy);
-    ctx.closePath();
-    ctx.stroke();
-
-    // Open book on lectern
-    ctx.lineWidth = 1.2 * s;
-    // Left page
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 6 * s);
-    ctx.quadraticCurveTo(cx - 4 * s, cy - 8 * s, cx - 7 * s, cy - 6 * s);
-    ctx.lineTo(cx - 7 * s, cy - 2 * s);
-    ctx.stroke();
-    // Right page
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 6 * s);
-    ctx.quadraticCurveTo(cx + 4 * s, cy - 8 * s, cx + 7 * s, cy - 6 * s);
-    ctx.lineTo(cx + 7 * s, cy - 2 * s);
-    ctx.stroke();
-    // Text lines on pages
-    ctx.lineWidth = 0.8 * s;
-    ctx.beginPath();
-    ctx.moveTo(cx - 6 * s, cy - 5 * s);
-    ctx.lineTo(cx - 2 * s, cy - 5 * s);
-    ctx.moveTo(cx + 2 * s, cy - 5 * s);
-    ctx.lineTo(cx + 6 * s, cy - 5 * s);
-    ctx.stroke();
+    drawTextFallback(ctx, cx, cy, s, 'CONF');
 }
 
 function drawSabbaticalFallback(ctx, cx, cy, s) {
-    // Stack of books with candle - scholarly rest and contemplation
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Stack of books
-    // Bottom book
-    ctx.beginPath();
-    ctx.rect(cx - 8 * s, cy + 4 * s, 12 * s, 4 * s);
-    ctx.stroke();
-    // Middle book
-    ctx.beginPath();
-    ctx.rect(cx - 7 * s, cy, 10 * s, 3.5 * s);
-    ctx.stroke();
-    // Top book (slightly angled)
-    ctx.beginPath();
-    ctx.moveTo(cx - 6 * s, cy - 4 * s);
-    ctx.lineTo(cx + 5 * s, cy - 3 * s);
-    ctx.lineTo(cx + 5 * s, cy);
-    ctx.lineTo(cx - 6 * s, cy - 0.5 * s);
-    ctx.closePath();
-    ctx.stroke();
-
-    // Candle holder and candle
-    ctx.beginPath();
-    ctx.moveTo(cx + 6 * s, cy + 8 * s);
-    ctx.lineTo(cx + 10 * s, cy + 8 * s);
-    ctx.lineTo(cx + 9 * s, cy + 4 * s);
-    ctx.lineTo(cx + 7 * s, cy + 4 * s);
-    ctx.closePath();
-    ctx.stroke();
-    // Candle
-    ctx.beginPath();
-    ctx.rect(cx + 7 * s, cy - 4 * s, 2 * s, 8 * s);
-    ctx.stroke();
-    // Flame
-    ctx.fillStyle = '#a89458';
-    ctx.beginPath();
-    ctx.moveTo(cx + 8 * s, cy - 4 * s);
-    ctx.quadraticCurveTo(cx + 6 * s, cy - 8 * s, cx + 8 * s, cy - 10 * s);
-    ctx.quadraticCurveTo(cx + 10 * s, cy - 8 * s, cx + 8 * s, cy - 4 * s);
-    ctx.fill();
+    drawTextFallback(ctx, cx, cy, s, 'BREAK');
 }
 
 function drawCommunityServiceFallback(ctx, cx, cy, s) {
-    // Document with spectacles (repurposed from peer review)
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Document/paper
-    ctx.beginPath();
-    ctx.rect(cx - 8 * s, cy - 2 * s, 14 * s, 12 * s);
-    ctx.stroke();
-    // Text lines on document
-    ctx.lineWidth = 0.8 * s;
-    ctx.beginPath();
-    ctx.moveTo(cx - 6 * s, cy + 1 * s);
-    ctx.lineTo(cx + 4 * s, cy + 1 * s);
-    ctx.moveTo(cx - 6 * s, cy + 4 * s);
-    ctx.lineTo(cx + 4 * s, cy + 4 * s);
-    ctx.moveTo(cx - 6 * s, cy + 7 * s);
-    ctx.lineTo(cx + 2 * s, cy + 7 * s);
-    ctx.stroke();
-
-    // Classical round spectacles above
-    ctx.lineWidth = 1.5 * s;
-    // Left lens
-    ctx.beginPath();
-    ctx.arc(cx - 4 * s, cy - 8 * s, 4 * s, 0, Math.PI * 2);
-    ctx.stroke();
-    // Right lens
-    ctx.beginPath();
-    ctx.arc(cx + 4 * s, cy - 8 * s, 4 * s, 0, Math.PI * 2);
-    ctx.stroke();
-    // Bridge
-    ctx.beginPath();
-    ctx.moveTo(cx - 0.5 * s, cy - 8 * s);
-    ctx.lineTo(cx + 0.5 * s, cy - 8 * s);
-    ctx.stroke();
-    // Temple arms
-    ctx.beginPath();
-    ctx.moveTo(cx - 8 * s, cy - 8 * s);
-    ctx.lineTo(cx - 11 * s, cy - 6 * s);
-    ctx.moveTo(cx + 8 * s, cy - 8 * s);
-    ctx.lineTo(cx + 11 * s, cy - 6 * s);
-    ctx.stroke();
+    drawTextFallback(ctx, cx, cy, s, 'SERVICE');
 }
 
 function drawGrantFallback(ctx, cx, cy, s) {
-    // Royal coin purse with coins - period patronage
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
-
-    // Coin purse body
-    ctx.beginPath();
-    ctx.moveTo(cx - 6 * s, cy - 4 * s);
-    ctx.quadraticCurveTo(cx - 8 * s, cy + 4 * s, cx, cy + 8 * s);
-    ctx.quadraticCurveTo(cx + 8 * s, cy + 4 * s, cx + 6 * s, cy - 4 * s);
-    ctx.stroke();
-
-    // Purse opening with drawstring
-    ctx.beginPath();
-    ctx.ellipse(cx, cy - 4 * s, 6 * s, 2 * s, 0, 0, Math.PI, true);
-    ctx.stroke();
-    // Drawstring ties
-    ctx.beginPath();
-    ctx.moveTo(cx - 4 * s, cy - 5 * s);
-    ctx.quadraticCurveTo(cx - 6 * s, cy - 10 * s, cx - 2 * s, cy - 10 * s);
-    ctx.moveTo(cx + 4 * s, cy - 5 * s);
-    ctx.quadraticCurveTo(cx + 6 * s, cy - 10 * s, cx + 2 * s, cy - 10 * s);
-    ctx.stroke();
-
-    // Gold coins spilling out
-    ctx.fillStyle = '#a89458';
-    ctx.strokeStyle = '#6a5a3a';
-    ctx.lineWidth = 1 * s;
-    // Coin 1
-    ctx.beginPath();
-    ctx.ellipse(cx + 8 * s, cy + 2 * s, 4 * s, 3 * s, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    // Coin 2
-    ctx.beginPath();
-    ctx.ellipse(cx + 6 * s, cy + 6 * s, 3.5 * s, 2.5 * s, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
+    drawTextFallback(ctx, cx, cy, s, 'GRANT');
 }
 
 function drawScandalFallback(ctx, cx, cy, s) {
-    // Broken quill and spilled ink - scientific scandal
-    ctx.strokeStyle = '#2c3e50';
-    ctx.fillStyle = '#2c3e50';
-    ctx.lineWidth = 1.5 * s;
-    ctx.lineCap = 'round';
+    drawTextFallback(ctx, cx, cy, s, 'SCANDAL');
+}
 
-    // Broken quill - upper part
-    ctx.beginPath();
-    ctx.moveTo(cx + 8 * s, cy - 12 * s);
-    ctx.quadraticCurveTo(cx + 4 * s, cy - 10 * s, cx + 2 * s, cy - 6 * s);
-    ctx.stroke();
-    // Feather on upper part
-    ctx.beginPath();
-    ctx.moveTo(cx + 8 * s, cy - 12 * s);
-    ctx.quadraticCurveTo(cx + 5 * s, cy - 14 * s, cx + 4 * s, cy - 10 * s);
-    ctx.fill();
+function drawCollaborationFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'COLLAB');
+}
 
-    // Broken quill - lower part (fallen)
-    ctx.beginPath();
-    ctx.moveTo(cx - 2 * s, cy - 4 * s);
-    ctx.lineTo(cx - 8 * s, cy + 4 * s);
-    ctx.stroke();
-
-    // Break mark (jagged)
-    ctx.lineWidth = 1 * s;
-    ctx.beginPath();
-    ctx.moveTo(cx + 2 * s, cy - 6 * s);
-    ctx.lineTo(cx, cy - 5 * s);
-    ctx.lineTo(cx + 1 * s, cy - 4 * s);
-    ctx.lineTo(cx - 2 * s, cy - 4 * s);
-    ctx.stroke();
-
-    // Spilled ink blot
-    ctx.fillStyle = '#2e2420';
-    ctx.beginPath();
-    ctx.ellipse(cx - 4 * s, cy + 6 * s, 6 * s, 4 * s, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-    // Smaller splatter
-    ctx.beginPath();
-    ctx.ellipse(cx + 2 * s, cy + 8 * s, 3 * s, 2 * s, -0.3, 0, Math.PI * 2);
-    ctx.fill();
+function drawEurekaFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'EUREKA');
 }
 
 // ============================================
