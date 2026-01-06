@@ -155,7 +155,12 @@ function drawStartFallback(ctx, cx, cy, s) {
 }
 
 function drawHypothesisFallback(ctx, cx, cy, s) {
-    drawTextFallback(ctx, cx, cy, s, '?');
+    // Larger question mark for hypothesis spaces
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = `${Math.floor(20 * s)}px "Press Start 2P", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', cx, cy);
 }
 
 function drawProvenFallback(ctx, cx, cy, s) {
