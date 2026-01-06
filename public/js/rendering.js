@@ -144,7 +144,7 @@ function drawIcon(ctx, iconType, cx, cy, scale) {
 // Fallback drawing functions - draw text labels
 function drawTextFallback(ctx, cx, cy, s, text) {
     ctx.fillStyle = '#2c3e50';
-    ctx.font = `${Math.floor(12 * s)}px Arial, sans-serif`;
+    ctx.font = `${Math.floor(12 * s)}px "Press Start 2P", monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, cx, cy);
