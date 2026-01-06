@@ -913,8 +913,8 @@ function renderBoard() {
         ctx.fillStyle = '#333';
         ctx.beginPath();
         ctx.moveTo(0, 1);
-        ctx.lineTo(-1, tipLength - 1);
-        ctx.lineTo(1, tipLength - 1);
+        ctx.lineTo(-1.5, 3);
+        ctx.lineTo(1.5, 3);
         ctx.closePath();
         ctx.fill();
 
