@@ -1037,6 +1037,17 @@ function playerRollDice() {
 function checkGameEnd() {
     const alivePlayers = GameState.players.filter(p => p.isAlive);
 
+    // Check if all hypothesis spaces are invested
+    const hypothesisSpaces = GameState.board.filter(s => s.type === SPACE_TYPES.HYPOTHESIS);
+    const allHypothesesInvested = hypothesisSpaces.every(s => s.investments && s.investments.length > 0);
+
+    if (allHypothesesInvested && hypothesisSpaces.length > 0) {
+        // All hypotheses invested - highest total fame wins
+        const winner = GameState.players.reduce((a, b) => a.totalFame > b.totalFame ? a : b);
+        endGame(winner, 'All hypotheses have been invested! Victory to the most famous researcher!');
+        return;
+    }
+
     if (alivePlayers.length === 0) {
         // All dead - highest total fame wins
         const winner = GameState.players.reduce((a, b) => a.totalFame > b.totalFame ? a : b);
