@@ -169,7 +169,7 @@ function drawHypothesisFallback(ctx, cx, cy, s) {
 }
 
 function drawProvenFallback(ctx, cx, cy, s) {
-    drawTextFallback(ctx, cx, cy, s, 'PROVEN');
+    drawTextFallback(ctx, cx, cy, s, ' ');
 }
 
 function drawRecruitFallback(ctx, cx, cy, s) {
@@ -357,13 +357,36 @@ function renderBoard() {
             ? space.investments.reduce((sum, inv) => sum + inv.years, 0)
             : 0;
 
+        // Draw faint paper background
+        sketchyRoundedRect(ctx, x, y, w, h, radius, seed);
+        ctx.fillStyle = '#f8f4e8'; // Very light cream/blank paper
+        ctx.fill();
+
+        // Draw space type icon (hand-drawn style) - grey for non-hypothesis
+        drawSpaceIcon(ctx, space.type, pos.x, pos.y, spaceSize - 2, space.isProven);
+
+        // Draw investment cost for hypothesis (pixel font with hand-drawn underline)
+        if (isHypothesis && space.investmentCost > 0) {
+            ctx.fillStyle = hasInvestment ? '#2c3e50' : '#888';
+            ctx.font = '7px "Press Start 2P", monospace';
+            ctx.textAlign = 'center';
+            const costText = space.investmentCost + 'y';
+            const textX = pos.x + spaceSize/2;
+            const textY = pos.y + spaceSize - 6;
+            ctx.fillText(costText, textX, textY);
+
+            // Add sketchy underline
+            ctx.strokeStyle = hasInvestment ? 'rgba(44, 62, 80, 0.4)' : 'rgba(100, 100, 100, 0.3)';
+            ctx.lineWidth = 1;
+            sketchyLine(ctx, textX - 12, textY + 2, textX + 12, textY + 2, seed + 200);
+
+            ctx.textAlign = 'left';
+        }
+
+        ctx.restore();
+
         if (isHypothesis) {
             // HYPOTHESIS SPACES: Blank until invested, then show colored pencil hatching
-
-            // Draw faint paper background
-            sketchyRoundedRect(ctx, x, y, w, h, radius, seed);
-            ctx.fillStyle = '#f8f4e8'; // Very light cream/blank paper
-            ctx.fill();
 
             if (hasInvestment) {
                 // Draw colored pencil hatching based on investments
@@ -395,9 +418,9 @@ function renderBoard() {
                 ctx.stroke();
             }
 
-            // Draw extra border for hypothesis spaces with content (proven or in progress)
-            if (space.hypothesis) {
-                ctx.strokeStyle = space.isProven ? '#27ae60' : '#e67e22';
+            // Draw extra border for poven hypothesis spaces
+            if (space.hypothesis && space.isProven) {
+                ctx.strokeStyle = '#2749ae';
                 ctx.lineWidth = 2.5;
                 ctx.setLineDash([4, 2]);
                 sketchyRoundedRect(ctx, x - 1, y - 1, w + 2, h + 2, radius + 1, seed + 30);
@@ -409,9 +432,9 @@ function renderBoard() {
             // NON-HYPOTHESIS SPACES: Plain grey pencil sketches
 
             // Draw light paper background
-            sketchyRoundedRect(ctx, x, y, w, h, radius, seed);
-            ctx.fillStyle = '#f0ece0';
-            ctx.fill();
+            //sketchyRoundedRect(ctx, x, y, w, h, radius, seed);
+            //ctx.fillStyle = '#f0ece0';
+            //ctx.fill();
 
             // Add grey pencil shading
             drawPencilShading(ctx, x + 3, y + 3, w - 6, h - 6, 0.12, seed + 50);
@@ -436,28 +459,6 @@ function renderBoard() {
             ctx.stroke();
         }
 
-        ctx.restore();
-
-        // Draw space type icon (hand-drawn style) - grey for non-hypothesis
-        drawSpaceIcon(ctx, space.type, pos.x, pos.y, spaceSize - 2, space.isProven);
-
-        // Draw investment cost for hypothesis (pixel font with hand-drawn underline)
-        if (isHypothesis && space.investmentCost > 0) {
-            ctx.fillStyle = hasInvestment ? '#2c3e50' : '#888';
-            ctx.font = '7px "Press Start 2P", monospace';
-            ctx.textAlign = 'center';
-            const costText = space.investmentCost + 'y';
-            const textX = pos.x + spaceSize/2;
-            const textY = pos.y + spaceSize - 6;
-            ctx.fillText(costText, textX, textY);
-
-            // Add sketchy underline
-            ctx.strokeStyle = hasInvestment ? 'rgba(44, 62, 80, 0.4)' : 'rgba(100, 100, 100, 0.3)';
-            ctx.lineWidth = 1;
-            sketchyLine(ctx, textX - 12, textY + 2, textX + 12, textY + 2, seed + 200);
-
-            ctx.textAlign = 'left';
-        }
     });
 
     // Draw players (pencil-sketch circle tokens)
