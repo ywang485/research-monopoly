@@ -965,11 +965,24 @@ function handleNPCProveTheory(space) {
     playSound('theory');
     space.isProven = true;
 
-    // Find who invested the most
-    let maxInvestor = space.investments[0];
+    // Find who invested the most (sum up all investments per player)
+    const playerInvestments = {};
     space.investments.forEach(inv => {
-        if (inv.years > maxInvestor.years) {
-            maxInvestor = inv;
+        if (!playerInvestments[inv.playerIndex]) {
+            playerInvestments[inv.playerIndex] = 0;
+        }
+        playerInvestments[inv.playerIndex] += inv.years;
+    });
+
+    // Find the player with maximum total investment
+    let maxPlayerIndex = null;
+    let maxYears = 0;
+    Object.keys(playerInvestments).forEach(playerIndexStr => {
+        const playerIndex = parseInt(playerIndexStr);
+        const totalYears = playerInvestments[playerIndex];
+        if (totalYears > maxYears) {
+            maxYears = totalYears;
+            maxPlayerIndex = playerIndex;
         }
     });
 
@@ -978,7 +991,7 @@ function handleNPCProveTheory(space) {
     const fameReward = significance * 5;
 
     // Find the player and reward them
-    const winner = GameState.players[maxInvestor.playerIndex];
+    const winner = GameState.players[maxPlayerIndex];
     if (winner) {
         winner.addFame(fameReward);
         winner.theoriesPublished.push(space.hypothesis);
@@ -987,7 +1000,7 @@ function handleNPCProveTheory(space) {
     // Add to theories list
     GameState.theories.push({
         hypothesis: space.hypothesis,
-        author: maxInvestor.player,
+        author: winner ? winner.name : 'Unknown',
         significance: significance,
         fameAwarded: fameReward,
         contributions: space.contributions ? [...space.contributions] : [],
