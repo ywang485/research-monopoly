@@ -462,12 +462,17 @@ async function handleEurekaSpace(player) {
                         closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
                         closestSpace.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
                         log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
-                        renderBoard();
-                        updatePlayerStats();
-                        checkGameEnd();
-                        if (!GameState.gameOver) endTurn();
+
+                        // Delay rendering until after modal closes for proper visual update
+                        setTimeout(() => {
+                            renderBoard();
+                            updatePlayerStats();
+                            checkGameEnd();
+                            if (!GameState.gameOver) endTurn();
+                        }, 0);
                     }
-                }
+                },
+                closeModal: true
             },
             {
                 text: 'Skip',
