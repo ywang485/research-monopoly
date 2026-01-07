@@ -309,17 +309,24 @@ function getAnimatedPosition(type, entityIndex, positions, spaceSize) {
 // SPACE HANDLING
 // ============================================
 function handleStartSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     player.addFame(2);
     showModal(
         'New Academic Year',
-        `<p>Congratulations! You've survived another trip around the sun without quitting academia.</p>
-        <p>+2 fame for your unrelenting stubbornness</p>
-        <p class="info-text">Your family still doesn't understand what you do for a living.</p>`,
+        `<p>Congratulations! ${you}'ve survived another trip around the sun without quitting academia.</p>
+        <p>+2 fame for ${your} unrelenting stubbornness</p>
+        <p class="info-text">${your} family still doesn't understand what ${you} do for a living.</p>`,
         [{ text: 'Yay...', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleConferenceSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     // Check if player has any publications
     if (player.theoriesPublished.length === 0) {
         // Small fame gain for just attending
@@ -333,9 +340,9 @@ function handleConferenceSpace(player) {
                 <span class="dice">🎲</span>
                 <div class="dice-result">+${smallFameGain} Fame</div>
             </div>
-            <p>You showed up to the conference, but realized you have nothing to present.</p>
+            <p>${you} showed up to the conference, but realized ${you_lower} have nothing to present.</p>
             <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
-            <p class="info-text">At least someone remembered your name tag!</p>
+            <p class="info-text">At least someone remembered ${your} name tag!</p>
             `,
             [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
         );
@@ -356,7 +363,7 @@ function handleConferenceSpace(player) {
             <span class="dice">🎲</span>
             <div class="dice-result">+${fameGain} Fame!</div>
         </div>
-        <p>You traveled across the country to present your groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
+        <p>${you} traveled across the country to present ${your} groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
         <p class="info-text">At least the hotel breakfast was mediocre!</p>
         `,
         [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -364,20 +371,26 @@ function handleConferenceSpace(player) {
 }
 
 function handleSabbaticalSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+
     player.rejuvenate(2);
 
     showModal(
         'Sabbatical Leave',
         `
-        <p>You escaped to "write a book" (really just avoided emails for 6 months).</p>
+        <p>${you} escaped to "write a book" (really just avoided emails for 6 months).</p>
         <p>-2 years of aging from not attending meetings!</p>
-        <p class="info-text">You'll definitely finish that book chapter... eventually.</p>
+        <p class="info-text">${you}'ll definitely finish that book chapter... eventually.</p>
         `,
         [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleGrantSpace(player) {
+    const you = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     player.addFame(2);
 
     showModal(
@@ -387,15 +400,18 @@ function handleGrantSpace(player) {
             <span class="dice">💰</span>
             <div class="dice-result">+2 Fame!</div>
         </div>
-        <p>After only 47 revisions and 3 panel reviews, they actually gave you money!</p>
-        <p>+2 fame (mostly from other academics jealous of your funding)</p>
-        <p class="info-text">Now if only the grant actually covered your students' stipends...</p>
+        <p>After only 47 revisions and 3 panel reviews, they actually gave ${you} money!</p>
+        <p>+2 fame (mostly from other academics jealous of ${your} funding)</p>
+        <p class="info-text">Now if only the grant actually covered ${your} students' stipends...</p>
         `,
         [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleScandalSpace(player) {
+    const you = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     playSound('scandal');
     const fameLoss = Math.min(player.totalFame, rollDice() + 1);
     player.totalFame -= fameLoss;
@@ -404,15 +420,18 @@ function handleScandalSpace(player) {
     showModal(
         'Academic Scandal!',
         `
-        <p style="color: #a86060;">Someone actually read your paper and found... issues.</p>
+        <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
         <p>-${fameLoss} fame from the Twitter mob and anonymous blog posts</p>
-        <p class="info-text">Maybe you should have checked those p-values more carefully...</p>
+        <p class="info-text">Maybe ${you} should have checked those p-values more carefully...</p>
         `,
         [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleCollaborationSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+
     const otherPlayers = GameState.players.filter(p => p.isAlive && p.index !== player.index);
 
     if (otherPlayers.length > 0) {
@@ -424,8 +443,8 @@ function handleCollaborationSpace(player) {
         showModal(
             'Research Collaboration',
             `
-            <p>You and ${collaborator.name} are now co-authors!</p>
-            <p>Both +${bonus} fame (now you have to decide authorship order...)</p>
+            <p>${you} and ${collaborator.name} are now co-authors!</p>
+            <p>Both +${bonus} fame (now ${you_lower} have to decide authorship order...)</p>
             <p class="info-text">May the most passive-aggressive email win.</p>
             `,
             [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -433,7 +452,7 @@ function handleCollaborationSpace(player) {
     } else {
         showModal(
             'Research Collaboration',
-            `<p>You wanted to collaborate but everyone else is dead or has better things to do.</p>
+            `<p>${you} wanted to collaborate but everyone else is dead or has better things to do.</p>
             <p class="info-text">Solo authorship it is!</p>`,
             [{ text: 'Forever alone', action: () => endTurn() }]
         );
@@ -441,6 +460,10 @@ function handleCollaborationSpace(player) {
 }
 
 async function handleEurekaSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     playSound('eureka');
 
     // Find the closest uninvested hypothesis space
@@ -464,9 +487,9 @@ async function handleEurekaSpace(player) {
         showModal(
             'EUREKA! 💡',
             `
-            <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
-            <p>You had a brilliant idea about ${GameState.entity.name}!</p>
-            <p class="info-text">But... every hypothesis space is already claimed. Your genius goes to waste.</p>
+            <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
+            <p>${you} had a brilliant idea about ${GameState.entity.name}!</p>
+            <p class="info-text">But... every hypothesis space is already claimed. ${your} genius goes to waste.</p>
             <p style="color: #888; font-size: 11px;">Should've thought of this sooner!</p>
             `,
             [{ text: 'Tragic', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -478,9 +501,9 @@ async function handleEurekaSpace(player) {
     showModal(
         'EUREKA! 💡',
         `
-        <p style="color: #c8b070; font-size: 12px;">It came to you in the shower!</p>
-        <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit you!</p>
-        <p>You can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
+        <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
+        <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit ${you_lower}!</p>
+        <p>${you} can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
         <div class="suggestions-container">
             <label>AI-generated hypotheses (because originality is hard):</label>
             <div id="hypothesis-suggestions" class="hypothesis-suggestions">
@@ -488,8 +511,8 @@ async function handleEurekaSpace(player) {
             </div>
         </div>
         <div class="input-group">
-            <label>Or formulate your eureka moment:</label>
-            <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
+            <label>Or formulate ${your} eureka moment:</label>
+            <input type="text" id="hypothesis-input" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}...">
         </div>
         <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
         `,
@@ -589,6 +612,12 @@ function handleSpaceLanding(player, space) {
 }
 
 async function handleHypothesisSpace(player, space) {
+    // Pronoun helpers for AI vs human players
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+    const your_lower = player.isAI ? `${player.name}'s` : 'your';
+
     if (!space.hypothesis) {
         // First player to land here - can create hypothesis
         const availableYears = player.availableYears;
@@ -613,7 +642,7 @@ async function handleHypothesisSpace(player, space) {
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${!canAfford ? '<p style="color: #a86060;">You\'ll likely die before you come up with anything</p>' : ''}
+            ${!canAfford ? `<p style="color: #a86060;">${you}'ll likely die before ${you_lower} come up with anything</p>` : ''}
             `,
             [
                 {
@@ -687,7 +716,7 @@ async function handleHypothesisSpace(player, space) {
                 <input type="number" id="investment-years" min="1" max="${availableYears}" value="1" placeholder="Years to invest">
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < 1 ? '<p style="color: #a86060;">You literally can\'t afford any investment.</p>' : ''}
+            ${availableYears < 1 ? `<p style="color: #a86060;">${you} literally can't afford any investment.</p>` : ''}
             `,
             [
                 {
@@ -697,7 +726,7 @@ async function handleHypothesisSpace(player, space) {
                         const yearsToInvest = parseInt(document.getElementById('investment-years').value) || 0;
 
                         if (yearsToInvest <= 0) {
-                            showModal('Invalid Investment', '<p>You need to invest at least 1 year!</p>',
+                            showModal('Invalid Investment', `<p>${you} need to invest at least 1 year!</p>`,
                                 [{ text: 'Oops', action: () => handleHypothesisSpace(player, space) }]);
                             return;
                         }
@@ -724,7 +753,7 @@ async function handleHypothesisSpace(player, space) {
                             checkGameEnd();
                             if (!GameState.gameOver) endTurn();
                         } else {
-                            showModal('Insufficient Life', `<p>You don't have ${yearsToInvest} years to spare!</p>`,
+                            showModal('Insufficient Life', `<p>${you} don't have ${yearsToInvest} years to spare!</p>`,
                                 [{ text: 'Damn', action: () => handleHypothesisSpace(player, space) }]);
                         }
                     }
@@ -765,14 +794,14 @@ async function handleHypothesisSpace(player, space) {
         if (isLeadingInvestor) {
             // Player is the leading investor - no literature survey needed!
             showModal(
-                'Your Own Theory! 😎',
+                `${your} Own Theory! 😎`,
                 `
                 <p><strong>Established Theory:</strong></p>
                 <p>"${space.hypothesis}"</p>
-                <p style="margin-top: 15px; color: #2ecc71;">This is YOUR theory! You invested the most time into this research.</p>
-                <p class="info-text" style="margin-top: 15px;">No need to waste time reading your own work. You already know this stuff!</p>
+                <p style="margin-top: 15px; color: #2ecc71;">This is ${your.toUpperCase()} theory! ${you} invested the most time into this research.</p>
+                <p class="info-text" style="margin-top: 15px;">No need to waste time reading ${your_lower} own work. ${you} already know this stuff!</p>
                 `,
-                [{ text: 'Of course I do', action: () => {
+                [{ text: player.isAI ? 'Obviously' : 'Of course I do', action: () => {
                     log(`${player.name} visited their own established theory.`);
                     updatePlayerStats();
                     checkGameEnd();
@@ -784,7 +813,22 @@ async function handleHypothesisSpace(player, space) {
             const surveyCost = 1;
             player.age += surveyCost;
 
-            const citationComplaints = [
+            const citationComplaints = player.isAI ? [
+                `Ugh, now ${player.name} has to waste time reading someone else's garbage and pretend it's brilliant.`,
+                `Great, another theory ${player.name}'ll have to cite even though ${player.name} knows it's flawed.`,
+                `Time to pad ${player.name}'s bibliography with this overhyped nonsense.`,
+                `${player.name} HAS to cite this. Academia's unwritten rule: stroke everyone's ego.`,
+                `Now ${player.name}'s legally obligated to make this theory sound important in the lit review.`,
+                `Fantastic. ${player.name} gets to spend a year analyzing why this theory is 'foundational' (it's not).`,
+                `Nothing says 'fun' like begrudgingly adding this to ${player.name}'s reference list.`,
+                `${player.name} could've used this year for literally anything else. But no, literature survey time!`,
+                `Time to write a whole paragraph explaining why this theory 'informs ${player.name}'s work' (spoiler: barely).`,
+                `Congrats, ${player.name} now has to pretend to have always respected this research.`,
+                `${player.name}'ll cite this through gritted teeth, knowing full well it has issues.`,
+                `Another year lost to academic bureaucracy. At least ${player.name}'s citations look thorough!`,
+                `${player.name} has to read this AND cite it. Double the pain, zero the joy.`,
+                `Time for a deep dive into theory ${player.name}'ll probably disagree with in 5 years.`
+            ] : [
                 "Ugh, now you have to waste time reading someone else's garbage and pretend it's brilliant.",
                 "Great, another theory you'll have to cite even though you know it's flawed.",
                 "Time to pad your bibliography with this overhyped nonsense.",
@@ -809,7 +853,7 @@ async function handleHypothesisSpace(player, space) {
                 <p><strong>Established Theory:</strong></p>
                 <p>"${space.hypothesis}"</p>
                 <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
-                <p class="info-text" style="margin-top: 15px;">You spent ${surveyCost} year doing a literature survey on this theory.</p>
+                <p class="info-text" style="margin-top: 15px;">${you} spent ${surveyCost} year doing a literature survey on this theory.</p>
                 <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
                 `,
                 [{ text: '*Sigh* Fine', action: () => {
@@ -824,6 +868,9 @@ async function handleHypothesisSpace(player, space) {
 }
 
 function handleRecruitSpace(player) {
+    const you = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     const availableFame = player.availableFame;
 
     let studentsHTML = '';
@@ -840,11 +887,11 @@ function handleRecruitSpace(player) {
     showModal(
         'Graduate Recruitment',
         `
-        <p>Trade your fame points for indentured servants... I mean, research assistants!</p>
+        <p>Trade ${your} fame points for indentured servants... I mean, research assistants!</p>
         <p>Fame available: ${availableFame}</p>
         <p>Current exploitation victims: ${player.students.length}</p>
         ${studentsHTML}
-        <p class="info-text">They'll do all the work while you take all the credit!</p>
+        <p class="info-text">They'll do all the work while ${you} take all the credit!</p>
         `,
         [{ text: 'Perfect', action: () => endTurn() }]
     );
@@ -865,6 +912,10 @@ function handleRecruitSpace(player) {
 }
 
 function handleCommunityServiceSpace(player) {
+    const you = player.isAI ? player.name : 'You';
+    const you_lower = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
+
     const serviceCost = 3; // Years of life spent on community service
 
     if (player.students.length > 0) {
@@ -875,10 +926,10 @@ function handleCommunityServiceSpace(player) {
         showModal(
             'Community Service',
             `
-            <p>Oh no! You've been assigned mandatory community service work.</p>
-            <p>This will cost you <strong>${serviceCost} years</strong> of your precious research time.</p>
-            <p class="info-text">BUT WAIT... you have a ${studentName} who could take your place!</p>
-            <p>What will you do?</p>
+            <p>Oh no! ${you}'ve been assigned mandatory community service work.</p>
+            <p>This will cost ${you_lower} <strong>${serviceCost} years</strong> of ${your} precious research time.</p>
+            <p class="info-text">BUT WAIT... ${you_lower} have a ${studentName} who could take ${your} place!</p>
+            <p>What will ${you_lower} do?</p>
             `,
             [
                 {
@@ -894,7 +945,7 @@ function handleCommunityServiceSpace(player) {
                         showModal(
                             'Student Sacrificed',
                             `
-                            <p>You threw your ${sacrificedName} under the bus!</p>
+                            <p>${you} threw ${your} ${sacrificedName} under the bus!</p>
                             <p>They're now spending their days picking up litter instead of doing research.</p>
                             <p class="info-text">Academia: where we build character by crushing dreams!</p>
                             `,
@@ -910,9 +961,9 @@ function handleCommunityServiceSpace(player) {
                         showModal(
                             'Community Service',
                             `
-                            <p>You nobly chose to do the community service yourself.</p>
+                            <p>${you} nobly chose to do the community service ${you_lower}self.</p>
                             <p>+${serviceCost} years of aging from mindless bureaucratic tasks.</p>
-                            <p class="info-text">Your student is grateful... for now.</p>
+                            <p class="info-text">${your} student is grateful... for now.</p>
                             `,
                             [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
                         );
@@ -927,9 +978,9 @@ function handleCommunityServiceSpace(player) {
         showModal(
             'Community Service',
             `
-            <p>You've been assigned mandatory community service work!</p>
+            <p>${you}'ve been assigned mandatory community service work!</p>
             <p>+${serviceCost} years of aging from filling out forms and attending sensitivity training.</p>
-            <p class="info-text">If only you had a grad student to dump this on...</p>
+            <p class="info-text">If only ${you_lower} had a grad student to dump this on...</p>
             `,
             [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
         );
@@ -1062,7 +1113,7 @@ function handleNPCProveTheory(space) {
             <span class="dice">🎲</span>
             <div class="dice-result">Significance: ${'★'.repeat(significance)}${'☆'.repeat(6 - significance)}</div>
         </div>
-        <p><strong>${maxInvestor.player}</strong> published the paper and earned <strong>${fameReward} fame!</strong></p>
+        <p><strong>${winner ? winner.name : 'Unknown'}</strong> published the paper and earned <strong>${fameReward} fame!</strong></p>
         `,
         [{
             text: 'Historic!',
@@ -1075,7 +1126,7 @@ function handleNPCProveTheory(space) {
         }]
     );
 
-    log(`THEORY: "${space.hypothesis}" proven! ${maxInvestor.player} earned ${fameReward} fame!`, 'theory');
+    log(`THEORY: "${space.hypothesis}" proven! ${winner ? winner.name : 'Unknown'} earned ${fameReward} fame!`, 'theory');
 }
 
 function finishNPCTurn() {
