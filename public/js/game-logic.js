@@ -679,19 +679,30 @@ async function handleHypothesisSpace(player, space) {
             <p>People who've already sacrificed years of their life:</p>
             ${investmentsHTML}
             <div class="input-group" style="margin-top: 10px;">
-                <label>Add unnecessary complexity (costs more life):</label>
+                <label>Add unnecessary complexity (optional):</label>
                 <input type="text" id="hypothesis-addition" placeholder="Make it sound more academic...">
             </div>
-            <p>Cost: ${space.investmentCost} more years you'll never get back</p>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>How many years to waste on this?</label>
+                <input type="number" id="investment-years" min="1" max="${availableYears}" value="1" placeholder="Years to invest">
+            </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this investment.</p>' : ''}
+            ${availableYears < 1 ? '<p style="color: #a86060;">You literally can\'t afford any investment.</p>' : ''}
             `,
             [
                 {
                     text: 'Invest',
-                    disabled: availableYears < space.investmentCost,
+                    disabled: availableYears < 1,
                     action: () => {
-                        if (availableYears >= space.investmentCost) {
+                        const yearsToInvest = parseInt(document.getElementById('investment-years').value) || 0;
+
+                        if (yearsToInvest <= 0) {
+                            showModal('Invalid Investment', '<p>You need to invest at least 1 year!</p>',
+                                [{ text: 'Oops', action: () => handleHypothesisSpace(player, space) }]);
+                            return;
+                        }
+
+                        if (availableYears >= yearsToInvest) {
                             // Check if player added to the hypothesis
                             const addition = document.getElementById('hypothesis-addition').value.trim();
                             if (addition) {
@@ -702,16 +713,19 @@ async function handleHypothesisSpace(player, space) {
 
                             const existingInv = space.investments.find(i => i.playerIndex === player.index);
                             if (existingInv) {
-                                existingInv.years += space.investmentCost;
+                                existingInv.years += yearsToInvest;
                             } else {
-                                space.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
+                                space.investments.push({ player: player.name, years: yearsToInvest, playerIndex: player.index });
                             }
-                            player.investLife(space.investmentCost);
-                            log(`${player.name} invested ${space.investmentCost} more years in the hypothesis.`);
+                            player.investLife(yearsToInvest);
+                            log(`${player.name} invested ${yearsToInvest} years in the hypothesis.`);
                             renderBoard();
                             updatePlayerStats();
                             checkGameEnd();
                             if (!GameState.gameOver) endTurn();
+                        } else {
+                            showModal('Insufficient Life', `<p>You don't have ${yearsToInvest} years to spare!</p>`,
+                                [{ text: 'Damn', action: () => handleHypothesisSpace(player, space) }]);
                         }
                     }
                 },
@@ -722,13 +736,44 @@ async function handleHypothesisSpace(player, space) {
             ]
         );
     } else {
-        // Already proven - just info
+        // Already proven - must do literature survey
+        const surveyCost = 1;
+        player.age += surveyCost;
+
+        const citationComplaints = [
+            "Ugh, now you have to waste time reading someone else's garbage and pretend it's brilliant.",
+            "Great, another theory you'll have to cite even though you know it's flawed.",
+            "Time to pad your bibliography with this overhyped nonsense.",
+            "You HAVE to cite this. Academia's unwritten rule: stroke everyone's ego.",
+            "Now you're legally obligated to make this theory sound important in your lit review.",
+            "Fantastic. You get to spend a year analyzing why this theory is 'foundational' (it's not).",
+            "Nothing says 'fun' like begrudgingly adding this to your reference list.",
+            "You could've used this year for literally anything else. But no, literature survey time!",
+            "Time to write a whole paragraph explaining why this theory 'informs your work' (spoiler: barely).",
+            "Congrats, you now have to pretend you've always respected this research.",
+            "You'll cite this through gritted teeth, knowing full well it has issues.",
+            "Another year lost to academic bureaucracy. At least your citations look thorough!",
+            "You have to read this AND cite it. Double the pain, zero the joy.",
+            "Time for a deep dive into theory you'll probably disagree with in 5 years."
+        ];
+
+        const randomComplaint = citationComplaints[Math.floor(Math.random() * citationComplaints.length)];
+
         showModal(
-            'Established Theory',
-            `<p>This is settled science now. You're too late to the party.</p>
-            <p><strong>"${space.hypothesis}"</strong></p>
-            <p class="info-text">Should've worked faster.</p>`,
-            [{ text: 'Damn', action: () => endTurn() }]
+            'Literature Survey Required 📚',
+            `
+            <p><strong>Established Theory:</strong></p>
+            <p>"${space.hypothesis}"</p>
+            <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
+            <p class="info-text" style="margin-top: 15px;">You spent ${surveyCost} year doing a literature survey on this theory.</p>
+            <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
+            `,
+            [{ text: '*Sigh* Fine', action: () => {
+                log(`${player.name} grudgingly surveyed the literature on: "${space.hypothesis}"`, 'important');
+                updatePlayerStats();
+                checkGameEnd();
+                if (!GameState.gameOver) endTurn();
+            }}]
         );
     }
 }
@@ -793,6 +838,7 @@ function handleCommunityServiceSpace(player) {
             [
                 {
                     text: `Sacrifice ${studentName} 😈`,
+                    closeModal: false,
                     action: () => {
                         // Remove the first student
                         const sacrificedStudent = player.students.shift();
@@ -919,11 +965,24 @@ function handleNPCProveTheory(space) {
     playSound('theory');
     space.isProven = true;
 
-    // Find who invested the most
-    let maxInvestor = space.investments[0];
+    // Find who invested the most (sum up all investments per player)
+    const playerInvestments = {};
     space.investments.forEach(inv => {
-        if (inv.years > maxInvestor.years) {
-            maxInvestor = inv;
+        if (!playerInvestments[inv.playerIndex]) {
+            playerInvestments[inv.playerIndex] = 0;
+        }
+        playerInvestments[inv.playerIndex] += inv.years;
+    });
+
+    // Find the player with maximum total investment
+    let maxPlayerIndex = null;
+    let maxYears = 0;
+    Object.keys(playerInvestments).forEach(playerIndexStr => {
+        const playerIndex = parseInt(playerIndexStr);
+        const totalYears = playerInvestments[playerIndex];
+        if (totalYears > maxYears) {
+            maxYears = totalYears;
+            maxPlayerIndex = playerIndex;
         }
     });
 
@@ -932,7 +991,7 @@ function handleNPCProveTheory(space) {
     const fameReward = significance * 5;
 
     // Find the player and reward them
-    const winner = GameState.players[maxInvestor.playerIndex];
+    const winner = GameState.players[maxPlayerIndex];
     if (winner) {
         winner.addFame(fameReward);
         winner.theoriesPublished.push(space.hypothesis);
@@ -941,7 +1000,7 @@ function handleNPCProveTheory(space) {
     // Add to theories list
     GameState.theories.push({
         hypothesis: space.hypothesis,
-        author: maxInvestor.player,
+        author: winner ? winner.name : 'Unknown',
         significance: significance,
         fameAwarded: fameReward,
         contributions: space.contributions ? [...space.contributions] : [],
