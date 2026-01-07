@@ -13,14 +13,14 @@ export default function GameoverScreen() {
       </div>
 
       <div className="page-content">
-        <h1 className="hand-title">📓 GAME OVER 📓</h1>
+        <h1 className="hand-title">GAME OVER</h1>
         <div id="winner-display" className="winner-card"></div>
 
         {/* Theory Revelation Section */}
         <div id="theory-revelation" className="theory-revelation notebook-insert">
           <div className="tape tape-left"></div>
           <div className="tape tape-right"></div>
-          <h2 className="revelation-title">📜 THE GRAND UNIFIED THEORY 📜</h2>
+          <h2 className="revelation-title">THE GRAND UNIFIED THEORY </h2>
           <div id="theory-entity" className="theory-entity"></div>
           <div id="theory-content" className="theory-content">
             <div className="theory-loading">✏️ Synthesizing groundbreaking discoveries...</div>
