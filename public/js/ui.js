@@ -21,6 +21,9 @@ function showModal(title, bodyHTML, buttons) {
                 hideModal();
             }
         };
+        if (btn.disabled) {
+            button.disabled = true;
+        }
         buttonsContainer.appendChild(button);
     });
 

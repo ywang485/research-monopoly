@@ -571,6 +571,7 @@ async function handleHypothesisSpace(player, space) {
             [
                 {
                     text: 'Invest',
+                    disabled: availableYears < space.investmentCost,
                     action: () => {
                         const hypothesis = document.getElementById('hypothesis-input').value.trim();
                         if (hypothesis && availableYears >= space.investmentCost) {
@@ -634,10 +635,12 @@ async function handleHypothesisSpace(player, space) {
             </div>
             <p>Cost: ${space.investmentCost} more years you'll never get back</p>
             <p class="info-text">Life years remaining: ${availableYears}</p>
+            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this investment.</p>' : ''}
             `,
             [
                 {
                     text: 'Invest',
+                    disabled: availableYears < space.investmentCost,
                     action: () => {
                         if (availableYears >= space.investmentCost) {
                             // Check if player added to the hypothesis
