@@ -929,7 +929,7 @@ function handleNPCProveTheory(space) {
 
     // Roll for significance
     const significance = rollDice();
-    const fameReward = significance * 5;
+    const fameReward = significance * maxInvestor.years;
 
     // Find the player and reward them
     const winner = GameState.players[maxInvestor.playerIndex];
