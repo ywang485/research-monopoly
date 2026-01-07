@@ -1365,12 +1365,42 @@ async function endGame(winner, reason) {
         // Try to get LLM-generated integrated theory
         const integratedTheory = await fetchIntegratedTheory(GameState.entity.name, provenHypotheses);
 
+        // Helper function to find leading investor for a space
+        const getLeadingInvestor = (space) => {
+            const playerInvestments = {};
+            space.investments.forEach(inv => {
+                if (!playerInvestments[inv.playerIndex]) {
+                    playerInvestments[inv.playerIndex] = 0;
+                }
+                playerInvestments[inv.playerIndex] += inv.years;
+            });
+
+            let maxPlayerIndex = null;
+            let maxYears = 0;
+            Object.keys(playerInvestments).forEach(playerIndexStr => {
+                const playerIndex = parseInt(playerIndexStr);
+                const totalYears = playerInvestments[playerIndex];
+                if (totalYears > maxYears) {
+                    maxYears = totalYears;
+                    maxPlayerIndex = playerIndex;
+                }
+            });
+
+            return maxPlayerIndex !== null ? GameState.players[maxPlayerIndex] : null;
+        };
+
         if (integratedTheory) {
             document.getElementById('theory-content').innerHTML = `
                 <div class="theory-text">${integratedTheory}</div>
                 <div class="theory-hypotheses">
                     <h4>Established Theories:</h4>
-                    ${provenHypotheses.map((h, i) => `<div class="proven-hypothesis">${i + 1}. "${h}"</div>`).join('')}
+                    ${provenSpaces.map((space, i) => {
+                        const leadingInvestor = getLeadingInvestor(space);
+                        return `<div class="proven-hypothesis">
+                            ${i + 1}. "${space.hypothesis}"
+                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 11px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
+                        </div>`;
+                    }).join('')}
                 </div>
             `;
         } else {
@@ -1380,7 +1410,13 @@ async function endGame(winner, reason) {
                     After years of rigorous research and academic debate, the scientific community has established the following truths:
                 </div>
                 <div class="theory-hypotheses">
-                    ${provenHypotheses.map((h, i) => `<div class="proven-hypothesis">${i + 1}. "${h}"</div>`).join('')}
+                    ${provenSpaces.map((space, i) => {
+                        const leadingInvestor = getLeadingInvestor(space);
+                        return `<div class="proven-hypothesis">
+                            ${i + 1}. "${space.hypothesis}"
+                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 11px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
+                        </div>`;
+                    }).join('')}
                 </div>
             `;
         }
