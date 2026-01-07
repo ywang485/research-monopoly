@@ -679,19 +679,30 @@ async function handleHypothesisSpace(player, space) {
             <p>People who've already sacrificed years of their life:</p>
             ${investmentsHTML}
             <div class="input-group" style="margin-top: 10px;">
-                <label>Add unnecessary complexity (costs more life):</label>
+                <label>Add unnecessary complexity (optional):</label>
                 <input type="text" id="hypothesis-addition" placeholder="Make it sound more academic...">
             </div>
-            <p>Cost: ${space.investmentCost} more years you'll never get back</p>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>How many years to waste on this?</label>
+                <input type="number" id="investment-years" min="1" max="${availableYears}" value="1" placeholder="Years to invest">
+            </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this investment.</p>' : ''}
+            ${availableYears < 1 ? '<p style="color: #a86060;">You literally can\'t afford any investment.</p>' : ''}
             `,
             [
                 {
                     text: 'Invest',
-                    disabled: availableYears < space.investmentCost,
+                    disabled: availableYears < 1,
                     action: () => {
-                        if (availableYears >= space.investmentCost) {
+                        const yearsToInvest = parseInt(document.getElementById('investment-years').value) || 0;
+
+                        if (yearsToInvest <= 0) {
+                            showModal('Invalid Investment', '<p>You need to invest at least 1 year!</p>',
+                                [{ text: 'Oops', action: () => handleHypothesisSpace(player, space) }]);
+                            return;
+                        }
+
+                        if (availableYears >= yearsToInvest) {
                             // Check if player added to the hypothesis
                             const addition = document.getElementById('hypothesis-addition').value.trim();
                             if (addition) {
@@ -702,16 +713,19 @@ async function handleHypothesisSpace(player, space) {
 
                             const existingInv = space.investments.find(i => i.playerIndex === player.index);
                             if (existingInv) {
-                                existingInv.years += space.investmentCost;
+                                existingInv.years += yearsToInvest;
                             } else {
-                                space.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
+                                space.investments.push({ player: player.name, years: yearsToInvest, playerIndex: player.index });
                             }
-                            player.investLife(space.investmentCost);
-                            log(`${player.name} invested ${space.investmentCost} more years in the hypothesis.`);
+                            player.investLife(yearsToInvest);
+                            log(`${player.name} invested ${yearsToInvest} years in the hypothesis.`);
                             renderBoard();
                             updatePlayerStats();
                             checkGameEnd();
                             if (!GameState.gameOver) endTurn();
+                        } else {
+                            showModal('Insufficient Life', `<p>You don't have ${yearsToInvest} years to spare!</p>`,
+                                [{ text: 'Damn', action: () => handleHypothesisSpace(player, space) }]);
                         }
                     }
                 },
