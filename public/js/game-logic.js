@@ -1421,7 +1421,7 @@ async function endGame(winner, reason) {
             `;
         }
 
-        // Show contributors
+        // Show contributors with loading state
         if (sortedContributors.length > 0) {
             document.getElementById('theory-contributors').innerHTML = `
                 <h4>📚 Contributors to Science 📚</h4>
@@ -1431,10 +1431,45 @@ async function endGame(winner, reason) {
                             <span class="contributor-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
                             <span class="contributor-name" style="color: ${c.player.color}">${c.player.name}</span>
                             <span class="contributor-stats">${c.years} years invested</span>
+                            <div class="contributor-bio" style="margin-top: 10px; font-size: 12px; font-style: italic; color: #666;">
+                                ✨ Generating career bio...
+                            </div>
                         </div>
                     `).join('')}
                 </div>
             `;
+
+            // Collect game log from DOM
+            const logEntries = Array.from(document.querySelectorAll('.log-entry')).map(entry => entry.textContent);
+            const gameLog = logEntries.join('\n');
+
+            // Fetch player bios asynchronously
+            fetchPlayerBios(GameState.players, gameLog).then(bios => {
+                if (bios && bios.length === GameState.players.length) {
+                    // Update the contributors display with bios
+                    document.getElementById('theory-contributors').innerHTML = `
+                        <h4>📚 Contributors to Science 📚</h4>
+                        <div class="contributors-list">
+                            ${sortedContributors.map((c, i) => {
+                                const playerBio = bios[c.player.index] || 'A mysterious figure in the annals of academic history.';
+                                return `
+                                    <div class="contributor ${i === 0 ? 'top-contributor' : ''}" style="border-color: ${c.player.color}">
+                                        <span class="contributor-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
+                                        <span class="contributor-name" style="color: ${c.player.color}">${c.player.name}</span>
+                                        <span class="contributor-stats">${c.years} years invested</span>
+                                        <div class="contributor-bio" style="margin-top: 10px; font-size: 12px; font-style: italic; color: #666; line-height: 1.4;">
+                                            ${playerBio}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+            }).catch(err => {
+                console.warn('Failed to generate player bios:', err);
+                // Keep the display without bios if generation fails
+            });
         }
     } else {
         // No proven theories
