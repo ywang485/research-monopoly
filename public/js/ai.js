@@ -263,6 +263,62 @@ async function fetchPeerReview(hypothesis) {
     }
 }
 
+async function fetchPlayerBios(players, gameLog) {
+    if (!GameState.llm.available || players.length === 0) {
+        return null;
+    }
+
+    try {
+        // Prepare player data with their invested hypotheses
+        const playerData = players.map(player => ({
+            name: player.name,
+            totalFame: player.totalFame,
+            finalAge: player.age,
+            isAlive: player.isAlive,
+            theoriesPublished: player.theoriesPublished,
+            totalYearsInvested: 0 // Will be calculated from game board
+        }));
+
+        // Calculate total years invested per player from board
+        GameState.board.filter(s => s.isProven && s.hypothesis).forEach(space => {
+            const playerInvestments = {};
+            space.investments.forEach(inv => {
+                if (!playerInvestments[inv.playerIndex]) {
+                    playerInvestments[inv.playerIndex] = 0;
+                }
+                playerInvestments[inv.playerIndex] += inv.years;
+            });
+
+            Object.keys(playerInvestments).forEach(playerIndexStr => {
+                const playerIndex = parseInt(playerIndexStr);
+                if (playerData[playerIndex]) {
+                    playerData[playerIndex].totalYearsInvested += playerInvestments[playerIndex];
+                }
+            });
+        });
+
+        const response = await fetch('/api/generate-bios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                players: playerData,
+                gameLog: gameLog
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.fallback || data.error) {
+            return null;
+        }
+
+        return data.bios; // Should be an array of bios, one per player
+    } catch (e) {
+        console.warn('Failed to fetch player bios:', e);
+        return null;
+    }
+}
+
 // ============================================
 // AI DECISION MAKING (for AI players)
 // ============================================

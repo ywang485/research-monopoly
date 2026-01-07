@@ -77,6 +77,23 @@ Examples of the tone:
 
 Generate ONLY the review comment, no quotes or formatting.`;
 
+const PLAYER_BIO_PROMPT = `You are a sarcastic academic biographer writing obituaries for researchers.
+Given player data (name, theories published, fame, age, years invested) and the game log of their academic career, write a single paragraph bio that:
+- Is brutally honest and sarcastic about their "accomplishments"
+- Highlights their struggles, failures, and questionable choices during the game
+- References specific events from the game log (investments, deaths, scandals, etc.)
+- Makes fun of their hypotheses and theories
+- Is mean but in a darkly humorous way
+- Should be 3-4 sentences maximum
+- Focuses on what makes their career pathetic or absurd
+
+Examples of the tone:
+- "After wasting 15 years on a hypothesis about quantum foam, they died before seeing it published."
+- "Their greatest achievement was convincing others to cite their poorly-researched theory."
+- "They sacrificed three grad students to avoid community service, which really says it all."
+
+Generate ONLY the bio paragraph, no quotes, no player name header, just the narrative.`;
+
 export function buildHypothesisPrompt(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
   let prompt = `Generate a humorous pseudo-scientific hypothesis about "${entity}".`;
 
