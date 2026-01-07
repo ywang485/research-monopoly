@@ -239,73 +239,81 @@ function drawInvestmentHatching(ctx, x, y, w, h, investments, totalYears, seed =
         playerInvestments[inv.playerIndex] += inv.years;
     });
 
-    // Draw hatching for each player with their color
-    const playerIndices = Object.keys(playerInvestments);
-    const angleStep = Math.PI / (playerIndices.length + 1); // Different angles for each player
-
-    playerIndices.forEach((playerIndexStr, pIdx) => {
+    // Find the player with the most investment
+    let leadingPlayerIndex = null;
+    let maxYears = 0;
+    Object.keys(playerInvestments).forEach(playerIndexStr => {
         const playerIndex = parseInt(playerIndexStr);
-        const player = GameState.players[playerIndex];
-        if (!player) return;
-
-        const playerYears = playerInvestments[playerIndex];
-        const playerDensity = playerYears / totalYears; // Proportion of total
-        const angle = (Math.PI / 4) + (pIdx - (playerIndices.length - 1) / 2) * 0.3; // Vary angle slightly
-
-        ctx.strokeStyle = player.color;
-        ctx.globalAlpha = 0.4 + playerDensity * 0.3; // More investment = more opaque
-        ctx.lineWidth = 1 + playerDensity * 0.5;
-
-        // Draw diagonal hatching lines
-        const cosA = Math.cos(angle);
-        const sinA = Math.sin(angle);
-        const diagLength = Math.sqrt(w * w + h * h);
-
-        ctx.beginPath();
-        for (let i = -diagLength; i < diagLength * 2; i += spacing / playerDensity) {
-            const wobble = (seededRandom(seed + i * 7 + playerIndex * 100) - 0.5) * 1.5;
-
-            // Calculate line endpoints based on angle
-            const offsetX = i * cosA + wobble;
-            const offsetY = i * sinA;
-
-            // Start and end points for line crossing the box
-            let x1 = x + offsetX;
-            let y1 = y;
-            let x2 = x + offsetX - h * sinA / cosA;
-            let y2 = y + h;
-
-            // Clip to box bounds
-            if (x1 < x) { y1 += (x - x1) * sinA / cosA; x1 = x; }
-            if (x1 > x + w) { y1 += (x1 - (x + w)) * sinA / cosA; x1 = x + w; }
-            if (x2 < x) { y2 -= (x - x2) * sinA / cosA; x2 = x; }
-            if (x2 > x + w) { y2 -= (x2 - (x + w)) * sinA / cosA; x2 = x + w; }
-
-            if (y1 >= y && y1 <= y + h && y2 >= y && y2 <= y + h) {
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-            }
-        }
-        ctx.stroke();
-
-        // Add some scribble marks for texture
-        const numScribbles = Math.ceil(playerYears / 5);
-        ctx.lineWidth = 1.5;
-        for (let s = 0; s < numScribbles; s++) {
-            ctx.beginPath();
-            const sx = x + 5 + seededRandom(seed + s * 3 + playerIndex * 50) * (w - 10);
-            const sy = y + 5 + seededRandom(seed + s * 3 + 1 + playerIndex * 50) * (h - 10);
-            const scribbleSize = 3 + seededRandom(seed + s * 3 + 2 + playerIndex * 50) * 5;
-
-            ctx.moveTo(sx, sy);
-            for (let p = 0; p < 4; p++) {
-                const nx = sx + (seededRandom(seed + s * 10 + p + playerIndex * 50) - 0.5) * scribbleSize * 2;
-                const ny = sy + (seededRandom(seed + s * 10 + p + 5 + playerIndex * 50) - 0.5) * scribbleSize * 2;
-                ctx.lineTo(nx, ny);
-            }
-            ctx.stroke();
+        const years = playerInvestments[playerIndex];
+        if (years > maxYears) {
+            maxYears = years;
+            leadingPlayerIndex = playerIndex;
         }
     });
+
+    // Only draw hatching for the leading investor
+    if (leadingPlayerIndex === null) return;
+
+    const player = GameState.players[leadingPlayerIndex];
+    if (!player) return;
+
+    const playerYears = playerInvestments[leadingPlayerIndex];
+    const playerDensity = playerYears / totalYears; // Proportion of total
+    const angle = Math.PI / 4; // 45-degree angle
+
+    ctx.strokeStyle = player.color;
+    ctx.globalAlpha = 0.5; // Consistent opacity for leading investor
+    ctx.lineWidth = 1.5;
+
+    // Draw diagonal hatching lines
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const diagLength = Math.sqrt(w * w + h * h);
+
+    ctx.beginPath();
+    for (let i = -diagLength; i < diagLength * 2; i += spacing / playerDensity) {
+        const wobble = (seededRandom(seed + i * 7 + leadingPlayerIndex * 100) - 0.5) * 1.5;
+
+        // Calculate line endpoints based on angle
+        const offsetX = i * cosA + wobble;
+        const offsetY = i * sinA;
+
+        // Start and end points for line crossing the box
+        let x1 = x + offsetX;
+        let y1 = y;
+        let x2 = x + offsetX - h * sinA / cosA;
+        let y2 = y + h;
+
+        // Clip to box bounds
+        if (x1 < x) { y1 += (x - x1) * sinA / cosA; x1 = x; }
+        if (x1 > x + w) { y1 += (x1 - (x + w)) * sinA / cosA; x1 = x + w; }
+        if (x2 < x) { y2 -= (x - x2) * sinA / cosA; x2 = x; }
+        if (x2 > x + w) { y2 -= (x2 - (x + w)) * sinA / cosA; x2 = x + w; }
+
+        if (y1 >= y && y1 <= y + h && y2 >= y && y2 <= y + h) {
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+        }
+    }
+    ctx.stroke();
+
+    // Add some scribble marks for texture
+    const numScribbles = Math.ceil(playerYears / 5);
+    ctx.lineWidth = 1.5;
+    for (let s = 0; s < numScribbles; s++) {
+        ctx.beginPath();
+        const sx = x + 5 + seededRandom(seed + s * 3 + leadingPlayerIndex * 50) * (w - 10);
+        const sy = y + 5 + seededRandom(seed + s * 3 + 1 + leadingPlayerIndex * 50) * (h - 10);
+        const scribbleSize = 3 + seededRandom(seed + s * 3 + 2 + leadingPlayerIndex * 50) * 5;
+
+        ctx.moveTo(sx, sy);
+        for (let p = 0; p < 4; p++) {
+            const nx = sx + (seededRandom(seed + s * 10 + p + leadingPlayerIndex * 50) - 0.5) * scribbleSize * 2;
+            const ny = sy + (seededRandom(seed + s * 10 + p + 5 + leadingPlayerIndex * 50) - 0.5) * scribbleSize * 2;
+            ctx.lineTo(nx, ny);
+        }
+        ctx.stroke();
+    }
 
     ctx.restore();
 }
