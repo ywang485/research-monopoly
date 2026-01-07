@@ -722,13 +722,44 @@ async function handleHypothesisSpace(player, space) {
             ]
         );
     } else {
-        // Already proven - just info
+        // Already proven - must do literature survey
+        const surveyCost = 1;
+        player.age += surveyCost;
+
+        const citationComplaints = [
+            "Ugh, now you have to waste time reading someone else's garbage and pretend it's brilliant.",
+            "Great, another theory you'll have to cite even though you know it's flawed.",
+            "Time to pad your bibliography with this overhyped nonsense.",
+            "You HAVE to cite this. Academia's unwritten rule: stroke everyone's ego.",
+            "Now you're legally obligated to make this theory sound important in your lit review.",
+            "Fantastic. You get to spend a year analyzing why this theory is 'foundational' (it's not).",
+            "Nothing says 'fun' like begrudgingly adding this to your reference list.",
+            "You could've used this year for literally anything else. But no, literature survey time!",
+            "Time to write a whole paragraph explaining why this theory 'informs your work' (spoiler: barely).",
+            "Congrats, you now have to pretend you've always respected this research.",
+            "You'll cite this through gritted teeth, knowing full well it has issues.",
+            "Another year lost to academic bureaucracy. At least your citations look thorough!",
+            "You have to read this AND cite it. Double the pain, zero the joy.",
+            "Time for a deep dive into theory you'll probably disagree with in 5 years."
+        ];
+
+        const randomComplaint = citationComplaints[Math.floor(Math.random() * citationComplaints.length)];
+
         showModal(
-            'Established Theory',
-            `<p>This is settled science now. You're too late to the party.</p>
-            <p><strong>"${space.hypothesis}"</strong></p>
-            <p class="info-text">Should've worked faster.</p>`,
-            [{ text: 'Damn', action: () => endTurn() }]
+            'Literature Survey Required 📚',
+            `
+            <p><strong>Established Theory:</strong></p>
+            <p>"${space.hypothesis}"</p>
+            <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
+            <p class="info-text" style="margin-top: 15px;">You spent ${surveyCost} year doing a literature survey on this theory.</p>
+            <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
+            `,
+            [{ text: '*Sigh* Fine', action: () => {
+                log(`${player.name} grudgingly surveyed the literature on: "${space.hypothesis}"`, 'important');
+                updatePlayerStats();
+                checkGameEnd();
+                if (!GameState.gameOver) endTurn();
+            }}]
         );
     }
 }
