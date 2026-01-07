@@ -145,6 +145,47 @@ class Player {
         this.isAlive = false;
         playSound('death');
         log(`${this.name} has passed away at age ${this.age}. Their legacy lives on through ${this.theoriesPublished.length} theories.`, 'important');
+
+        // Show death modal with sarcastic commentary
+        const deathMessages = [
+            "Should've invested in better health insurance instead of hypotheses.",
+            "At least they won't have to peer review any more grant proposals.",
+            "Death: the ultimate sabbatical.",
+            "Their h-index was never THAT impressive anyway.",
+            "Posthumous publications don't count for tenure, unfortunately.",
+            "Gone but not cited.",
+            "They finally found the one research question they couldn't answer.",
+            "Academia claims another victim.",
+            "Should've spent less time in the lab and more time exercising.",
+            "Their last hypothesis: 'I'll live forever.' Status: Disproven.",
+            "The university will replace them with three adjuncts.",
+            "At least now they don't have to attend any more faculty meetings.",
+            "Their final contribution to science: becoming a cautionary tale.",
+            "Too much coffee, not enough sleep, inevitable conclusion."
+        ];
+
+        const randomMessage = deathMessages[Math.floor(Math.random() * deathMessages.length)];
+
+        showModal(
+            '💀 OBITUARY 💀',
+            `
+            <p style="font-size: 14px; margin-bottom: 10px;"><strong>${this.name}</strong> has passed away at the ripe old age of ${this.age}.</p>
+            <p style="color: #888; font-style: italic; margin-bottom: 12px;">${randomMessage}</p>
+            <div style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
+                <p style="font-size: 10px;">Final Stats:</p>
+                <p style="font-size: 10px;">📊 Total Fame: ${this.totalFame}</p>
+                <p style="font-size: 10px;">📚 Theories Published: ${this.theoriesPublished.length}</p>
+                <p style="font-size: 10px;">🎓 Students Exploited: ${this.students.length}</p>
+            </div>
+            <p style="font-size: 9px; color: #666; margin-top: 12px;">The game continues without them.</p>
+            `,
+            [
+                {
+                    text: 'RIP',
+                    action: () => { }
+                }
+            ]
+        );
     }
 
     hireStudent(type) {
