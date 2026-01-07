@@ -501,7 +501,7 @@ async function handleEurekaSpace(player) {
                     if (hypothesis) {
                         closestSpace.hypothesis = hypothesis;
                         closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
-                        closestSpace.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
+                        closestSpace.investments.push({ player: player.name, years: closestSpace.investmentCost, playerIndex: player.index });
                         log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
 
                         // Delay rendering until after modal closes for proper visual update
