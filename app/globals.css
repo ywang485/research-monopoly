@@ -1148,7 +1148,7 @@ select {
     background: rgba(255,255,255,0.5);
     padding: 10px 12px;
     margin-bottom: 8px;
-    border-left: 4px solid var(--pencil-yellow);
+    border-left: 4px solid var(--pencil-blue);
     border-radius: 0 5px 5px 0;
     position: relative;
 }
@@ -1177,7 +1177,7 @@ select {
 
 .theory-item .theory-significance {
     font-family: var(--font-notes);
-    color: var(--pencil-orange);
+    color: var(--pencil-blue);
     font-size: 11px;
     margin-top: 4px;
 }

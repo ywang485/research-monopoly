@@ -1391,7 +1391,7 @@ async function endGame(winner, reason) {
             document.getElementById('theory-content').innerHTML = `
                 <div class="theory-text">${integratedTheory}</div>
                 <div class="theory-hypotheses">
-                    <h4>Established Theories:</h4>
+                    <h4>References:</h4>
                     ${provenSpaces.map((space, i) => {
                         const leadingInvestor = getLeadingInvestor(space);
                         return `<div class="proven-hypothesis">
