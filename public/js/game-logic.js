@@ -1088,7 +1088,7 @@ async function endGame(winner, reason) {
         <h2>🏆 WINNER 🏆</h2>
         <div class="winner-name" style="color: ${winner.color}">${winner.name}</div>
         <div class="winner-fame">Total Fame: ${winner.totalFame}</div>
-        <p style="margin-top: 15px; font-size: 8px;">${reason}</p>
+        <p style="margin-top: 15px; font-size: 16px;">${reason}</p>
     `;
 
     // Collect all proven hypotheses and calculate contributions
