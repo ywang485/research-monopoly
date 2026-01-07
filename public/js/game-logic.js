@@ -950,6 +950,19 @@ function nextPlayer() {
 
 function updateTurnDisplay() {
     const player = GameState.players[GameState.currentPlayerIndex];
+
+    // Check if player should die at the start of their turn
+    if (player.isAlive && player.age >= MAX_AGE) {
+        player.die();
+        checkGameEnd();
+
+        // Skip to next player if current player just died
+        if (!player.isAlive) {
+            endTurn();
+            return;
+        }
+    }
+
     const aiIndicator = player.isAI ? ' (AI)' : '';
     document.getElementById('current-turn').textContent = `Turn: ${player.name}${aiIndicator}`;
     document.getElementById('current-turn').style.color = player.color;
