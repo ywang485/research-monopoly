@@ -793,6 +793,7 @@ function handleCommunityServiceSpace(player) {
             [
                 {
                     text: `Sacrifice ${studentName} 😈`,
+                    closeModal: false,
                     action: () => {
                         // Remove the first student
                         const sacrificedStudent = player.students.shift();
