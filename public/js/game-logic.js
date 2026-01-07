@@ -485,8 +485,9 @@ async function handleEurekaSpace(player) {
     const suggestions = await fetchHypothesisSuggestions(3);
 
     if (suggestions && suggestions.length > 0) {
+
         const suggestionsHtml = suggestions.map(s =>
-            `<div class="suggestion-item" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
+            `<div class="suggestion-btn" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
         ).join('');
 
         const suggestionsContainer = document.getElementById('hypothesis-suggestions');
@@ -494,10 +495,12 @@ async function handleEurekaSpace(player) {
             suggestionsContainer.innerHTML = suggestionsHtml;
 
             // Add click handlers for suggestions
-            suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const suggestion = item.getAttribute('data-suggestion');
-                    document.getElementById('hypothesis-input').value = suggestion;
+            suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('hypothesis-input').value = suggestions[i];
+                    // Highlight the selected suggestion
+                    suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
                 });
             });
         }
