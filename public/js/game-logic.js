@@ -501,7 +501,7 @@ async function handleEurekaSpace(player) {
                     if (hypothesis) {
                         closestSpace.hypothesis = hypothesis;
                         closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
-                        closestSpace.investments.push({ player: player.name, years: 0, playerIndex: player.index });
+                        closestSpace.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
                         log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
 
                         // Delay rendering until after modal closes for proper visual update
@@ -526,8 +526,9 @@ async function handleEurekaSpace(player) {
     const suggestions = await fetchHypothesisSuggestions(3);
 
     if (suggestions && suggestions.length > 0) {
+
         const suggestionsHtml = suggestions.map(s =>
-            `<div class="suggestion-item" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
+            `<div class="suggestion-btn" data-suggestion="${s.replace(/"/g, '&quot;')}">${s}</div>`
         ).join('');
 
         const suggestionsContainer = document.getElementById('hypothesis-suggestions');
@@ -535,10 +536,12 @@ async function handleEurekaSpace(player) {
             suggestionsContainer.innerHTML = suggestionsHtml;
 
             // Add click handlers for suggestions
-            suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const suggestion = item.getAttribute('data-suggestion');
-                    document.getElementById('hypothesis-input').value = suggestion;
+            suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('hypothesis-input').value = suggestions[i];
+                    // Highlight the selected suggestion
+                    suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
                 });
             });
         }
@@ -607,7 +610,7 @@ async function handleHypothesisSpace(player, space) {
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this hypothesis.</p>' : ''}
+            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You\'ll likely die before you come up with anything</p>' : ''}
             `,
             [
                 {
@@ -1137,7 +1140,7 @@ async function endGame(winner, reason) {
         <h2>🏆 WINNER 🏆</h2>
         <div class="winner-name" style="color: ${winner.color}">${winner.name}</div>
         <div class="winner-fame">Total Fame: ${winner.totalFame}</div>
-        <p style="margin-top: 15px; font-size: 8px;">${reason}</p>
+        <p style="margin-top: 15px; font-size: 16px;">${reason}</p>
     `;
 
     // Collect all proven hypotheses and calculate contributions
