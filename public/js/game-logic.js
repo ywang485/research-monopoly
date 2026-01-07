@@ -610,7 +610,7 @@ async function handleHypothesisSpace(player, space) {
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You literally can\'t afford this hypothesis.</p>' : ''}
+            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You\'ll likely die before you come up with anything</p>' : ''}
             `,
             [
                 {
