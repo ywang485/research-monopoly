@@ -2347,7 +2347,7 @@ select {
     top: 50px;
     left: 120px;
     width: 300px;
-    max-height: 280px;
+    max-height: 500px;
     overflow-y: auto;
     z-index: 30;
     transform: rotate(3deg);
