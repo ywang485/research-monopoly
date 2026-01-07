@@ -736,45 +736,90 @@ async function handleHypothesisSpace(player, space) {
             ]
         );
     } else {
-        // Already proven - must do literature survey
-        const surveyCost = 1;
-        player.age += surveyCost;
+        // Already proven - check if player is the leading investor
 
-        const citationComplaints = [
-            "Ugh, now you have to waste time reading someone else's garbage and pretend it's brilliant.",
-            "Great, another theory you'll have to cite even though you know it's flawed.",
-            "Time to pad your bibliography with this overhyped nonsense.",
-            "You HAVE to cite this. Academia's unwritten rule: stroke everyone's ego.",
-            "Now you're legally obligated to make this theory sound important in your lit review.",
-            "Fantastic. You get to spend a year analyzing why this theory is 'foundational' (it's not).",
-            "Nothing says 'fun' like begrudgingly adding this to your reference list.",
-            "You could've used this year for literally anything else. But no, literature survey time!",
-            "Time to write a whole paragraph explaining why this theory 'informs your work' (spoiler: barely).",
-            "Congrats, you now have to pretend you've always respected this research.",
-            "You'll cite this through gritted teeth, knowing full well it has issues.",
-            "Another year lost to academic bureaucracy. At least your citations look thorough!",
-            "You have to read this AND cite it. Double the pain, zero the joy.",
-            "Time for a deep dive into theory you'll probably disagree with in 5 years."
-        ];
+        // Find who invested the most (sum up all investments per player)
+        const playerInvestments = {};
+        space.investments.forEach(inv => {
+            if (!playerInvestments[inv.playerIndex]) {
+                playerInvestments[inv.playerIndex] = 0;
+            }
+            playerInvestments[inv.playerIndex] += inv.years;
+        });
 
-        const randomComplaint = citationComplaints[Math.floor(Math.random() * citationComplaints.length)];
+        // Find the player with maximum total investment
+        let maxPlayerIndex = null;
+        let maxYears = 0;
+        Object.keys(playerInvestments).forEach(playerIndexStr => {
+            const playerIndex = parseInt(playerIndexStr);
+            const totalYears = playerInvestments[playerIndex];
+            if (totalYears > maxYears) {
+                maxYears = totalYears;
+                maxPlayerIndex = playerIndex;
+            }
+        });
 
-        showModal(
-            'Literature Survey Required 📚',
-            `
-            <p><strong>Established Theory:</strong></p>
-            <p>"${space.hypothesis}"</p>
-            <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
-            <p class="info-text" style="margin-top: 15px;">You spent ${surveyCost} year doing a literature survey on this theory.</p>
-            <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
-            `,
-            [{ text: '*Sigh* Fine', action: () => {
-                log(`${player.name} grudgingly surveyed the literature on: "${space.hypothesis}"`, 'important');
-                updatePlayerStats();
-                checkGameEnd();
-                if (!GameState.gameOver) endTurn();
-            }}]
-        );
+        // Check if current player is the leading investor
+        const isLeadingInvestor = (maxPlayerIndex === player.index);
+
+        if (isLeadingInvestor) {
+            // Player is the leading investor - no literature survey needed!
+            showModal(
+                'Your Own Theory! 😎',
+                `
+                <p><strong>Established Theory:</strong></p>
+                <p>"${space.hypothesis}"</p>
+                <p style="margin-top: 15px; color: #2ecc71;">This is YOUR theory! You invested the most time into this research.</p>
+                <p class="info-text" style="margin-top: 15px;">No need to waste time reading your own work. You already know this stuff!</p>
+                `,
+                [{ text: 'Of course I do', action: () => {
+                    log(`${player.name} visited their own established theory.`);
+                    updatePlayerStats();
+                    checkGameEnd();
+                    if (!GameState.gameOver) endTurn();
+                }}]
+            );
+        } else {
+            // Player is not the leading investor - must do literature survey
+            const surveyCost = 1;
+            player.age += surveyCost;
+
+            const citationComplaints = [
+                "Ugh, now you have to waste time reading someone else's garbage and pretend it's brilliant.",
+                "Great, another theory you'll have to cite even though you know it's flawed.",
+                "Time to pad your bibliography with this overhyped nonsense.",
+                "You HAVE to cite this. Academia's unwritten rule: stroke everyone's ego.",
+                "Now you're legally obligated to make this theory sound important in your lit review.",
+                "Fantastic. You get to spend a year analyzing why this theory is 'foundational' (it's not).",
+                "Nothing says 'fun' like begrudgingly adding this to your reference list.",
+                "You could've used this year for literally anything else. But no, literature survey time!",
+                "Time to write a whole paragraph explaining why this theory 'informs your work' (spoiler: barely).",
+                "Congrats, you now have to pretend you've always respected this research.",
+                "You'll cite this through gritted teeth, knowing full well it has issues.",
+                "Another year lost to academic bureaucracy. At least your citations look thorough!",
+                "You have to read this AND cite it. Double the pain, zero the joy.",
+                "Time for a deep dive into theory you'll probably disagree with in 5 years."
+            ];
+
+            const randomComplaint = citationComplaints[Math.floor(Math.random() * citationComplaints.length)];
+
+            showModal(
+                'Literature Survey Required 📚',
+                `
+                <p><strong>Established Theory:</strong></p>
+                <p>"${space.hypothesis}"</p>
+                <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
+                <p class="info-text" style="margin-top: 15px;">You spent ${surveyCost} year doing a literature survey on this theory.</p>
+                <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
+                `,
+                [{ text: '*Sigh* Fine', action: () => {
+                    log(`${player.name} grudgingly surveyed the literature on: "${space.hypothesis}"`, 'important');
+                    updatePlayerStats();
+                    checkGameEnd();
+                    if (!GameState.gameOver) endTurn();
+                }}]
+            );
+        }
     }
 }
 
