@@ -1191,18 +1191,16 @@ function updateTurnDisplay() {
             `${player.name}'s Turn`,
             `
             <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; margin-bottom: 20px;">${player.color === '#e74c3c' ? '🔴' : player.color === '#3498db' ? '🔵' : player.color === '#2ecc71' ? '🟢' : '🟡'}</div>
-                <p style="font-size: 24px; color: ${player.color}; font-weight: bold;">${player.name}</p>
-                <p style="color: #888; font-size: 14px;">Your turn to roll!</p>
+                <p style="color: #888; font-size: 30x;">Your turn to roll!</p>
             </div>
             `,
             [{ text: 'Ready!', action: () => {} }]
         );
 
         // Auto-close after 1 second
-        setTimeout(() => {
-            hideModal();
-        }, 1000);
+        //setTimeout(() => {
+        //    hideModal();
+        //}, 1000);
 
         document.getElementById('roll-dice-btn').disabled = false;
         document.getElementById('roll-dice-btn').textContent = 'Roll Dice';
