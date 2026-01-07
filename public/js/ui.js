@@ -471,7 +471,7 @@ function initSetupScreen() {
 
     // Reset used names and randomize initial player names
     resetUsedNames();
-    const initialColors = ['#F01AB3', '#3F1AF0'];
+    const initialColors = ['#3EAAF7', '#3EE5F7', '#3E6FF7', '#3EF7CC'];
     const initialAI = [false, true];
 
     // Update initial player inputs with random names and randomize buttons

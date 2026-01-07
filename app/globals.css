@@ -1611,11 +1611,11 @@ select {
 }
 
 #gameover-screen .hand-title {
-    font-size: 24px;
+    font-size: 30px;
     color: var(--pencil-red);
     margin-bottom: 25px;
     text-shadow:
-        4px 4px 0 var(--pencil-orange),
+        4px 4px 0 var(--pencil-grey),
         -1px -1px 0 var(--paper-white);
 }
 
@@ -1646,8 +1646,8 @@ select {
 
 .winner-fame {
     font-family: var(--font-handwriting);
-    font-size: 16px;
-    color: var(--pencil-orange);
+    font-size: 20px;
+    color: var(--pencil-blue);
     margin-top: 10px;
 }
 
@@ -1664,7 +1664,7 @@ select {
     margin: 30px auto;
     padding: 30px;
     background: var(--paper-aged);
-    border: 3px solid var(--pencil-brown);
+    border: none;
     max-width: 750px;
     position: relative;
     transform: rotate(0.5deg);
@@ -1698,7 +1698,7 @@ select {
 
 .entity-reveal {
     font-family: var(--font-notes);
-    font-size: 14px;
+    font-size: 16px;
     color: var(--ink-light);
     margin-bottom: 6px;
 }
@@ -1725,12 +1725,12 @@ select {
 
 .theory-text {
     font-family: var(--font-handwriting);
-    font-size: 16px;
+    font-size: 24px;
     line-height: 1.7;
     color: var(--ink-dark);
     padding: 20px;
     background: rgba(255,255,255,0.5);
-    border-left: 4px solid var(--pencil-purple);
+    border-left: 4px solid var(--pencil-blue);
     border-radius: 0 5px 5px 0;
 }
 
@@ -1752,20 +1752,20 @@ select {
 }
 
 .theory-hypotheses h4 {
-    font-family: var(--font-title);
-    font-size: 14px;
-    color: var(--pencil-orange);
+    font-family: var(--font-notes);
+    font-size: 18px;
+    color: var(--pencil-blue);
     margin-bottom: 12px;
 }
 
 .proven-hypothesis {
     font-family: var(--font-handwriting);
-    font-size: 14px;
+    font-size: 18px;
     color: var(--ink-dark);
     padding: 8px 12px;
     margin: 6px 0;
     background: rgba(255,255,255,0.4);
-    border-left: 3px solid var(--pencil-green);
+    border-left: 3px solid var(--pencil-brown);
     border-radius: 0 3px 3px 0;
 }
 
@@ -1777,8 +1777,8 @@ select {
 }
 
 .theory-contributors h4 {
-    font-family: var(--font-title);
-    font-size: 14px;
+    font-family: var(--font-notes);
+    font-size: 18px;
     color: var(--pencil-blue);
     margin-bottom: 15px;
     text-align: center;
@@ -1827,8 +1827,17 @@ select {
    FINAL STATS
    ============================================ */
 
-#final-stats {
+.final-stats-grid {
     display: flex;
+}
+
+
+.stats-board h4 {
+    font-size: 20px;
+    font-family: var(--font-notes);
+}
+
+#final-stats {
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
@@ -1851,18 +1860,19 @@ select {
 .final-player-stat:nth-child(4) { --stat-rotation: 1deg; }
 
 .final-player-stat h3 {
-    font-family: var(--font-title);
-    font-size: 14px;
+    font-family: var(--font-notes);
+    font-size: 20px;
     margin-bottom: 12px;
     color: var(--ink-dark);
 }
+
 
 .final-player-stat .stat-row {
     display: flex;
     justify-content: space-between;
     padding: 5px 0;
     font-family: var(--font-handwriting);
-    font-size: 14px;
+    font-size: 18px;
     border-bottom: 1px dotted var(--paper-shadow);
 }
 
@@ -2327,7 +2337,7 @@ select {
     top: 10px;
     left: -140px;
     width: 300px;
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
     z-index: 31;
     transform: rotate(-3deg);

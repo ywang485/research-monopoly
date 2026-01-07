@@ -490,7 +490,7 @@ async function handleEurekaSpace(player) {
             <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
             <p>${you} had a brilliant idea about ${GameState.entity.name}!</p>
             <p class="info-text">But... every hypothesis space is already claimed. ${your} genius goes to waste.</p>
-            <p style="color: #888; font-size: 11px;">Should've thought of this sooner!</p>
+            <p style="color: #888; font-size: 18px;">Should've thought of this sooner!</p>
             `,
             [{ text: 'Tragic', action: () => { updatePlayerStats(); endTurn(); } }]
         );
@@ -1285,7 +1285,7 @@ function checkGameEnd() {
     if (allHypothesesInvested && hypothesisSpaces.length > 0) {
         // All hypotheses invested - highest total fame wins
         const winner = GameState.players.reduce((a, b) => a.totalFame > b.totalFame ? a : b);
-        endGame(winner, 'All hypotheses have been invested! Victory to the most famous researcher!');
+        endGame(winner, 'The academic world is too crowded.');
         return;
     }
 
@@ -1349,7 +1349,7 @@ async function endGame(winner, reason) {
 
     // Show entity name
     document.getElementById('theory-entity').innerHTML = `
-        <div class="entity-reveal">Concerning the nature of</div>
+        <div class="entity-reveal">The grand unified theory</div>
         <div class="entity-name">"${GameState.entity.name}"</div>
     `;
 
@@ -1396,7 +1396,7 @@ async function endGame(winner, reason) {
                         const leadingInvestor = getLeadingInvestor(space);
                         return `<div class="proven-hypothesis">
                             ${i + 1}. "${space.hypothesis}"
-                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 11px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
+                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 18px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
                         </div>`;
                     }).join('')}
                 </div>
@@ -1412,7 +1412,7 @@ async function endGame(winner, reason) {
                         const leadingInvestor = getLeadingInvestor(space);
                         return `<div class="proven-hypothesis">
                             ${i + 1}. "${space.hypothesis}"
-                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 11px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
+                            ${leadingInvestor ? `<span style="color: ${leadingInvestor.color}; font-size: 20px; margin-left: 10px;">(Leading Investor: ${leadingInvestor.name})</span>` : ''}
                         </div>`;
                     }).join('')}
                 </div>
@@ -1422,14 +1422,14 @@ async function endGame(winner, reason) {
         // Show contributors with loading state
         if (sortedContributors.length > 0) {
             document.getElementById('theory-contributors').innerHTML = `
-                <h4>📚 Contributors to Science 📚</h4>
+                <h4>Contributors to Science</h4>
                 <div class="contributors-list">
                     ${sortedContributors.map((c, i) => `
                         <div class="contributor ${i === 0 ? 'top-contributor' : ''}" style="border-color: ${c.player.color}">
                             <span class="contributor-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
                             <span class="contributor-name" style="color: ${c.player.color}">${c.player.name}</span>
                             <span class="contributor-stats">${c.years} years invested</span>
-                            <div class="contributor-bio" style="margin-top: 10px; font-size: 12px; font-style: italic; color: #666;">
+                            <div class="contributor-bio" style="margin-top: 10px; font-size: 25px; font-style: italic; color: #666;">
                                 ✨ Generating career bio...
                             </div>
                         </div>
@@ -1455,7 +1455,7 @@ async function endGame(winner, reason) {
                                         <span class="contributor-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
                                         <span class="contributor-name" style="color: ${c.player.color}">${c.player.name}</span>
                                         <span class="contributor-stats">${c.years} years invested</span>
-                                        <div class="contributor-bio" style="margin-top: 10px; font-size: 12px; font-style: italic; color: #666; line-height: 1.4;">
+                                        <div class="contributor-bio" style="margin-top: 10px; font-size: 18px; font-style: italic; color: #666; line-height: 1.4;">
                                             ${playerBio}
                                         </div>
                                     </div>
@@ -1481,13 +1481,13 @@ async function endGame(winner, reason) {
     }
 
     // Final stats
-    let statsHTML = '<h3>Final Standings</h3><div class="final-stats-grid">';
+    let statsHTML = '<h4>Final Standings</h4><div class="final-stats-grid">';
     // Sort players by fame for final standings
     const sortedPlayers = [...GameState.players].sort((a, b) => b.totalFame - a.totalFame);
     sortedPlayers.forEach((player, rank) => {
         const isWinner = player.index === winner.index;
         statsHTML += `
-            <div class="final-player-stat ${isWinner ? 'winner-stat' : ''}" style="border-color: ${player.color}">
+            <div class="final-player-stat ${isWinner ? 'winner-stat' : ''}">
                 <div class="player-rank">${rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`}</div>
                 <h3 style="color: ${player.color}">${player.name}</h3>
                 <div class="stat-row"><span>Total Fame:</span><span class="value">${player.totalFame}</span></div>
