@@ -111,7 +111,7 @@ export default function GameplayScreen() {
         </div>
 
         <div className="page-content">
-          <h1 className="hand-title">📓 GAME OVER 📓</h1>
+          <h1 className="hand-title">GAME OVER</h1>
           <div id="winner-display" className="winner-card"></div>
 
           {/* Theory Revelation Section */}
@@ -127,7 +127,7 @@ export default function GameplayScreen() {
           </div>
 
           <div id="final-stats" className="stats-board"></div>
-          <button id="play-again-btn" className="sketch-btn large">🔄 PLAY AGAIN!</button>
+          <button id="play-again-btn" className="sketch-btn large">PLAY AGAIN!</button>
 
           <div className="sticker sticker-trophy">🏆</div>
         </div>

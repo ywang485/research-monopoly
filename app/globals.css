@@ -1690,9 +1690,9 @@ select {
 .revelation-title {
     font-family: var(--font-pixel);
     font-size: 11px;
-    color: var(--pencil-purple);
+    color: var(--pencil-pink);
     margin-bottom: 20px;
-    text-shadow: 2px 2px 0 var(--pencil-pink);
+    text-shadow: 2px 2px 0 var(--paper-shadow);
 }
 
 .theory-entity {
