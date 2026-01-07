@@ -592,30 +592,33 @@ async function handleHypothesisSpace(player, space) {
     if (!space.hypothesis) {
         // First player to land here - can create hypothesis
         const availableYears = player.availableYears;
+        const canAfford = availableYears >= space.investmentCost;
 
-        // Show initial modal with loading state for suggestions
+        // Show initial modal with loading state for suggestions (only if player can afford)
         showModal(
             'New Research Opportunity!',
             `
             <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
             <p>Invest ${space.investmentCost} years to claim this territory before someone else does.</p>
+            ${canAfford ? `
             <div class="suggestions-container">
                 <label>AI-generated hypotheses (because originality is hard):</label>
                 <div id="hypothesis-suggestions" class="hypothesis-suggestions">
                     <div class="suggestion-loading">Generating suggestions...</div>
                 </div>
             </div>
+            ` : ''}
             <div class="input-group">
                 <label>Or pretend to have original thoughts:</label>
                 <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
-            ${availableYears < space.investmentCost ? '<p style="color: #a86060;">You\'ll likely die before you come up with anything</p>' : ''}
+            ${!canAfford ? '<p style="color: #a86060;">You\'ll likely die before you come up with anything</p>' : ''}
             `,
             [
                 {
                     text: 'Invest',
-                    disabled: availableYears < space.investmentCost,
+                    disabled: !canAfford,
                     action: () => {
                         const hypothesis = document.getElementById('hypothesis-input').value.trim();
                         if (hypothesis && availableYears >= space.investmentCost) {
@@ -638,23 +641,25 @@ async function handleHypothesisSpace(player, space) {
             ]
         );
 
-        // Fetch suggestions asynchronously and update the modal
-        const suggestions = await fetchHypothesisSuggestions(3);
-        const suggestionsContainer = document.getElementById('hypothesis-suggestions');
-        if (suggestionsContainer) {
-            suggestionsContainer.innerHTML = suggestions.map((s, i) =>
-                `<button class="suggestion-btn" data-suggestion="${i}">${s}</button>`
-            ).join('');
+        // Fetch suggestions asynchronously and update the modal (only if player can afford)
+        if (canAfford) {
+            const suggestions = await fetchHypothesisSuggestions(3);
+            const suggestionsContainer = document.getElementById('hypothesis-suggestions');
+            if (suggestionsContainer) {
+                suggestionsContainer.innerHTML = suggestions.map((s, i) =>
+                    `<button class="suggestion-btn" data-suggestion="${i}">${s}</button>`
+                ).join('');
 
-            // Add click handlers to suggestion buttons
-            suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
-                btn.addEventListener('click', () => {
-                    document.getElementById('hypothesis-input').value = suggestions[i];
-                    // Highlight the selected suggestion
-                    suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
+                // Add click handlers to suggestion buttons
+                suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('hypothesis-input').value = suggestions[i];
+                        // Highlight the selected suggestion
+                        suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
                 });
-            });
+            }
         }
     } else if (!space.isProven) {
         // Hypothesis exists - can invest more or add to description
