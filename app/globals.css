@@ -671,7 +671,7 @@ body {
     color: var(--ink-dark);
 }
 
-input[type="text"], select, textarea {
+input[type="text"], input[type="number"], select, textarea {
     font-family: var(--font-handwriting);
     font-size: 16px;
     padding: 10px 12px;
