@@ -1660,170 +1660,200 @@ select {
 }
 
 /* ============================================
-   THEORY REVELATION - NOTEBOOK INSERT
+   THEORY REVELATION - ACADEMIC PAPER STYLE
    ============================================ */
 
 .theory-revelation {
     margin: 30px auto;
-    padding: 30px;
-    background: var(--paper-aged);
-    border: 3px solid var(--pencil-brown);
-    max-width: 750px;
+    padding: 50px 60px;
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    max-width: 800px;
     position: relative;
-    transform: rotate(0.5deg);
+    transform: rotate(0deg);
     box-shadow:
-        5px 5px 15px rgba(0,0,0,0.15),
-        inset 0 0 50px rgba(0,0,0,0.03);
+        0 2px 8px rgba(0,0,0,0.08),
+        0 4px 16px rgba(0,0,0,0.04);
+    font-family: Georgia, 'Times New Roman', serif;
 }
 
 .notebook-insert {
-    /* Lined paper effect */
-    background-image:
-        repeating-linear-gradient(
-            var(--paper-aged),
-            var(--paper-aged) 27px,
-            var(--line-blue) 27px,
-            var(--line-blue) 28px
-        );
+    /* Clean academic paper - no lines */
+    background-image: none;
 }
 
 .revelation-title {
-    font-family: var(--font-pixel);
-    font-size: 11px;
-    color: var(--pencil-pink);
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 0 var(--paper-shadow);
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    text-shadow: none;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .theory-entity {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .entity-reveal {
-    font-family: var(--font-notes);
-    font-size: 14px;
-    color: var(--ink-light);
-    margin-bottom: 6px;
+    font-family: Georgia, serif;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .entity-name {
-    font-family: var(--font-title);
-    font-size: 22px;
-    color: var(--pencil-blue);
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #2c3e50;
+    font-weight: normal;
 }
 
 .theory-content {
-    margin: 20px 0;
-    text-align: left;
+    margin: 30px 0;
+    text-align: justify;
 }
 
 .theory-loading {
-    font-family: var(--font-notes);
-    font-size: 16px;
-    color: var(--ink-light);
-    padding: 30px;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: #888;
+    padding: 40px;
     text-align: center;
     animation: pulse 1.5s ease-in-out infinite;
+    font-style: italic;
 }
 
 .theory-text {
-    font-family: var(--font-handwriting);
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--ink-dark);
-    padding: 20px;
-    background: rgba(255,255,255,0.5);
-    border-left: 4px solid var(--pencil-purple);
-    border-radius: 0 5px 5px 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #2c2c2c;
+    padding: 0;
+    background: transparent;
+    border-left: none;
+    border-radius: 0;
+    text-align: justify;
+    text-indent: 2em;
 }
 
 .theory-text.fallback {
-    font-style: normal;
-    color: var(--ink-light);
+    font-style: italic;
+    color: #666;
+    text-indent: 0;
 }
 
 .theory-text.no-theories {
     font-style: italic;
-    color: var(--ink-light);
+    color: #999;
     text-align: center;
     border-left: none;
+    text-indent: 0;
 }
 
 .theory-hypotheses {
-    margin-top: 25px;
+    margin-top: 35px;
     text-align: left;
 }
 
 .theory-hypotheses h4 {
-    font-family: var(--font-title);
-    font-size: 14px;
-    color: var(--pencil-orange);
-    margin-bottom: 12px;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .proven-hypothesis {
-    font-family: var(--font-handwriting);
-    font-size: 14px;
-    color: var(--ink-dark);
-    padding: 8px 12px;
-    margin: 6px 0;
-    background: rgba(255,255,255,0.4);
-    border-left: 3px solid var(--pencil-green);
-    border-radius: 0 3px 3px 0;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    color: #2c2c2c;
+    padding: 0 0 8px 20px;
+    margin: 8px 0;
+    background: transparent;
+    border-left: none;
+    border-radius: 0;
+    position: relative;
+}
+
+.proven-hypothesis::before {
+    content: '•';
+    position: absolute;
+    left: 8px;
+    color: #2c3e50;
 }
 
 .theory-contributors {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 2px dashed var(--paper-shadow);
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #d0d0d0;
     text-align: left;
 }
 
 .theory-contributors h4 {
-    font-family: var(--font-title);
-    font-size: 14px;
-    color: var(--pencil-blue);
-    margin-bottom: 15px;
-    text-align: center;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .contributors-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .contributor {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
-    padding: 10px 15px;
-    background: rgba(255,255,255,0.4);
-    border-left: 4px solid var(--paper-shadow);
-    border-radius: 0 5px 5px 0;
+    padding: 0;
+    background: transparent;
+    border-left: none;
+    border-radius: 0;
+    font-family: Georgia, serif;
+    font-size: 13px;
 }
 
 .contributor.top-contributor {
-    background: var(--highlight-yellow);
-    border-left-color: var(--pencil-yellow);
+    background: transparent;
+    border-left-color: transparent;
+    font-weight: bold;
 }
 
 .contributor-rank {
-    font-size: 20px;
-    min-width: 35px;
+    font-size: 13px;
+    min-width: 25px;
+    color: #666;
 }
 
 .contributor-name {
-    font-family: var(--font-handwriting);
-    font-size: 16px;
+    font-family: Georgia, serif;
+    font-size: 13px;
     flex: 1;
-    color: var(--ink-dark);
+    color: #2c3e50;
 }
 
 .contributor-stats {
-    font-family: var(--font-notes);
-    font-size: 13px;
-    color: var(--ink-light);
+    font-family: Georgia, serif;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
 }
 
 /* ============================================
