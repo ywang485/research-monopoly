@@ -1845,8 +1845,7 @@ select {
 }
 
 .final-player-stat {
-    background: var(--paper-white);
-    border: 3px solid var(--paper-shadow);
+    background: #fff;
     padding: 20px;
     min-width: 200px;
     text-align: left;
@@ -1886,8 +1885,7 @@ select {
 }
 
 .final-player-stat.winner-stat {
-    border-color: var(--pencil-yellow);
-    background: var(--sticky-yellow);
+    background: #fff;
     box-shadow: 0 0 20px rgba(241,196,15,0.3);
 }
 
