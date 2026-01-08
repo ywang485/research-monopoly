@@ -152,7 +152,7 @@ function drawTextFallback(ctx, cx, cy, s, text) {
     ctx.font = `${Math.floor(12 * s)}px "Press Start 2P", monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, cx, cy);
+    ctx.fillText(text, cx+2, cy);
 }
 
 function drawStartFallback(ctx, cx, cy, s) {

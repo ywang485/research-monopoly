@@ -19,7 +19,7 @@ export default function GameplayScreen() {
           {/* Two-page spread */}
           <div className="two-page-spread">
             {/* LEFT PAGE - Game Board */}
-            <div className="notebook-page left-page" style={{ border: 'none', boxShadow: 'none'}}>
+            <div className="notebook-page left-page" style={{ background: 'transparent', border: 'none', boxShadow: 'none'}}>
               <div className="spiral-binding">
               <div className="spiral-ring"></div>
               <div className="spiral-ring"></div>

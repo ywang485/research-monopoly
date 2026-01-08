@@ -199,17 +199,14 @@ body {
    ============================================ */
 
 .notebook-page {
-    background:
-        /* Wrinkle creases */
+    background-image:
         url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,80 Q60,75 120,85 T240,78 T300,82' stroke='%238B7750' stroke-width='0.4' fill='none' opacity='0.15'/%3E%3Cpath d='M0,180 Q80,175 160,188 T300,180' stroke='%238B7750' stroke-width='0.3' fill='none' opacity='0.12'/%3E%3Cpath d='M80,0 Q75,60 88,120 T80,240 T82,300' stroke='%238B7750' stroke-width='0.3' fill='none' opacity='0.1'/%3E%3Cpath d='M220,0 Q225,80 215,160 T220,300' stroke='%238B7750' stroke-width='0.4' fill='none' opacity='0.12'/%3E%3C/svg%3E"),
-        /* Aged paper gradient */
-        radial-gradient(ellipse 60% 40% at 20% 30%, var(--paper-stain) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 60% at 80% 70%, var(--paper-stain) 0%, transparent 50%),
-        /* Edge darkening for worn look */
-        linear-gradient(to right, rgba(139,119,80,0.08) 0%, transparent 5%, transparent 95%, rgba(139,119,80,0.08) 100%),
-        linear-gradient(to bottom, rgba(139,119,80,0.06) 0%, transparent 3%, transparent 97%, rgba(139,119,80,0.06) 100%),
-        /* Base paper color */
-        var(--paper-white);
+        repeating-linear-gradient(
+            var(--paper-white),
+            var(--paper-white) 27px,
+            var(--line-blue) 27px,
+            var(--line-blue) 28px
+        );
     position: relative;
     padding-left: 60px;
     border: 2px solid var(--paper-shadow);
@@ -674,7 +671,7 @@ body {
     color: var(--ink-dark);
 }
 
-input[type="text"], select, textarea {
+input[type="text"], input[type="number"], select, textarea {
     font-family: var(--font-handwriting);
     font-size: 16px;
     padding: 10px 12px;
@@ -1151,7 +1148,7 @@ select {
     background: rgba(255,255,255,0.5);
     padding: 10px 12px;
     margin-bottom: 8px;
-    border-left: 4px solid var(--pencil-yellow);
+    border-left: 4px solid var(--pencil-blue);
     border-radius: 0 5px 5px 0;
     position: relative;
 }
@@ -1180,7 +1177,7 @@ select {
 
 .theory-item .theory-significance {
     font-family: var(--font-notes);
-    color: var(--pencil-orange);
+    color: var(--pencil-blue);
     font-size: 11px;
     margin-top: 4px;
 }
@@ -1614,11 +1611,11 @@ select {
 }
 
 #gameover-screen .hand-title {
-    font-size: 24px;
+    font-size: 30px;
     color: var(--pencil-red);
     margin-bottom: 25px;
     text-shadow:
-        4px 4px 0 var(--pencil-orange),
+        4px 4px 0 var(--pencil-grey),
         -1px -1px 0 var(--paper-white);
 }
 
@@ -1649,8 +1646,8 @@ select {
 
 .winner-fame {
     font-family: var(--font-handwriting);
-    font-size: 16px;
-    color: var(--pencil-orange);
+    font-size: 20px;
+    color: var(--pencil-blue);
     margin-top: 10px;
 }
 
@@ -1860,8 +1857,17 @@ select {
    FINAL STATS
    ============================================ */
 
-#final-stats {
+.final-stats-grid {
     display: flex;
+}
+
+
+.stats-board h4 {
+    font-size: 20px;
+    font-family: var(--font-notes);
+}
+
+#final-stats {
     flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
@@ -1884,18 +1890,19 @@ select {
 .final-player-stat:nth-child(4) { --stat-rotation: 1deg; }
 
 .final-player-stat h3 {
-    font-family: var(--font-title);
-    font-size: 14px;
+    font-family: var(--font-notes);
+    font-size: 20px;
     margin-bottom: 12px;
     color: var(--ink-dark);
 }
+
 
 .final-player-stat .stat-row {
     display: flex;
     justify-content: space-between;
     padding: 5px 0;
     font-family: var(--font-handwriting);
-    font-size: 14px;
+    font-size: 18px;
     border-bottom: 1px dotted var(--paper-shadow);
 }
 
@@ -2215,7 +2222,7 @@ select {
     padding: 30px;
     position: relative;
     overflow: hidden;
-    background: transparent; /* Let the grid show through */
+    /*background: transparent; */
 }
 
 .left-page {
@@ -2360,7 +2367,7 @@ select {
     top: 10px;
     left: -140px;
     width: 300px;
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
     z-index: 31;
     transform: rotate(-3deg);
@@ -2380,7 +2387,7 @@ select {
     top: 50px;
     left: 120px;
     width: 300px;
-    max-height: 280px;
+    max-height: 500px;
     overflow-y: auto;
     z-index: 30;
     transform: rotate(3deg);

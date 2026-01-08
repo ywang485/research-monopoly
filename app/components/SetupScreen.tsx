@@ -53,12 +53,12 @@ export default function SetupScreen() {
           <div id="player-inputs">
             <div className="player-input">
               <input type="text" className="player-name" placeholder="Player 1 Name" defaultValue="Dr. Hypothesis" />
-              <input type="color" className="player-color" defaultValue="#F01AB3" />
+              <input type="color" className="player-color" defaultValue="#3EE5F7" />
               <label className="ai-toggle"><input type="checkbox" className="player-ai" /> AI</label>
             </div>
             <div className="player-input">
               <input type="text" className="player-name" placeholder="Player 2 Name" defaultValue="Prof. Theory" />
-              <input type="color" className="player-color" defaultValue="#3F1AF0" />
+              <input type="color" className="player-color" defaultValue="#3E6FF7" />
               <label className="ai-toggle"><input type="checkbox" className="player-ai" defaultChecked /> AI</label>
             </div>
           </div>

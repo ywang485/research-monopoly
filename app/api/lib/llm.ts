@@ -51,10 +51,12 @@ Examples by type:
 Generate ONLY the research subject (2-8 words), no quotes or extra formatting.`;
 
 const THEORY_PROMPT = `You are a pompous academic narrator announcing the culmination of groundbreaking research.
-Given an entity and a list of "proven" hypotheses about it, write a dramatic, humorous paragraph that:
+Given a research topic and a list of "proven" hypotheses about it, write a dramatic, humorous and sarcarstic paragraph that:
 - Presents the integrated theory as an earth-shattering scientific breakthrough
 - Weaves together all the hypotheses into one gloriously absurd unified theory
-- Uses grandiose academic language with satirical undertones
+- Use east-to-understand language and be concise
+- 95% of the text should be about the content of the hypothsis
+- Go straight into the hypotheses without introduction or greeting
 - Is sarcastic about how "revolutionary" this discovery is
 - Should be 3-5 sentences, dramatic and epic in tone
 - End with an ironic note about what this means for humanity
@@ -397,7 +399,7 @@ export async function generateTheoryWithGoogle(entity: string, hypotheses: strin
     body: JSON.stringify({
       contents: [{
         parts: [{
-          text: `${THEORY_PROMPT}\n\nEntity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`
+          text: `${THEORY_PROMPT}\n\nResearch topic: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`
         }]
       }],
       generationConfig: {
