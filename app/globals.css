@@ -859,6 +859,17 @@ select {
     color: white;
 }
 
+.share-btn {
+    background: var(--pencil-green) !important;
+    border-color: var(--pencil-green) !important;
+    box-shadow: 4px 4px 0 var(--pencil-green) !important;
+}
+
+.share-btn:hover {
+    background: var(--pencil-teal) !important;
+    box-shadow: 3px 3px 0 var(--pencil-teal) !important;
+}
+
 .sketch-btn:disabled {
     background: var(--paper-aged);
     border-color: var(--ink-light);

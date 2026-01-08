@@ -20,6 +20,7 @@ export default function Home() {
     // Load all game scripts in order
     const loadGameScripts = async () => {
       try {
+        await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js')
         await loadScript('/js/constants.js')
         await loadScript('/js/utils.js')
         await loadScript('/js/sound.js')
