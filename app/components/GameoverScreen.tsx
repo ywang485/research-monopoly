@@ -30,6 +30,7 @@ export default function GameoverScreen() {
 
         <div id="final-stats" className="stats-board"></div>
         <button id="play-again-btn" className="sketch-btn large">PLAY AGAIN!</button>
+        <button id="share-btn" className="sketch-btn large share-btn">SHARE RESULTS</button>
 
         <div className="sticker sticker-trophy">🏆</div>
       </div>

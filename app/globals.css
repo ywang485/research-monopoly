@@ -869,6 +869,17 @@ select {
     opacity: 0.7;
 }
 
+.share-btn {
+    background: var(--pencil-teal) !important;
+    border-color: var(--pencil-blue) !important;
+    box-shadow: 4px 4px 0 var(--pencil-grey) !important;
+}
+
+.share-btn:hover {
+    background: var(--pencil-teal) !important;
+    box-shadow: 3px 3px 0 var(--pencil-teal) !important;
+}
+
 .roll-btn {
     font-size: 12px;
     padding: 14px 28px;

@@ -519,6 +519,54 @@ function initSetupScreen() {
         location.reload();
     });
 
+    // Share button - export gameover screen as image
+    document.getElementById('share-btn').addEventListener('click', async () => {
+        const shareBtn = document.getElementById('share-btn');
+        const originalText = shareBtn.innerHTML;
+
+        try {
+            // Show loading state
+            shareBtn.innerHTML = '📸 GENERATING...';
+            shareBtn.disabled = true;
+
+            // Get the gameover screen element
+            const gameoverScreen = document.getElementById('gameover-screen');
+
+            // Use html2canvas to capture the screen
+            const canvas = await html2canvas(gameoverScreen, {
+                backgroundColor: '#f5edd8',
+                scale: 2, // Higher quality
+                logging: false,
+                useCORS: true,
+                allowTaint: true
+            });
+
+            // Convert canvas to blob
+            canvas.toBlob((blob) => {
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                link.download = `theory-research-results-${timestamp}.png`;
+                link.href = url;
+                link.click();
+
+                // Clean up
+                URL.revokeObjectURL(url);
+
+                // Restore button
+                shareBtn.innerHTML = originalText;
+                shareBtn.disabled = false;
+            });
+
+        } catch (error) {
+            console.error('Failed to export image:', error);
+            alert('Failed to export image. Please try again.');
+            shareBtn.innerHTML = originalText;
+            shareBtn.disabled = false;
+        }
+    });
+
     // Entity suggestions button
     const generateEntitiesBtn = document.getElementById('generate-entities-btn');
     if (generateEntitiesBtn) {
