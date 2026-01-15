@@ -54,12 +54,12 @@ const GameState = {
 // PLAYER CLASS
 // ============================================
 class Player {
-    constructor(name, color, index, isAI = false) {
+    constructor(name, color, index, isAI = false, startingAge = null) {
         this.name = name;
         this.color = color;
         this.index = index;
         this.position = 0;
-        this.age = STARTING_AGE;
+        this.age = startingAge !== null ? startingAge : STARTING_AGE;
         this.totalFame = 0;
         this.spentFame = 0;
         this.students = [];

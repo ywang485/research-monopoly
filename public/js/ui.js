@@ -615,13 +615,23 @@ function startGame() {
     GameState.entity.type = document.getElementById('entity-type').value;
     GameState.entity.name = document.getElementById('entity-name').value || 'The Unknown';
 
+    // Get starting age
+    const startingAgeInput = document.getElementById('starting-age');
+    let startingAge = STARTING_AGE;
+    if (startingAgeInput) {
+        const inputValue = parseInt(startingAgeInput.value);
+        if (!isNaN(inputValue) && inputValue >= 1 && inputValue < MAX_AGE) {
+            startingAge = inputValue;
+        }
+    }
+
     // Get players
     const playerInputs = document.querySelectorAll('.player-input');
     playerInputs.forEach((input, index) => {
         const name = input.querySelector('.player-name').value || `Player ${index + 1}`;
         const color = input.querySelector('.player-color').value;
         const isAI = input.querySelector('.player-ai')?.checked || false;
-        GameState.players.push(new Player(name, color, index, isAI));
+        GameState.players.push(new Player(name, color, index, isAI, startingAge));
     });
 
     // Parse map

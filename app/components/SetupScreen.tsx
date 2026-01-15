@@ -81,6 +81,10 @@ export default function SetupScreen() {
           <div id="custom-map-input" style={{ display: 'none' }}>
             <textarea id="map-text" placeholder="Paste map configuration here..."></textarea>
           </div>
+          <div className="input-group">
+            <label htmlFor="starting-age">Initial Player Age:</label>
+            <input type="number" id="starting-age" min="1" max="79" defaultValue="70" />
+          </div>
         </div>
 
         <button id="start-game-btn" className="sketch-btn large">▶ START GAME!</button>
