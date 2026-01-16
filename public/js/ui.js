@@ -616,128 +616,169 @@ function initSetupScreen() {
                 }
             }
 
-            // Set up PDF styling
+            // Set up PDF styling (arXiv style)
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 20;
+            const margin = 25; // Academic paper margins
             const maxWidth = pageWidth - (margin * 2);
-            let yPos = margin;
+            const centerX = pageWidth / 2;
+            let yPos = margin + 10;
+            let pageNumber = 1;
 
-            // Helper function to add text with word wrapping
-            const addWrappedText = (text, fontSize, isBold = false, color = [0, 0, 0]) => {
-                doc.setFontSize(fontSize);
-                doc.setTextColor(color[0], color[1], color[2]);
-                if (isBold) {
-                    doc.setFont(undefined, 'bold');
-                } else {
-                    doc.setFont(undefined, 'normal');
-                }
-                
-                const lines = doc.splitTextToSize(text, maxWidth);
-                lines.forEach(line => {
-                    if (yPos > pageHeight - margin - 10) {
-                        doc.addPage();
-                        yPos = margin;
-                    }
-                    doc.text(line, margin, yPos);
-                    yPos += fontSize * 0.4;
-                });
-                yPos += 5; // Add spacing after text block
+            // Helper function to add page numbers
+            const addPageNumber = () => {
+                doc.setFontSize(10);
+                doc.setFont('times', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(String(pageNumber), centerX, pageHeight - 15, { align: 'center' });
             };
 
-            // Title
-            addWrappedText(researchSubject, 18, true, [0, 0, 0]);
+            // Helper function to check page break and add new page
+            const checkPageBreak = (requiredSpace) => {
+                if (yPos + requiredSpace > pageHeight - 25) {
+                    addPageNumber();
+                    doc.addPage();
+                    pageNumber++;
+                    yPos = margin;
+                }
+            };
+
+            // === TITLE SECTION ===
+            doc.setFontSize(20);
+            doc.setFont('times', 'bold');
+            doc.setTextColor(0, 0, 0);
+
+            // Split title into lines if needed
+            const titleLines = doc.splitTextToSize(researchSubject, maxWidth - 20);
+            titleLines.forEach(line => {
+                doc.text(line, centerX, yPos, { align: 'center' });
+                yPos += 24;
+            });
+
             yPos += 5;
 
-            // Authors
+            // === AUTHORS SECTION ===
             if (sortedAuthors.length > 0) {
                 doc.setFontSize(12);
-                doc.setFont(undefined, 'normal');
-                doc.setTextColor(100, 100, 100);
+                doc.setFont('times', 'normal');
+                doc.setTextColor(0, 0, 0);
+
                 const authorNames = sortedAuthors.map(a => a.name).join(', ');
-                const authorLines = doc.splitTextToSize(authorNames, maxWidth);
+                const authorLines = doc.splitTextToSize(authorNames, maxWidth - 20);
                 authorLines.forEach(line => {
-                    if (yPos > pageHeight - margin - 10) {
-                        doc.addPage();
-                        yPos = margin;
-                    }
-                    doc.text(line, margin, yPos);
-                    yPos += 5;
+                    doc.text(line, centerX, yPos, { align: 'center' });
+                    yPos += 14;
                 });
                 yPos += 10;
             }
 
-            // Abstract/Content section
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
+            // Horizontal line separator
+            doc.setLineWidth(0.5);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 15;
+
+            // === ABSTRACT SECTION ===
+            checkPageBreak(30);
+
+            // Abstract header (centered and bold)
+            doc.setFontSize(12);
+            doc.setFont('times', 'bold');
+            doc.text('Abstract', centerX, yPos, { align: 'center' });
+            yPos += 15;
+
+            // Abstract content (indented and slightly smaller)
+            const abstractIndent = 15;
+            doc.setFontSize(10);
+            doc.setFont('times', 'italic');
             doc.setTextColor(0, 0, 0);
-            doc.text('Abstract', margin, yPos);
-            yPos += 8;
 
-            // Theory content
-            addWrappedText(theoryContent, 11, false, [0, 0, 0]);
-            yPos += 10;
+            const abstractLines = doc.splitTextToSize(theoryContent, maxWidth - (abstractIndent * 2));
+            abstractLines.forEach(line => {
+                checkPageBreak(12);
+                doc.text(line, margin + abstractIndent, yPos);
+                yPos += 12;
+            });
+            yPos += 15;
 
-            // References section
+            // === REFERENCES SECTION ===
             if (establishedTheories.length > 0) {
-                doc.setFontSize(14);
-                doc.setFont(undefined, 'bold');
+                checkPageBreak(25);
+
+                // Section header
+                doc.setFontSize(13);
+                doc.setFont('times', 'bold');
                 doc.setTextColor(0, 0, 0);
                 doc.text('References', margin, yPos);
-                yPos += 8;
+                yPos += 18;
 
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'normal');
+                // References with hanging indent
+                doc.setFontSize(9);
+                doc.setFont('times', 'normal');
+
                 establishedTheories.forEach((theory, idx) => {
-                    const refText = `[${idx + 1}] ${theory}`;
-                    const refLines = doc.splitTextToSize(refText, maxWidth);
-                    refLines.forEach(line => {
-                        if (yPos > pageHeight - margin - 10) {
-                            doc.addPage();
-                            yPos = margin;
+                    checkPageBreak(15);
+
+                    const refNumber = `[${idx + 1}]`;
+                    const refIndent = 10;
+
+                    // Reference number
+                    doc.text(refNumber, margin, yPos);
+
+                    // Reference text with hanging indent
+                    const refLines = doc.splitTextToSize(theory, maxWidth - refIndent - 5);
+                    refLines.forEach((line, lineIdx) => {
+                        if (lineIdx === 0) {
+                            doc.text(line, margin + refIndent, yPos);
+                        } else {
+                            checkPageBreak(11);
+                            yPos += 11;
+                            doc.text(line, margin + refIndent, yPos);
                         }
-                        doc.text(line, margin, yPos);
-                        yPos += 4;
                     });
-                    yPos += 2;
+                    yPos += 14;
                 });
                 yPos += 10;
             }
 
-            // Author Bios section
+            // === AUTHOR BIOGRAPHIES SECTION ===
             if (sortedAuthors.length > 0 && Object.keys(authorBios).length > 0) {
-                doc.setFontSize(14);
-                doc.setFont(undefined, 'bold');
+                checkPageBreak(25);
+
+                // Section header
+                doc.setFontSize(13);
+                doc.setFont('times', 'bold');
                 doc.setTextColor(0, 0, 0);
                 doc.text('Author Biographies', margin, yPos);
-                yPos += 8;
+                yPos += 18;
 
                 sortedAuthors.forEach(author => {
                     if (authorBios[author.index]) {
+                        checkPageBreak(20);
+
                         // Author name
                         doc.setFontSize(11);
-                        doc.setFont(undefined, 'bold');
-                        doc.setTextColor(0, 0, 0);
+                        doc.setFont('times', 'bold');
                         doc.text(author.name, margin, yPos);
-                        yPos += 6;
+                        yPos += 14;
 
                         // Author bio
                         doc.setFontSize(10);
-                        doc.setFont(undefined, 'italic');
-                        doc.setTextColor(60, 60, 60);
-                        const bioLines = doc.splitTextToSize(authorBios[author.index], maxWidth);
+                        doc.setFont('times', 'normal');
+                        doc.setTextColor(40, 40, 40);
+
+                        const bioLines = doc.splitTextToSize(authorBios[author.index], maxWidth - 5);
                         bioLines.forEach(line => {
-                            if (yPos > pageHeight - margin - 10) {
-                                doc.addPage();
-                                yPos = margin;
-                            }
-                            doc.text(line, margin, yPos);
-                            yPos += 4;
+                            checkPageBreak(12);
+                            doc.text(line, margin + 5, yPos);
+                            yPos += 12;
                         });
-                        yPos += 8;
+                        yPos += 12;
                     }
                 });
             }
+
+            // Add final page number
+            addPageNumber();
 
             // Save the PDF
             const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
