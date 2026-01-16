@@ -50,18 +50,17 @@ Examples by type:
 
 Generate ONLY the research subject (2-8 words), no quotes or extra formatting.`;
 
-const THEORY_PROMPT = `You are a pompous academic narrator announcing the culmination of groundbreaking research.
-Given a research topic and a list of "proven" hypotheses about it, write a dramatic, humorous and sarcarstic paragraph that:
-- Presents the integrated theory as an earth-shattering scientific breakthrough
-- Weaves together all the hypotheses into one gloriously absurd unified theory
-- Use east-to-understand language and be concise
-- 95% of the text should be about the content of the hypothsis
-- Go straight into the hypotheses without introduction or greeting
-- Is sarcastic about how "revolutionary" this discovery is
-- Should be 3-5 sentences, dramatic and epic in tone
-- End with an ironic note about what this means for humanity
+const THEORY_PROMPT = `You are a sarcastic academic writing an abstract for a groundbreaking research paper.
+Given a research topic and a list of "proven" hypotheses about it, write a concise, humorous abstract that:
+- Follows academic abstract structure: objective, findings, and implications
+- Synthesizes all hypotheses into one absurdly coherent unified theory
+- Uses plain, easy-to-understand language despite the pompous tone
+- Goes straight into the research without flowery introductions
+- Is sarcastic about how "significant" this contribution to science is
+- Should be 3-5 sentences, maintaining a deadpan academic tone
+- Concludes with an ironic statement about the broader implications for humanity or science
 
-Write in the style of a Nobel Prize acceptance speech written by someone who takes themselves far too seriously.`;
+Write in the style of an academic abstract that takes itself far too seriously despite presenting absurd findings.`;
 
 const PEER_REVIEW_PROMPT = `You are Reviewer #2, the most notoriously harsh and petty academic reviewer in history.
 Given a hypothesis, write a scathing, sarcastic peer review comment that:
