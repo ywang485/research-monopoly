@@ -538,11 +538,25 @@ function initSetupScreen() {
             });
 
             // Extract data from GameState and DOM
-            const researchSubject = GameState.entity.name;
-            
+            // Capitalize the title for the PDF
+            const researchSubject = GameState.entity.name
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+
             // Get proven theories (established theories)
             const provenSpaces = GameState.board.filter(s => s.isProven && s.hypothesis);
-            const establishedTheories = provenSpaces.map(s => s.hypothesis);
+            const establishedTheories = provenSpaces.map(s => {
+                // Get contributors sorted by years invested (descending)
+                const contributors = s.investments
+                    .sort((a, b) => b.years - a.years)
+                    .map(inv => inv.player);
+
+                return {
+                    hypothesis: s.hypothesis,
+                    contributors: contributors
+                };
+            });
             
             // Get theory content from DOM
             const theoryContentEl = document.getElementById('theory-content');
@@ -724,8 +738,14 @@ function initSetupScreen() {
                     // Reference number
                     doc.text(refNumber, margin, yPos);
 
+                    // Reference text with contributors
+                    let refText = theory.hypothesis;
+                    if (theory.contributors && theory.contributors.length > 0) {
+                        refText += ` , ${theory.contributors.join(', ')}`;
+                    }
+
                     // Reference text with hanging indent
-                    const refLines = doc.splitTextToSize(theory, maxWidth - refIndent - 5);
+                    const refLines = doc.splitTextToSize(refText, maxWidth - refIndent - 5);
                     refLines.forEach((line, lineIdx) => {
                         if (lineIdx === 0) {
                             doc.text(line, margin + refIndent, yPos);
