@@ -519,53 +519,242 @@ function initSetupScreen() {
         location.reload();
     });
 
-    // Share button - export gameover screen as image
+    // Share button - export gameover screen as PDF paper
     document.getElementById('share-btn').addEventListener('click', async () => {
         const shareBtn = document.getElementById('share-btn');
         const originalText = shareBtn.innerHTML;
 
         try {
             // Show loading state
-            shareBtn.innerHTML = '📸 GENERATING...';
+            shareBtn.innerHTML = '📄 GENERATING PDF...';
             shareBtn.disabled = true;
 
-            // Get the gameover screen element
-            const gameoverScreen = document.getElementById('gameover-screen');
-
-            // Use html2canvas to capture the screen
-            const canvas = await html2canvas(gameoverScreen, {
-                backgroundColor: '#f5edd8',
-                scale: 2, // Higher quality
-                logging: false,
-                useCORS: true,
-                allowTaint: true
+            // Use globally loaded jsPDF library
+            const { jsPDF } = window;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
             });
 
-            // Convert canvas to blob
-            canvas.toBlob((blob) => {
-                // Create download link
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                link.download = `theory-research-results-${timestamp}.png`;
-                link.href = url;
-                link.click();
-
-                // Clean up
-                URL.revokeObjectURL(url);
-
-                // Restore button
-                shareBtn.innerHTML = originalText;
-                shareBtn.disabled = false;
+            // Extract data from GameState and DOM
+            const researchSubject = GameState.entity.name;
+            
+            // Get proven theories (established theories)
+            const provenSpaces = GameState.board.filter(s => s.isProven && s.hypothesis);
+            const establishedTheories = provenSpaces.map(s => s.hypothesis);
+            
+            // Get theory content from DOM
+            const theoryContentEl = document.getElementById('theory-content');
+            const theoryTextEl = theoryContentEl?.querySelector('.theory-text');
+            const theoryContent = theoryTextEl ? theoryTextEl.textContent.trim() : 
+                'After years of rigorous research and academic debate, the scientific community has established the following truths.';
+            
+            // Get authors who contributed to established theories, sorted by total fame
+            const contributors = {};
+            provenSpaces.forEach(space => {
+                space.investments.forEach(inv => {
+                    if (!contributors[inv.playerIndex]) {
+                        const player = GameState.players[inv.playerIndex];
+                        if (player) {
+                            contributors[inv.playerIndex] = {
+                                name: player.name,
+                                totalFame: player.totalFame,
+                                index: inv.playerIndex
+                            };
+                        }
+                    }
+                });
+                space.contributions.forEach(contrib => {
+                    if (!contributors[contrib.playerIndex]) {
+                        const player = GameState.players[contrib.playerIndex];
+                        if (player) {
+                            contributors[contrib.playerIndex] = {
+                                name: player.name,
+                                totalFame: player.totalFame,
+                                index: contrib.playerIndex
+                            };
+                        }
+                    }
+                });
             });
+            
+            // Sort authors by total fame (descending)
+            const sortedAuthors = Object.values(contributors)
+                .sort((a, b) => b.totalFame - a.totalFame);
+            
+            // Get author bios from DOM
+            const contributorsEl = document.getElementById('theory-contributors');
+            const authorBios = {};
+            if (contributorsEl) {
+                const bioElements = contributorsEl.querySelectorAll('.contributor-bio');
+                bioElements.forEach((bioEl, idx) => {
+                    const bioText = bioEl.textContent.trim();
+                    // Find corresponding player by matching with sortedContributors
+                    // We'll match by index in the contributors list
+                    if (sortedAuthors[idx]) {
+                        authorBios[sortedAuthors[idx].index] = bioText;
+                    }
+                });
+            }
+            
+            // If bios aren't loaded yet, try to fetch them
+            if (Object.keys(authorBios).length === 0) {
+                const logEntries = Array.from(document.querySelectorAll('.log-entry')).map(entry => entry.textContent);
+                const gameLog = logEntries.join('\n');
+                try {
+                    const bios = await fetchPlayerBios(GameState.players, gameLog);
+                    if (bios && bios.length === GameState.players.length) {
+                        GameState.players.forEach((player, idx) => {
+                            if (bios[idx] && sortedAuthors.find(a => a.index === player.index)) {
+                                authorBios[player.index] = bios[idx];
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch bios for PDF:', err);
+                }
+            }
+
+            // Set up PDF styling
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const maxWidth = pageWidth - (margin * 2);
+            let yPos = margin;
+
+            // Helper function to add text with word wrapping
+            const addWrappedText = (text, fontSize, isBold = false, color = [0, 0, 0]) => {
+                doc.setFontSize(fontSize);
+                doc.setTextColor(color[0], color[1], color[2]);
+                if (isBold) {
+                    doc.setFont(undefined, 'bold');
+                } else {
+                    doc.setFont(undefined, 'normal');
+                }
+                
+                const lines = doc.splitTextToSize(text, maxWidth);
+                lines.forEach(line => {
+                    if (yPos > pageHeight - margin - 10) {
+                        doc.addPage();
+                        yPos = margin;
+                    }
+                    doc.text(line, margin, yPos);
+                    yPos += fontSize * 0.4;
+                });
+                yPos += 5; // Add spacing after text block
+            };
+
+            // Title
+            addWrappedText(researchSubject, 18, true, [0, 0, 0]);
+            yPos += 5;
+
+            // Authors
+            if (sortedAuthors.length > 0) {
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                doc.setTextColor(100, 100, 100);
+                const authorNames = sortedAuthors.map(a => a.name).join(', ');
+                const authorLines = doc.splitTextToSize(authorNames, maxWidth);
+                authorLines.forEach(line => {
+                    if (yPos > pageHeight - margin - 10) {
+                        doc.addPage();
+                        yPos = margin;
+                    }
+                    doc.text(line, margin, yPos);
+                    yPos += 5;
+                });
+                yPos += 10;
+            }
+
+            // Abstract/Content section
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text('Abstract', margin, yPos);
+            yPos += 8;
+
+            // Theory content
+            addWrappedText(theoryContent, 11, false, [0, 0, 0]);
+            yPos += 10;
+
+            // References section
+            if (establishedTheories.length > 0) {
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text('References', margin, yPos);
+                yPos += 8;
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                establishedTheories.forEach((theory, idx) => {
+                    const refText = `[${idx + 1}] ${theory}`;
+                    const refLines = doc.splitTextToSize(refText, maxWidth);
+                    refLines.forEach(line => {
+                        if (yPos > pageHeight - margin - 10) {
+                            doc.addPage();
+                            yPos = margin;
+                        }
+                        doc.text(line, margin, yPos);
+                        yPos += 4;
+                    });
+                    yPos += 2;
+                });
+                yPos += 10;
+            }
+
+            // Author Bios section
+            if (sortedAuthors.length > 0 && Object.keys(authorBios).length > 0) {
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(0, 0, 0);
+                doc.text('Author Biographies', margin, yPos);
+                yPos += 8;
+
+                sortedAuthors.forEach(author => {
+                    if (authorBios[author.index]) {
+                        // Author name
+                        doc.setFontSize(11);
+                        doc.setFont(undefined, 'bold');
+                        doc.setTextColor(0, 0, 0);
+                        doc.text(author.name, margin, yPos);
+                        yPos += 6;
+
+                        // Author bio
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'italic');
+                        doc.setTextColor(60, 60, 60);
+                        const bioLines = doc.splitTextToSize(authorBios[author.index], maxWidth);
+                        bioLines.forEach(line => {
+                            if (yPos > pageHeight - margin - 10) {
+                                doc.addPage();
+                                yPos = margin;
+                            }
+                            doc.text(line, margin, yPos);
+                            yPos += 4;
+                        });
+                        yPos += 8;
+                    }
+                });
+            }
+
+            // Save the PDF
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            doc.save(`research-paper-${timestamp}.pdf`);
+
+            // Restore button
+            shareBtn.innerHTML = originalText;
+            shareBtn.disabled = false;
 
         } catch (error) {
-            console.error('Failed to export image:', error);
-            alert('Failed to export image. Please try again.');
+            console.error('Failed to generate PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
             shareBtn.innerHTML = originalText;
             shareBtn.disabled = false;
         }
     });
+
 
     // Entity suggestions button
     const generateEntitiesBtn = document.getElementById('generate-entities-btn');

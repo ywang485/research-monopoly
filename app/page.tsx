@@ -1,11 +1,16 @@
 'use client'
 
 import { useEffect } from 'react'
+import { jsPDF } from 'jspdf'
 import SetupScreen from './components/SetupScreen'
 import GameplayScreen from './components/GameplayScreen'
 
 export default function Home() {
   useEffect(() => {
+    // Make jsPDF available globally for ui.js
+    // @ts-ignore
+    window.jsPDF = jsPDF
+
     // Load game modules
     const loadScript = (src: string) => {
       return new Promise((resolve, reject) => {
@@ -20,7 +25,6 @@ export default function Home() {
     // Load all game scripts in order
     const loadGameScripts = async () => {
       try {
-        await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js')
         await loadScript('/js/constants.js')
         await loadScript('/js/utils.js')
         await loadScript('/js/sound.js')
