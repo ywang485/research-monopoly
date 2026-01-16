@@ -1,5 +1,33 @@
 // LLM utility functions
 
+// Helper function to retry operations with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+
+      // If this is the last attempt, throw the error
+      if (attempt === maxRetries - 1) {
+        throw lastError;
+      }
+
+      // Wait before retrying (exponential backoff)
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+}
+
 export function getAvailableLLM() {
   if (process.env.OPENAI_API_KEY) return 'openai';
   if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
@@ -115,371 +143,401 @@ export function buildHypothesisPrompt(entity: string, existingHypotheses: string
 }
 
 export async function generateWithOpenAI(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
-      ],
-      max_tokens: 150,
-      temperature: 0.9
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
+        ],
+        max_tokens: 150,
+        temperature: 0.9
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.choices[0].message.content.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content.trim();
+  });
 }
 
 export async function generateWithAnthropic(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 150,
-      system: SYSTEM_PROMPT,
-      messages: [
-        { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
-      ]
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 150,
+        system: SYSTEM_PROMPT,
+        messages: [
+          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
+        ]
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content[0].text.trim();
+  });
 }
 
 export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses)}`
-        }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 150,
-        temperature: 0.9
-      }
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses)}`
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 150,
+          temperature: 0.9
+        }
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates[0].content.parts[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates[0].content.parts[0].text.trim();
+  });
 }
 
 export async function generateAdditionWithOpenAI(existingHypothesis: string) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: ADDITION_PROMPT },
-        { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
-      ],
-      max_tokens: 60,
-      temperature: 0.9
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: ADDITION_PROMPT },
+          { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
+        ],
+        max_tokens: 60,
+        temperature: 0.9
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.choices[0].message.content.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content.trim();
+  });
 }
 
 export async function generateAdditionWithAnthropic(existingHypothesis: string) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 60,
-      system: ADDITION_PROMPT,
-      messages: [
-        { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
-      ]
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 60,
+        system: ADDITION_PROMPT,
+        messages: [
+          { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
+        ]
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content[0].text.trim();
+  });
 }
 
 export async function generateAdditionWithGoogle(existingHypothesis: string) {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${ADDITION_PROMPT}\n\nExisting hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:`
-        }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 60,
-        temperature: 0.9
-      }
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${ADDITION_PROMPT}\n\nExisting hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:`
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 60,
+          temperature: 0.9
+        }
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates[0].content.parts[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates[0].content.parts[0].text.trim();
+  });
 }
 
 export async function generateEntityWithOpenAI(variationIndex: number = 0) {
-  const variations = ['unique', 'creative', 'unexpected'];
-  const variation = variations[variationIndex % variations.length];
+  return retryWithBackoff(async () => {
+    const variations = ['unique', 'creative', 'unexpected'];
+    const variation = variations[variationIndex % variations.length];
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: ENTITY_PROMPT },
-        { role: 'user', content: `Suggest a ${variation} and funny research subject for a satirical academic game (suggestion #${variationIndex + 1}):` }
-      ],
-      max_tokens: 30,
-      temperature: 1.0
-    })
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: ENTITY_PROMPT },
+          { role: 'user', content: `Suggest a ${variation} and funny research subject for a satirical academic game (suggestion #${variationIndex + 1}):` }
+        ],
+        max_tokens: 30,
+        temperature: 1.0
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content.trim();
   });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.choices[0].message.content.trim();
 }
 
 export async function generateEntityWithAnthropic(entityType: string, variationIndex: number = 0) {
-  const variations = ['unique', 'creative', 'unexpected'];
-  const variation = variations[variationIndex % variations.length];
+  return retryWithBackoff(async () => {
+    const variations = ['unique', 'creative', 'unexpected'];
+    const variation = variations[variationIndex % variations.length];
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 30,
-      system: ENTITY_PROMPT,
-      messages: [
-        { role: 'user', content: `Suggest a ${variation} and funny research ${entityType} for a satirical academic game (suggestion #${variationIndex + 1}):` }
-      ]
-    })
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 30,
+        system: ENTITY_PROMPT,
+        messages: [
+          { role: 'user', content: `Suggest a ${variation} and funny research ${entityType} for a satirical academic game (suggestion #${variationIndex + 1}):` }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content[0].text.trim();
   });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text.trim();
 }
 
 export async function generateEntityWithGoogle(entityType: string, variationIndex: number = 0) {
-  const variations = ['unique', 'creative', 'unexpected'];
-  const variation = variations[variationIndex % variations.length];
+  return retryWithBackoff(async () => {
+    const variations = ['unique', 'creative', 'unexpected'];
+    const variation = variations[variationIndex % variations.length];
 
-  const categories = [
-    'Matter',
-    'Creature',
-    'Phenomenon',
-    'Place',
-    'Mechanism',
-    'Question'
-  ];
+    const categories = [
+      'Matter',
+      'Creature',
+      'Phenomenon',
+      'Place',
+      'Mechanism',
+      'Question'
+    ];
 
-  const typeIdx = Math.floor(Math.random() * categories.length);
+    const typeIdx = Math.floor(Math.random() * categories.length);
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${categories[typeIdx]} for a satirical academic game (suggestion #${variationIndex + 1}):`
-        }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 30,
-        temperature: 1.0
-      }
-    })
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${categories[typeIdx]} for a satirical academic game (suggestion #${variationIndex + 1}):`
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 30,
+          temperature: 1.0
+        }
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates[0].content.parts[0].text.trim();
   });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates[0].content.parts[0].text.trim();
 }
 
 export async function generateTheoryWithOpenAI(entity: string, hypotheses: string[]) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: THEORY_PROMPT },
-        { role: 'user', content: `Entity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:` }
-      ],
-      max_tokens: 300,
-      temperature: 0.9
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: THEORY_PROMPT },
+          { role: 'user', content: `Entity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:` }
+        ],
+        max_tokens: 300,
+        temperature: 0.9
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.choices[0].message.content.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content.trim();
+  });
 }
 
 export async function generateTheoryWithAnthropic(entity: string, hypotheses: string[]) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 300,
-      system: THEORY_PROMPT,
-      messages: [
-        { role: 'user', content: `Entity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:` }
-      ]
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 300,
+        system: THEORY_PROMPT,
+        messages: [
+          { role: 'user', content: `Entity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:` }
+        ]
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content[0].text.trim();
+  });
 }
 
 export async function generateTheoryWithGoogle(entity: string, hypotheses: string[]) {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${THEORY_PROMPT}\n\nResearch topic: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`
-        }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 300,
-        temperature: 0.9
-      }
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${THEORY_PROMPT}\n\nResearch topic: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 300,
+          temperature: 0.9
+        }
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates[0].content.parts[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates[0].content.parts[0].text.trim();
+  });
 }
 
 export async function generateReviewWithOpenAI(hypothesis: string) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: PEER_REVIEW_PROMPT },
-        { role: 'user', content: `Review this hypothesis: "${hypothesis}"` }
-      ],
-      max_tokens: 150,
-      temperature: 0.9
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: PEER_REVIEW_PROMPT },
+          { role: 'user', content: `Review this hypothesis: "${hypothesis}"` }
+        ],
+        max_tokens: 150,
+        temperature: 0.9
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.choices[0].message.content.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content.trim();
+  });
 }
 
 export async function generateReviewWithAnthropic(hypothesis: string) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 150,
-      system: PEER_REVIEW_PROMPT,
-      messages: [
-        { role: 'user', content: `Review this hypothesis: "${hypothesis}"` }
-      ]
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 150,
+        system: PEER_REVIEW_PROMPT,
+        messages: [
+          { role: 'user', content: `Review this hypothesis: "${hypothesis}"` }
+        ]
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.content[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.content[0].text.trim();
+  });
 }
 
 export async function generateReviewWithGoogle(hypothesis: string) {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${PEER_REVIEW_PROMPT}\n\nReview this hypothesis: "${hypothesis}"`
-        }]
-      }],
-      generationConfig: {
-        maxOutputTokens: 150,
-        temperature: 0.9
-      }
-    })
-  });
+  return retryWithBackoff(async () => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `${PEER_REVIEW_PROMPT}\n\nReview this hypothesis: "${hypothesis}"`
+          }]
+        }],
+        generationConfig: {
+          maxOutputTokens: 150,
+          temperature: 0.9
+        }
+      })
+    });
 
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.candidates[0].content.parts[0].text.trim();
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates[0].content.parts[0].text.trim();
+  });
 }
