@@ -462,7 +462,7 @@ function handleAISpaceLanding(player, space) {
                 handleCollaborationSpace(player);
                 break;
             case SPACE_TYPES.EUREKA:
-                handleEurekaSpace(player);
+                handleAIEurekaSpace(player);
                 break;
             default:
                 endTurn();
@@ -561,5 +561,64 @@ function handleAIRecruitSpace(player) {
     } else {
         log(`${player.name} decided not to hire any students.`);
         setTimeout(() => endTurn(), 300);
+    }
+}
+
+async function handleAIEurekaSpace(player) {
+    playSound('eureka');
+
+    // Find the closest uninvested hypothesis space
+    const boardSize = GameState.board.length;
+    let closestSpace = null;
+    let closestDistance = boardSize;
+
+    for (let i = 1; i < boardSize; i++) {
+        const checkIndex = (player.position + i) % boardSize;
+        const space = GameState.board[checkIndex];
+
+        if (space.type === SPACE_TYPES.HYPOTHESIS && !space.hypothesis) {
+            closestSpace = space;
+            closestDistance = i;
+            break;
+        }
+    }
+
+    if (!closestSpace) {
+        // No uninvested hypothesis spaces available
+        log(`${player.name} had a EUREKA moment, but every hypothesis space is already claimed!`, 'important');
+        updatePlayerStats();
+        setTimeout(() => endTurn(), 500);
+        return;
+    }
+
+    // Generate hypothesis using LLM
+    if (GameState.llm.available) {
+        log(`${player.name} had a EUREKA moment and is formulating a brilliant hypothesis...`);
+    }
+
+    const hypothesis = await generateLLMHypothesis();
+
+    // Claim the space for free
+    closestSpace.hypothesis = hypothesis;
+    closestSpace.contributions.push({
+        text: hypothesis,
+        author: player.name,
+        playerIndex: player.index
+    });
+    closestSpace.investments.push({
+        player: player.name,
+        years: closestSpace.investmentCost,
+        playerIndex: player.index
+    });
+
+    log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
+
+    // Update UI
+    renderBoard();
+    updatePlayerStats();
+    checkGameEnd();
+
+    if (!GameState.gameOver) {
+        setTimeout(() => endTurn(), 800);
     }
 }
