@@ -2253,6 +2253,7 @@ select {
     height: 100%;
     position: relative;
     overflow: auto;
+    padding: 20px;
     /* Hide scrollbars */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
