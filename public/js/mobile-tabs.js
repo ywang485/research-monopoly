@@ -4,7 +4,7 @@ let isMobileView = false;
 let currentOpenTab = null;
 
 function checkMobileView() {
-    isMobileView = window.innerWidth <= 480;
+    isMobileView = window.innerWidth <= 1024;
     return isMobileView;
 }
 
