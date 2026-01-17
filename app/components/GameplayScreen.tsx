@@ -1,4 +1,5 @@
 import GameoverScreen from './GameoverScreen'
+import MobileTabSystem from './MobileTabSystem'
 
 export default function GameplayScreen() {
   return (
@@ -104,6 +105,9 @@ export default function GameplayScreen() {
 
       {/* Board Tooltip */}
       <div id="board-tooltip" className="board-tooltip sketch-tooltip"></div>
+
+      {/* Mobile Tab System */}
+      <MobileTabSystem />
     </>
   )
 }

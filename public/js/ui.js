@@ -28,10 +28,12 @@ function showModal(title, bodyHTML, buttons) {
     });
 
     modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
 }
 
 function hideModal() {
     document.getElementById('modal').style.display = 'none';
+    document.body.classList.remove('modal-open');
 }
 
 // ============================================
@@ -44,6 +46,11 @@ function log(message, type = 'normal') {
     entry.textContent = `[Turn ${GameState.turnNumber}] ${message}`;
     logEl.appendChild(entry);
     logEl.scrollTop = logEl.scrollHeight;
+
+    // Update mobile panels if available
+    if (typeof updateMobilePanels === 'function') {
+        updateMobilePanels();
+    }
 }
 
 // ============================================
@@ -75,6 +82,11 @@ function updatePlayerStats() {
 
     // Update NPC position
     document.getElementById('npc-position').textContent = `Position: ${GameState.board[GameState.npc.position]?.name || 'Start'}`;
+
+    // Update mobile panels if available
+    if (typeof updateMobilePanels === 'function') {
+        updateMobilePanels();
+    }
 }
 
 function updateTheoriesList() {
@@ -115,6 +127,11 @@ function updateTheoriesList() {
 
         container.appendChild(div);
     });
+
+    // Update mobile panels if available
+    if (typeof updateMobilePanels === 'function') {
+        updateMobilePanels();
+    }
 }
 
 function generateTheoryTooltipContent(theory) {
@@ -410,6 +427,57 @@ function initZoomControls() {
                 }
             }
         });
+
+        // === MOBILE PINCH-TO-ZOOM ===
+        let initialPinchDistance = 0;
+        let initialZoom = 1;
+        let isPinching = false;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Start pinch zoom
+                e.preventDefault();
+                isPinching = true;
+                initialPinchDistance = getPinchDistance(e.touches);
+                initialZoom = GameState.zoom.level;
+            } else if (e.touches.length === 1 && GameState.zoom.level > 1) {
+                // Start single-finger pan when zoomed
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && isPinching) {
+                // Pinch zoom
+                e.preventDefault();
+                const currentDistance = getPinchDistance(e.touches);
+                const scale = currentDistance / initialPinchDistance;
+                const newZoom = initialZoom * scale;
+                updateZoomLevel(newZoom);
+            } else if (e.touches.length === 1 && GameState.zoom.level > 1 && !isPinching) {
+                // Single-finger pan when zoomed
+                e.preventDefault();
+                const deltaX = e.touches[0].clientX - lastTouchX;
+                const deltaY = e.touches[0].clientY - lastTouchY;
+
+                if (container) {
+                    container.scrollLeft -= deltaX;
+                    container.scrollTop -= deltaY;
+                }
+
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                isPinching = false;
+            }
+        });
     }
 
     // Keyboard shortcuts for zoom
@@ -428,6 +496,119 @@ function initZoomControls() {
             zoomReset();
         }
     });
+}
+
+// Helper function for pinch-to-zoom distance calculation
+function getPinchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ============================================
+// MOBILE TAP GESTURE HANDLING
+// ============================================
+function initMobileBoardInteraction() {
+    const canvas = document.getElementById('game-board');
+    if (!canvas) return;
+
+    let lastTapTime = 0;
+    let lastTapX = 0;
+    let lastTapY = 0;
+    const DOUBLE_TAP_DELAY = 300; // ms
+    const TAP_DISTANCE_THRESHOLD = 30; // pixels
+
+    canvas.addEventListener('touchend', (e) => {
+        // Ignore if it was a pinch or multi-touch
+        if (e.changedTouches.length !== 1) return;
+
+        // Ignore if there are still touches on screen
+        if (e.touches.length > 0) return;
+
+        const touch = e.changedTouches[0];
+        const currentTime = Date.now();
+        const timeDiff = currentTime - lastTapTime;
+        const distX = Math.abs(touch.clientX - lastTapX);
+        const distY = Math.abs(touch.clientY - lastTapY);
+
+        // Check for double-tap
+        if (timeDiff < DOUBLE_TAP_DELAY &&
+            distX < TAP_DISTANCE_THRESHOLD &&
+            distY < TAP_DISTANCE_THRESHOLD) {
+            // Double-tap detected
+            handleMobileDoubleTap(touch.clientX, touch.clientY);
+            lastTapTime = 0; // Reset to prevent triple-tap
+        } else {
+            // Single tap - show space info
+            handleMobileSingleTap(touch.clientX, touch.clientY);
+            lastTapTime = currentTime;
+            lastTapX = touch.clientX;
+            lastTapY = touch.clientY;
+        }
+    });
+}
+
+function handleMobileSingleTap(x, y) {
+    const spaceIndex = getSpaceAtPosition(x, y);
+    if (spaceIndex >= 0) {
+        showMobileSpaceInfo(spaceIndex);
+    }
+}
+
+function handleMobileDoubleTap(x, y) {
+    // Hide any open space info first
+    hideMobileSpaceInfo();
+
+    // Check if tapping on a space
+    const spaceIndex = getSpaceAtPosition(x, y);
+    if (spaceIndex < 0) return;
+
+    // Get current player
+    const player = GameState.players[GameState.currentPlayerIndex];
+    if (!player || !player.isAlive || GameState.isNPCTurn || GameState.gameOver) return;
+
+    // If player is on this space, trigger the space action again
+    if (player.position === spaceIndex) {
+        const space = GameState.board[spaceIndex];
+        if (space && typeof handleSpaceLanding === 'function') {
+            handleSpaceLanding(player, space);
+        }
+    }
+}
+
+function showMobileSpaceInfo(spaceIndex) {
+    const content = generateTooltipContent(spaceIndex);
+
+    // Create or update the mobile space info overlay
+    let overlay = document.getElementById('mobile-space-info');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'mobile-space-info';
+        overlay.className = 'mobile-space-info';
+        document.body.appendChild(overlay);
+    }
+
+    overlay.innerHTML = `
+        <div class="mobile-space-info-content">
+            ${content}
+            <button class="mobile-space-info-close" onclick="hideMobileSpaceInfo()">×</button>
+        </div>
+    `;
+    overlay.classList.add('visible');
+
+    // Close when tapping on the backdrop
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            hideMobileSpaceInfo();
+        }
+    });
+}
+
+function hideMobileSpaceInfo() {
+    const overlay = document.getElementById('mobile-space-info');
+    if (overlay) {
+        overlay.classList.remove('visible');
+    }
 }
 
 // ============================================

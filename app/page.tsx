@@ -33,6 +33,7 @@ export default function Home() {
         await loadScript('/js/ai.js')
         await loadScript('/js/ui.js')
         await loadScript('/js/draggable.js')
+        await loadScript('/js/mobile-tabs.js')
 
         // Wait a bit for all functions to be defined
         setTimeout(async () => {
@@ -54,6 +55,16 @@ export default function Home() {
             window.checkLLMAvailability()
             // @ts-ignore
             window.initDraggableNotepad()
+            // @ts-ignore - Initialize mobile systems
+            if (typeof window.initMobileTabSystem === 'function') {
+              // @ts-ignore
+              window.initMobileTabSystem()
+            }
+            // @ts-ignore
+            if (typeof window.initMobileBoardInteraction === 'function') {
+              // @ts-ignore
+              window.initMobileBoardInteraction()
+            }
           }
         }, 100)
 
