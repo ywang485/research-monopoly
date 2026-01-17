@@ -17,7 +17,11 @@
    ============================================ */
 
 @media (max-width: 1024px) {
-    /* === DISABLE BROWSER DOUBLE-TAP-TO-ZOOM === */
+    /* === DISABLE BROWSER ZOOM (pinch and double-tap) === */
+    html, body {
+        touch-action: pan-x pan-y;
+    }
+
     * {
         touch-action: manipulation;
     }
