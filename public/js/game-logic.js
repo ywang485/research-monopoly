@@ -1209,6 +1209,9 @@ function updateTurnDisplay() {
 
         document.getElementById('roll-dice-btn').disabled = false;
         document.getElementById('roll-dice-btn').textContent = 'Roll Dice';
+
+        // Start the arrow animation loop for the current player
+        renderBoard();
     }
 }
 
@@ -1312,6 +1315,12 @@ function checkGameEnd() {
 async function endGame(winner, reason) {
     GameState.gameOver = true;
     playSound('win');
+
+    // Disable roll button
+    document.getElementById('roll-dice-btn').disabled = true;
+    if (typeof updateMobileDiceButton === 'function') {
+        updateMobileDiceButton();
+    }
 
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('gameover-screen').style.display = 'block';

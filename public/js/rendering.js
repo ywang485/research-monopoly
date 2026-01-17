@@ -673,6 +673,97 @@ function renderBoard() {
         }
     }
 
+    // Draw current player indicator arrow (only when not animating and game is active)
+    if (!GameState.animation.active && !GameState.gameOver && !GameState.isNPCTurn) {
+        const currentPlayer = GameState.players[GameState.currentPlayerIndex];
+        if (currentPlayer && currentPlayer.isAlive) {
+            const playerPos = positions[currentPlayer.position];
+            if (playerPos) {
+                // Calculate arrow position (above the space)
+                const arrowX = playerPos.x + spaceSize / 2;
+                const arrowBaseY = playerPos.y - 15;
+
+                // Bouncing animation using time
+                const bounceTime = Date.now() / 400; // Speed of bounce
+                const bounceOffset = Math.sin(bounceTime) * 5; // Amplitude of bounce
+                const arrowY = arrowBaseY + bounceOffset;
+
+                const arrowWidth = 16;
+                const arrowHeight = 20;
+
+                ctx.save();
+
+                // Draw arrow shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(arrowX, arrowY + arrowHeight + 3);
+                ctx.lineTo(arrowX - arrowWidth / 2, arrowY + 3);
+                ctx.lineTo(arrowX - arrowWidth / 4, arrowY + 3);
+                ctx.lineTo(arrowX - arrowWidth / 4, arrowY - arrowHeight / 2 + 3);
+                ctx.lineTo(arrowX + arrowWidth / 4, arrowY - arrowHeight / 2 + 3);
+                ctx.lineTo(arrowX + arrowWidth / 4, arrowY + 3);
+                ctx.lineTo(arrowX + arrowWidth / 2, arrowY + 3);
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw arrow body (player color with gradient)
+                const gradient = ctx.createLinearGradient(arrowX - arrowWidth / 2, arrowY, arrowX + arrowWidth / 2, arrowY);
+                gradient.addColorStop(0, currentPlayer.color);
+                gradient.addColorStop(0.5, lightenColor(currentPlayer.color, 30));
+                gradient.addColorStop(1, currentPlayer.color);
+
+                ctx.fillStyle = gradient;
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 1.5;
+
+                // Arrow pointing down
+                ctx.beginPath();
+                ctx.moveTo(arrowX, arrowY + arrowHeight); // Bottom point
+                ctx.lineTo(arrowX - arrowWidth / 2, arrowY); // Left wing
+                ctx.lineTo(arrowX - arrowWidth / 4, arrowY); // Left inner
+                ctx.lineTo(arrowX - arrowWidth / 4, arrowY - arrowHeight / 2); // Left top
+                ctx.lineTo(arrowX + arrowWidth / 4, arrowY - arrowHeight / 2); // Right top
+                ctx.lineTo(arrowX + arrowWidth / 4, arrowY); // Right inner
+                ctx.lineTo(arrowX + arrowWidth / 2, arrowY); // Right wing
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Add highlight
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(arrowX - arrowWidth / 4 + 1, arrowY - arrowHeight / 2 + 2);
+                ctx.lineTo(arrowX - arrowWidth / 4 + 1, arrowY - 2);
+                ctx.stroke();
+
+                ctx.restore();
+
+                // Request another frame to keep the animation going
+                if (!GameState.animation.active) {
+                    requestAnimationFrame(() => {
+                        if (!GameState.animation.active && !GameState.gameOver) {
+                            renderBoard();
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     // Store positions for click handling
     canvas.positionData = positions;
+}
+
+// Helper function to lighten a color
+function lightenColor(color, percent) {
+    // Handle hex colors
+    if (color.startsWith('#')) {
+        const num = parseInt(color.slice(1), 16);
+        const r = Math.min(255, (num >> 16) + percent);
+        const g = Math.min(255, ((num >> 8) & 0x00FF) + percent);
+        const b = Math.min(255, (num & 0x0000FF) + percent);
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+    return color;
 }
