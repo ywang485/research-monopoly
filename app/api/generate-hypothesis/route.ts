@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getAvailableLLM, generateWithOpenAI, generateWithAnthropic, generateWithGoogle } from '../lib/llm'
 
 export async function POST(request: Request) {
-  const { entity, existingHypotheses = [], provenHypotheses = [] } = await request.json()
+  const { entity, existingHypotheses = [], provenHypotheses = [], language = 'en' } = await request.json()
   const llm = getAvailableLLM()
 
   if (!llm) {
@@ -17,13 +17,13 @@ export async function POST(request: Request) {
 
     switch (llm) {
       case 'openai':
-        hypothesis = await generateWithOpenAI(entity, existingHypotheses, provenHypotheses)
+        hypothesis = await generateWithOpenAI(entity, existingHypotheses, provenHypotheses, language)
         break
       case 'anthropic':
-        hypothesis = await generateWithAnthropic(entity, existingHypotheses, provenHypotheses)
+        hypothesis = await generateWithAnthropic(entity, existingHypotheses, provenHypotheses, language)
         break
       case 'google':
-        hypothesis = await generateWithGoogle(entity, existingHypotheses, provenHypotheses)
+        hypothesis = await generateWithGoogle(entity, existingHypotheses, provenHypotheses, language)
         break
       default:
         throw new Error('Unknown LLM provider')

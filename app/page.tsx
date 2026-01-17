@@ -25,6 +25,8 @@ export default function Home() {
     // Load all game scripts in order
     const loadGameScripts = async () => {
       try {
+        // Load i18n first so translations are available to other scripts
+        await loadScript('/js/i18n.js')
         await loadScript('/js/constants.js')
         await loadScript('/js/utils.js')
         await loadScript('/js/sound.js')

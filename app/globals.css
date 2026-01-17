@@ -60,10 +60,11 @@
     /* Fonts - Hybrid: Pixel art + Handwriting */
     --font-pixel: 'Press Start 2P', monospace;
     --font-title: 'Permanent Marker', cursive;
-    --font-handwriting: 'Patrick Hand', cursive;
-    --font-notes: 'Indie Flower', cursive;
-    --font-technical: 'Architects Daughter', cursive;
-    --font-fancy: 'Caveat', cursive;
+    --font-handwriting: 'Patrick Hand', 'Noto Sans SC', cursive;
+    --font-notes: 'Indie Flower', 'Noto Sans SC', cursive;
+    --font-technical: 'Architects Daughter', 'Noto Sans SC', cursive;
+    --font-fancy: 'Caveat', 'Noto Sans SC', cursive;
+    --font-chinese: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
 }
 
 /* ============================================
@@ -83,6 +84,51 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+}
+
+/* Chinese language body class */
+body.lang-zh {
+    font-family: var(--font-chinese);
+}
+
+/* ============================================
+   LANGUAGE SWITCHER
+   ============================================ */
+
+.language-switcher {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 5px;
+    background: var(--paper-white);
+    padding: 5px 8px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid var(--paper-shadow);
+}
+
+.lang-btn {
+    background: transparent;
+    border: 2px solid transparent;
+    padding: 5px 12px;
+    font-family: var(--font-handwriting);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: var(--ink-dark);
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: var(--highlight-yellow);
+}
+
+.lang-btn.active {
+    background: var(--sticky-yellow);
+    border-color: var(--pencil-orange);
+    font-weight: bold;
 }
 
 /* ============================================

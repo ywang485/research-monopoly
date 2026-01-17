@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getAvailableLLM, generateEntityWithOpenAI, generateEntityWithAnthropic, generateEntityWithGoogle } from '../lib/llm'
 
 export async function POST(request: Request) {
-  const { entityType, count = 3 } = await request.json()
+  const { entityType, count = 3, language = 'en' } = await request.json()
   const llm = getAvailableLLM()
 
   if (!llm) {
@@ -17,11 +17,11 @@ export async function POST(request: Request) {
       Array(count).fill(null).map(async (_, index) => {
         switch (llm) {
           case 'openai':
-            return await generateEntityWithOpenAI(index)
+            return await generateEntityWithOpenAI(index, language)
           case 'anthropic':
-            return await generateEntityWithAnthropic(entityType, index)
+            return await generateEntityWithAnthropic(entityType, index, language)
           case 'google':
-            return await generateEntityWithGoogle(entityType, index)
+            return await generateEntityWithGoogle(entityType, index, language)
           default:
             throw new Error('Unknown LLM provider')
         }

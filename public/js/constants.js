@@ -50,11 +50,18 @@ const SCIENTIST_NAMES = [
 // ============================================
 // GAME CONSTANTS
 // ============================================
+// Student types - names will be translated via t() function
 const STUDENT_TYPES = {
-    undergraduate: { name: 'Undergraduate', years: 1, cost: 5 },
-    master: { name: 'Master Student', years: 3, cost: 15 },
-    phd: { name: 'PhD Student', years: 7, cost: 35 }
+    undergraduate: { nameKey: 'student.undergraduate', years: 1, cost: 5 },
+    master: { nameKey: 'student.master', years: 3, cost: 15 },
+    phd: { nameKey: 'student.phd', years: 7, cost: 35 }
 };
+
+// Helper function to get translated student name
+function getStudentName(type) {
+    const student = STUDENT_TYPES[type];
+    return student ? t(student.nameKey) : type;
+}
 
 const SPACE_TYPES = {
     START: 'start',
@@ -90,21 +97,28 @@ const MARGIN_FORMULAS = [
     'H₂O', 'CO₂', 'π ≈ 3.14', 'e^iπ + 1 = 0', '√2', 'dx/dt'
 ];
 
-const SPACE_DESCRIPTIONS = {
-    [SPACE_TYPES.START]: 'Begin your academic journey! Passing this space rejuvenates you by 2 years.',
-    [SPACE_TYPES.HYPOTHESIS]: 'A research opportunity! Create a new hypothesis or invest in an existing one. If Scientific Underdeterminism lands here, the hypothesis becomes a proven theory.',
-    [SPACE_TYPES.RECRUIT]: 'Graduate recruitment center. Spend fame points to hire students who extend your available research years.',
-    [SPACE_TYPES.CONFERENCE]: 'Present your work and gain recognition! Earn 3 fame points for attending.',
-    [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break. Rejuvenate by 3 years of life.',
-    [SPACE_TYPES.COMMUNITY_SERVICE]: 'Forced to do community service! Lose years to service work, but you can sacrifice a student to get away with it.',
-    [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',
-    [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
-    [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
-    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).'
+// Space descriptions - use translation keys for i18n
+const SPACE_DESCRIPTION_KEYS = {
+    [SPACE_TYPES.START]: 'spaceDesc.start',
+    [SPACE_TYPES.HYPOTHESIS]: 'spaceDesc.hypothesis',
+    [SPACE_TYPES.RECRUIT]: 'spaceDesc.recruit',
+    [SPACE_TYPES.CONFERENCE]: 'spaceDesc.conference',
+    [SPACE_TYPES.SABBATICAL]: 'spaceDesc.sabbatical',
+    [SPACE_TYPES.COMMUNITY_SERVICE]: 'spaceDesc.communityService',
+    [SPACE_TYPES.GRANT]: 'spaceDesc.grant',
+    [SPACE_TYPES.SCANDAL]: 'spaceDesc.scandal',
+    [SPACE_TYPES.COLLABORATION]: 'spaceDesc.collaboration',
+    [SPACE_TYPES.EUREKA]: 'spaceDesc.eureka'
 };
 
+// Helper function to get translated space description
+function getSpaceDescription(spaceType) {
+    const key = SPACE_DESCRIPTION_KEYS[spaceType];
+    return key ? t(key) : spaceType;
+}
+
 const MAX_AGE = 80;
-const STARTING_AGE = 30;
+const STARTING_AGE = 70;
 
 // ============================================
 // AI TEMPLATES

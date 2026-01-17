@@ -1,6 +1,18 @@
 export default function SetupScreen() {
   return (
     <div id="setup-screen" className="screen notebook-page">
+      {/* Language Switcher */}
+      <div className="language-switcher" id="language-switcher">
+        <button className="lang-btn active" data-lang="en" onClick={() => {
+          // @ts-ignore
+          if (typeof window.setLanguage === 'function') window.setLanguage('en');
+        }}>EN</button>
+        <button className="lang-btn" data-lang="zh" onClick={() => {
+          // @ts-ignore
+          if (typeof window.setLanguage === 'function') window.setLanguage('zh');
+        }}>中文</button>
+      </div>
+
       {/* Spiral binding decoration */}
       <div className="spiral-binding">
         <div className="spiral-ring"></div>
@@ -15,9 +27,9 @@ export default function SetupScreen() {
 
       <div className="page-content">
         <h1 className="hand-title">
-          <span className="title-underline">Scientific Research is Gambling with Your Life</span>
+          <span className="title-underline" id="game-title">Scientific Research is Gambling with Your Life</span>
         </h1>
-        <p className="subtitle"> How much life can you invest? </p>
+        <p className="subtitle" id="game-subtitle"> How much life can you invest? </p>
 
         {/* Decorative tape */}
         <div className="tape tape-1"></div>

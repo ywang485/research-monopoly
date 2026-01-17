@@ -79,6 +79,9 @@ async function generateLLMHypothesis() {
             .filter(s => s.hypothesis && s.isProven)
             .map(s => s.hypothesis);
 
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-hypothesis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -86,7 +89,8 @@ async function generateLLMHypothesis() {
                 entity: GameState.entity.name,
                 entityType: GameState.entity.type,
                 existingHypotheses,
-                provenHypotheses
+                provenHypotheses,
+                language: lang
             })
         });
 
@@ -109,11 +113,15 @@ async function generateLLMHypothesisAddition(existingHypothesis) {
     }
 
     try {
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-addition', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                existingHypothesis
+                existingHypothesis,
+                language: lang
             })
         });
 
@@ -157,13 +165,17 @@ async function fetchHypothesisSuggestions(count = 3) {
             .filter(s => s.hypothesis)
             .map(s => s.hypothesis);
 
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-suggestions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 entity: GameState.entity.name,
                 existingHypotheses,
-                count
+                count,
+                language: lang
             })
         });
 
@@ -194,10 +206,13 @@ async function fetchEntitySuggestions(entityType, count = 3) {
     }
 
     try {
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-entities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ entityType, count })
+            body: JSON.stringify({ entityType, count, language: lang })
         });
 
         const data = await response.json();
@@ -219,10 +234,13 @@ async function fetchIntegratedTheory(entity, hypotheses) {
     }
 
     try {
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-theory', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ entity, hypotheses })
+            body: JSON.stringify({ entity, hypotheses, language: lang })
         });
 
         const data = await response.json();
@@ -244,10 +262,13 @@ async function fetchPeerReview(hypothesis) {
     }
 
     try {
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-review', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hypothesis })
+            body: JSON.stringify({ hypothesis, language: lang })
         });
 
         const data = await response.json();
@@ -297,12 +318,16 @@ async function fetchPlayerBios(players, gameLog) {
             });
         });
 
+        // Get current language for LLM generation
+        const lang = typeof getLanguage === 'function' ? getLanguage() : 'en';
+
         const response = await fetch('/api/generate-bios', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 players: playerData,
-                gameLog: gameLog
+                gameLog: gameLog,
+                language: lang
             })
         });
 

@@ -3,7 +3,7 @@ import { getAvailableLLM } from '../lib/llm'
 import { generatePlayerBiosWithOpenAI, generatePlayerBiosWithAnthropic, generatePlayerBiosWithGoogle } from '../lib/player-bios'
 
 export async function POST(request: Request) {
-  const { players, gameLog } = await request.json()
+  const { players, gameLog, language = 'en' } = await request.json()
   const llm = getAvailableLLM()
 
   if (!llm) {
@@ -25,13 +25,13 @@ export async function POST(request: Request) {
 
     switch (llm) {
       case 'openai':
-        bios = await generatePlayerBiosWithOpenAI(players, gameLog || '')
+        bios = await generatePlayerBiosWithOpenAI(players, gameLog || '', language)
         break
       case 'anthropic':
-        bios = await generatePlayerBiosWithAnthropic(players, gameLog || '')
+        bios = await generatePlayerBiosWithAnthropic(players, gameLog || '', language)
         break
       case 'google':
-        bios = await generatePlayerBiosWithGoogle(players, gameLog || '')
+        bios = await generatePlayerBiosWithGoogle(players, gameLog || '', language)
         break
       default:
         throw new Error('Unknown LLM provider')

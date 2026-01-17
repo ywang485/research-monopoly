@@ -1,6 +1,27 @@
 // Theory Investment Game - Core Game Logic
 
 // ============================================
+// PRONOUN HELPERS FOR i18n
+// ============================================
+function getPronouns(player) {
+    const isZh = typeof getLanguage === 'function' && getLanguage() === 'zh';
+    if (player.isAI) {
+        return {
+            you: player.name,
+            you_lower: player.name,
+            your: `${player.name}${isZh ? '的' : "'s"}`,
+            your_lower: `${player.name}${isZh ? '的' : "'s"}`
+        };
+    }
+    return {
+        you: isZh ? '你' : 'You',
+        you_lower: isZh ? '你' : 'you',
+        your: isZh ? '你的' : 'your',
+        your_lower: isZh ? '你的' : 'your'
+    };
+}
+
+// ============================================
 // GAME STATE
 // ============================================
 const GameState = {
@@ -144,44 +165,27 @@ class Player {
     die() {
         this.isAlive = false;
         playSound('death');
-        log(`${this.name} has passed away at age ${this.age}. Their legacy lives on through ${this.theoriesPublished.length} theories.`, 'important');
+        log(t('log.passedAway', { name: this.name, age: this.age, count: this.theoriesPublished.length }), 'important');
 
         // Show death modal with sarcastic commentary
-        const deathMessages = [
-            "Should've invested in better health insurance instead of hypotheses.",
-            "At least they won't have to peer review any more grant proposals.",
-            "Death: the ultimate sabbatical.",
-            "Their h-index was never THAT impressive anyway.",
-            "Posthumous publications don't count for tenure, unfortunately.",
-            "Gone but not cited.",
-            "They finally found the one research question they couldn't answer.",
-            "Academia claims another victim.",
-            "Should've spent less time in the lab and more time exercising.",
-            "Their last hypothesis: 'I'll live forever.' Status: Disproven.",
-            "The university will replace them with three adjuncts.",
-            "At least now they don't have to attend any more faculty meetings.",
-            "Their final contribution to science: becoming a cautionary tale.",
-            "Too much coffee, not enough sleep, inevitable conclusion."
-        ];
-
-        const randomMessage = deathMessages[Math.floor(Math.random() * deathMessages.length)];
+        const randomMessage = tRandom('death.message', 14);
 
         showModal(
-            '💀 OBITUARY 💀',
+            `💀 ${t('obituary.title')} 💀`,
             `
-            <p style="font-size: 14px; margin-bottom: 10px;"><strong>${this.name}</strong> has passed away at the ripe old age of ${this.age}.</p>
+            <p style="font-size: 14px; margin-bottom: 10px;"><strong>${this.name}</strong> ${t('obituary.passedAway', { name: '', age: this.age }).trim()}</p>
             <p style="color: #888; font-style: italic; margin-bottom: 12px;">${randomMessage}</p>
             <div style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
-                <p style="font-size: 10px;">Final Stats:</p>
-                <p style="font-size: 10px;">📊 Total Fame: ${this.totalFame}</p>
-                <p style="font-size: 10px;">📚 Theories Published: ${this.theoriesPublished.length}</p>
-                <p style="font-size: 10px;">🎓 Students Exploited: ${this.students.length}</p>
+                <p style="font-size: 10px;">${t('obituary.finalStats')}</p>
+                <p style="font-size: 10px;">📊 ${t('obituary.totalFame', { fame: this.totalFame })}</p>
+                <p style="font-size: 10px;">📚 ${t('obituary.theoriesPublished', { count: this.theoriesPublished.length })}</p>
+                <p style="font-size: 10px;">🎓 ${t('obituary.studentsExploited', { count: this.students.length })}</p>
             </div>
-            <p style="font-size: 9px; color: #666; margin-top: 12px;">The game continues without them.</p>
+            <p style="font-size: 9px; color: #666; margin-top: 12px;">${t('obituary.gameContinues')}</p>
             `,
             [
                 {
-                    text: 'RIP',
+                    text: t('obituary.rip'),
                     action: () => { }
                 }
             ]
@@ -193,7 +197,7 @@ class Player {
         if (this.spendFame(cost)) {
             this.students.push(type);
             playSound('hire');
-            log(`${this.name} hired a ${STUDENT_TYPES[type].name} for ${cost} fame.`);
+            log(t('log.hired', { name: this.name, student: getStudentName(type), cost: cost }));
             return true;
         }
         return false;
@@ -314,23 +318,20 @@ function getAnimatedPosition(type, entityIndex, positions, spaceSize) {
 // SPACE HANDLING
 // ============================================
 function handleStartSpace(player) {
-    const you = player.isAI ? player.name : 'You';
-    const your = player.isAI ? `${player.name}'s` : 'your';
+    const p = getPronouns(player);
 
     player.addFame(2);
     showModal(
-        'New Academic Year',
-        `<p>Congratulations! ${you}'ve survived another trip around the sun without quitting academia.</p>
-        <p>+2 fame for ${your} unrelenting stubbornness</p>
-        <p class="info-text">${your} family still doesn't understand what ${you} do for a living.</p>`,
-        [{ text: 'Yay...', action: () => { updatePlayerStats(); endTurn(); } }]
+        t('start.title'),
+        `<p>${t('start.congratulations', { you: p.you })}</p>
+        <p>${t('start.fameBonus', { your: p.your })}</p>
+        <p class="info-text">${t('start.familyJoke', { your: p.your, you: p.you })}</p>`,
+        [{ text: t('start.button'), action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleConferenceSpace(player) {
-    const you = player.isAI ? player.name : 'You';
-    const you_lower = player.isAI ? player.name : 'you';
-    const your = player.isAI ? `${player.name}'s` : 'your';
+    const p = getPronouns(player);
 
     // Check if player has any publications
     if (player.theoriesPublished.length === 0) {
@@ -339,17 +340,17 @@ function handleConferenceSpace(player) {
         player.addFame(smallFameGain);
 
         showModal(
-            'Academic Conference',
+            t('conference.title'),
             `
             <div class="dice-container">
                 <span class="dice">🎲</span>
-                <div class="dice-result">+${smallFameGain} Fame</div>
+                <div class="dice-result">+${smallFameGain} ${t('stats.fame').replace(':', '')}</div>
             </div>
-            <p>${you} showed up to the conference, but realized ${you_lower} have nothing to present.</p>
-            <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
-            <p class="info-text">At least someone remembered ${your} name tag!</p>
+            <p>${t('conference.noPublications', { you: p.you, you_lower: p.you_lower })}</p>
+            <p>${t('conference.ateCookies')}</p>
+            <p class="info-text">${t('conference.nameTag', { your: p.your })}</p>
             `,
-            [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
+            [{ text: t('conference.buttonOops'), action: () => { updatePlayerStats(); endTurn(); } }]
         );
         return;
     }
@@ -362,60 +363,57 @@ function handleConferenceSpace(player) {
     player.addFame(fameGain);
 
     showModal(
-        'Academic Conference',
+        t('conference.title'),
         `
         <div class="dice-container">
             <span class="dice">🎲</span>
-            <div class="dice-result">+${fameGain} Fame!</div>
+            <div class="dice-result">+${fameGain} ${t('stats.fame').replace(':', '')}!</div>
         </div>
-        <p>${you} traveled across the country to present ${your} groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
-        <p class="info-text">At least the hotel breakfast was mediocre!</p>
+        <p>${t('conference.presented', { you: p.you, your: p.your, hypothesis: selectedHypothesis })}</p>
+        <p class="info-text">${t('conference.hotelBreakfast')}</p>
         `,
-        [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: t('conference.buttonWorthIt'), action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleSabbaticalSpace(player) {
-    const you = player.isAI ? player.name : 'You';
-    const you_lower = player.isAI ? player.name : 'you';
+    const p = getPronouns(player);
 
     player.rejuvenate(2);
 
     showModal(
-        'Sabbatical Leave',
+        t('sabbatical.title'),
         `
-        <p>${you} escaped to "write a book" (really just avoided emails for 6 months).</p>
-        <p>-2 years of aging from not attending meetings!</p>
-        <p class="info-text">${you}'ll definitely finish that book chapter... eventually.</p>
+        <p>${t('sabbatical.escaped', { you: p.you })}</p>
+        <p>${t('sabbatical.rejuvenate')}</p>
+        <p class="info-text">${t('sabbatical.bookChapter', { you: p.you })}</p>
         `,
-        [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: t('sabbatical.button'), action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleGrantSpace(player) {
-    const you = player.isAI ? player.name : 'you';
-    const your = player.isAI ? `${player.name}'s` : 'your';
+    const p = getPronouns(player);
 
     player.addFame(2);
 
     showModal(
-        'Research Grant!',
+        t('grant.title'),
         `
         <div class="dice-container">
             <span class="dice">💰</span>
-            <div class="dice-result">+2 Fame!</div>
+            <div class="dice-result">+2 ${t('stats.fame').replace(':', '')}!</div>
         </div>
-        <p>After only 47 revisions and 3 panel reviews, they actually gave ${you} money!</p>
-        <p>+2 fame (mostly from other academics jealous of ${your} funding)</p>
-        <p class="info-text">Now if only the grant actually covered ${your} students' stipends...</p>
+        <p>${t('grant.approved', { you: p.you_lower })}</p>
+        <p>${t('grant.fameBonus', { your: p.your })}</p>
+        <p class="info-text">${t('grant.stipends', { your: p.your })}</p>
         `,
-        [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: t('grant.button'), action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleScandalSpace(player) {
-    const you = player.isAI ? player.name : 'you';
-    const your = player.isAI ? `${player.name}'s` : 'your';
+    const p = getPronouns(player);
 
     playSound('scandal');
     const fameLoss = Math.min(player.totalFame, rollDice() + 1);
@@ -423,21 +421,20 @@ function handleScandalSpace(player) {
     player.spentFame = Math.min(player.spentFame, player.totalFame);
 
     showModal(
-        'Academic Scandal!',
+        t('scandal.title'),
         `
-        <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
-        <p>-${fameLoss} fame from the Twitter mob and anonymous blog posts</p>
-        <p class="info-text">Maybe ${you} should have checked those p-values more carefully...</p>
+        <p style="color: #a86060;">${t('scandal.issues', { your: p.your })}</p>
+        <p>${t('scandal.fameLoss', { loss: fameLoss })}</p>
+        <p class="info-text">${t('scandal.pValues', { you: p.you_lower })}</p>
         `,
-        [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
+        [{ text: t('scandal.button'), action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
 
 function handleCollaborationSpace(player) {
-    const you = player.isAI ? player.name : 'You';
-    const you_lower = player.isAI ? player.name : 'you';
+    const p = getPronouns(player);
 
-    const otherPlayers = GameState.players.filter(p => p.isAlive && p.index !== player.index);
+    const otherPlayers = GameState.players.filter(pl => pl.isAlive && pl.index !== player.index);
 
     if (otherPlayers.length > 0) {
         const collaborator = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
@@ -446,28 +443,26 @@ function handleCollaborationSpace(player) {
         collaborator.addFame(bonus);
 
         showModal(
-            'Research Collaboration',
+            t('collaboration.title'),
             `
-            <p>${you} and ${collaborator.name} are now co-authors!</p>
-            <p>Both +${bonus} fame (now ${you_lower} have to decide authorship order...)</p>
-            <p class="info-text">May the most passive-aggressive email win.</p>
+            <p>${t('collaboration.coauthors', { you: p.you, collaborator: collaborator.name })}</p>
+            <p>${t('collaboration.fameBonus', { bonus: bonus, you_lower: p.you_lower })}</p>
+            <p class="info-text">${t('collaboration.passiveAggressive')}</p>
             `,
-            [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
+            [{ text: t('collaboration.buttonAwkward'), action: () => { updatePlayerStats(); endTurn(); } }]
         );
     } else {
         showModal(
-            'Research Collaboration',
-            `<p>${you} wanted to collaborate but everyone else is dead or has better things to do.</p>
-            <p class="info-text">Solo authorship it is!</p>`,
-            [{ text: 'Forever alone', action: () => endTurn() }]
+            t('collaboration.title'),
+            `<p>${t('collaboration.alone', { you: p.you })}</p>
+            <p class="info-text">${t('collaboration.soloAuthorship')}</p>`,
+            [{ text: t('collaboration.buttonForeverAlone'), action: () => endTurn() }]
         );
     }
 }
 
 async function handleEurekaSpace(player) {
-    const you = player.isAI ? player.name : 'You';
-    const you_lower = player.isAI ? player.name : 'you';
-    const your = player.isAI ? `${player.name}'s` : 'your';
+    const p = getPronouns(player);
 
     playSound('eureka');
 
@@ -490,47 +485,47 @@ async function handleEurekaSpace(player) {
     if (!closestSpace) {
         // No uninvested hypothesis spaces available
         showModal(
-            'EUREKA! 💡',
+            `${t('eureka.title')} 💡`,
             `
-            <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
-            <p>${you} had a brilliant idea about ${GameState.entity.name}!</p>
-            <p class="info-text">But... every hypothesis space is already claimed. ${your} genius goes to waste.</p>
-            <p style="color: #888; font-size: 18px;">Should've thought of this sooner!</p>
+            <p style="color: #c8b070; font-size: 12px;">${t('eureka.shower', { you_lower: p.you_lower })}</p>
+            <p>${t('eureka.insight', { entity: GameState.entity.name, you_lower: p.you_lower }).replace('A brilliant insight', p.you + ' had a brilliant idea')}</p>
+            <p class="info-text">${t('eureka.noSpaces', { your: p.your })}</p>
+            <p style="color: #888; font-size: 18px;">${t('eureka.shouldveThought')}</p>
             `,
-            [{ text: 'Tragic', action: () => { updatePlayerStats(); endTurn(); } }]
+            [{ text: t('eureka.buttonTragic'), action: () => { updatePlayerStats(); endTurn(); } }]
         );
         return;
     }
 
     // Show modal to claim the closest hypothesis for free
     showModal(
-        'EUREKA! 💡',
+        `${t('eureka.title')} 💡`,
         `
-        <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
-        <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit ${you_lower}!</p>
-        <p>${you} can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
+        <p style="color: #c8b070; font-size: 12px;">${t('eureka.shower', { you_lower: p.you_lower })}</p>
+        <p>${t('eureka.insight', { entity: GameState.entity.name, you_lower: p.you_lower })}</p>
+        <p>${t('eureka.claimFree', { you: p.you, space: closestSpace.name })}</p>
         <div class="suggestions-container">
-            <label>AI-generated hypotheses (because originality is hard):</label>
+            <label>${t('eureka.aiSuggestions')}</label>
             <div id="hypothesis-suggestions" class="hypothesis-suggestions">
-                <div class="suggestion-loading">Generating suggestions...</div>
+                <div class="suggestion-loading">${t('eureka.generating')}</div>
             </div>
         </div>
         <div class="input-group">
-            <label>Or formulate ${your} eureka moment:</label>
-            <input type="text" id="hypothesis-input" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}...">
+            <label>${t('eureka.formulate', { your: p.your })}</label>
+            <input type="text" id="hypothesis-input" placeholder="${t('eureka.placeholder', { your: p.your, entity: GameState.entity.name })}">
         </div>
-        <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
+        <p class="info-text">${t('eureka.normalCost', { cost: closestSpace.investmentCost })}</p>
         `,
         [
             {
-                text: 'Claim it!',
+                text: t('eureka.buttonClaim'),
                 action: () => {
                     const hypothesis = document.getElementById('hypothesis-input').value.trim();
                     if (hypothesis) {
                         closestSpace.hypothesis = hypothesis;
                         closestSpace.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
                         closestSpace.investments.push({ player: player.name, years: closestSpace.investmentCost, playerIndex: player.index });
-                        log(`${player.name} had a EUREKA moment and claimed "${closestSpace.name}" with: "${hypothesis}" (FREE!)`, 'important');
+                        log(t('log.eurekaFree', { name: player.name, space: closestSpace.name, hypothesis: hypothesis }), 'important');
 
                         // Delay rendering until after modal closes for proper visual update
                         setTimeout(() => {
@@ -544,7 +539,7 @@ async function handleEurekaSpace(player) {
                 closeModal: true
             },
             {
-                text: 'Skip',
+                text: t('eureka.buttonSkip'),
                 action: () => endTurn()
             }
         ]
@@ -578,7 +573,7 @@ async function handleEurekaSpace(player) {
 
 function handleSpaceLanding(player, space) {
     playSound('land');
-    log(`${player.name} landed on "${space.name}" (${space.type})`);
+    log(t('log.landed', { name: player.name, space: space.name, type: space.type }));
 
     switch (space.type) {
         case SPACE_TYPES.START:
