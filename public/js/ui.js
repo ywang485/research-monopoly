@@ -1126,6 +1126,7 @@ function startGame() {
     // Initialize display
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
+    document.body.classList.add('game-active');
 
     document.getElementById('entity-info').textContent =
         `Researching: ${GameState.entity.name}`;

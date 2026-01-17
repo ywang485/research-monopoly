@@ -68,7 +68,10 @@ export default function GameplayScreen() {
                 <div id="game-log-container" className="mini-notepad">
                   <div className="notepad-header">
                     <span className="notepad-title">Game Log</span>
-                    <div className="notepad-clip">📎</div>
+                    <div className="notepad-header-buttons">
+                      <button id="game-log-toggle" className="notepad-toggle" title="Collapse/Expand">−</button>
+                      <div className="notepad-clip">📎</div>
+                    </div>
                   </div>
                   <div id="game-log" className="notepad-content"></div>
                 </div>

@@ -10,6 +10,16 @@ function initDraggableNotepad() {
     if (notepad && notepadHeader) {
         notepad.style.zIndex = highestZIndex++;
         makeDraggable(notepad, notepadHeader, true);
+
+        // Initialize collapse/expand toggle
+        const toggleBtn = document.getElementById('game-log-toggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent triggering drag
+                notepad.classList.toggle('collapsed');
+                toggleBtn.textContent = notepad.classList.contains('collapsed') ? '+' : '−';
+            });
+        }
     }
 
     // Initialize Scientists panel

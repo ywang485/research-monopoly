@@ -1238,9 +1238,49 @@ select {
     color: var(--ink-dark);
 }
 
+.notepad-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notepad-toggle {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--ink-dark);
+    border-radius: 4px;
+    background: var(--paper-white);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.2s;
+}
+
+.notepad-toggle:hover {
+    background: var(--sticky-yellow);
+}
+
 .notepad-clip {
     font-size: 20px;
     transform: rotate(45deg);
+}
+
+/* Collapsed state */
+.mini-notepad.collapsed .notepad-content {
+    display: none;
+}
+
+.mini-notepad.collapsed {
+    max-height: none;
+}
+
+.mini-notepad.collapsed .notepad-header {
+    border-bottom: none;
 }
 
 .notepad-content {
