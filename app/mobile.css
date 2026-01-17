@@ -96,6 +96,8 @@
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
+        overflow: hidden; /* Disable scrolling on gameplay screen */
+        touch-action: none; /* Disable touch scrolling on gameplay screen */
     }
 
     /* === PAPER LABEL ROW (Game Header) === */
