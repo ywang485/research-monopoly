@@ -1189,6 +1189,7 @@ function updateTurnDisplay() {
     if (player.isAI && player.isAlive && !GameState.gameOver && !GameState.animation.active) {
         document.getElementById('roll-dice-btn').disabled = true;
         document.getElementById('roll-dice-btn').textContent = 'AI Thinking...';
+        if (typeof updateMobileDiceButton === 'function') updateMobileDiceButton();
         setTimeout(() => executeAITurn(player), 800);
     } else if (!player.isAI) {
         // Show turn indicator modal for human players
@@ -1209,6 +1210,7 @@ function updateTurnDisplay() {
 
         document.getElementById('roll-dice-btn').disabled = false;
         document.getElementById('roll-dice-btn').textContent = 'Roll Dice';
+        if (typeof updateMobileDiceButton === 'function') updateMobileDiceButton();
 
         // Start the arrow animation loop for the current player
         renderBoard();
