@@ -98,6 +98,12 @@
         box-sizing: border-box;
         overflow: hidden; /* Disable scrolling on gameplay screen */
         touch-action: none; /* Disable touch scrolling on gameplay screen */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    #game-screen::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
     }
 
     /* === PAPER LABEL ROW (Game Header) === */
