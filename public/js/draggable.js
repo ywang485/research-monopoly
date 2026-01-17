@@ -43,22 +43,10 @@ function initDraggableNotepad() {
 
 function makeDraggable(element, dragHandle, isCentered) {
     let isDragging = false;
-    let currentX;
-    let currentY;
-    let initialX;
-    let initialY;
-    let xOffset = 0;
-    let yOffset = 0;
-
-    // Get initial position from computed style
-    const rect = element.getBoundingClientRect();
-    if (isCentered) {
-        xOffset = 0;
-        yOffset = 0;
-    } else {
-        xOffset = rect.left;
-        yOffset = rect.top;
-    }
+    let startMouseX;
+    let startMouseY;
+    let startElementX;
+    let startElementY;
 
     dragHandle.addEventListener('mousedown', dragStart);
     document.addEventListener('mousemove', drag);
@@ -70,15 +58,36 @@ function makeDraggable(element, dragHandle, isCentered) {
     document.addEventListener('touchend', dragEnd);
 
     function dragStart(e) {
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-        }
-
         if (e.target === dragHandle || dragHandle.contains(e.target)) {
+            // Get mouse/touch position
+            if (e.type === "touchstart") {
+                startMouseX = e.touches[0].clientX;
+                startMouseY = e.touches[0].clientY;
+            } else {
+                startMouseX = e.clientX;
+                startMouseY = e.clientY;
+            }
+
+            // Get element's current position
+            if (isCentered) {
+                // For centered elements, we track the translation offset
+                // Parse current transform to get existing offset
+                const transform = element.style.transform;
+                const match = transform.match(/translate\(calc\(-50% \+ (-?\d+(?:\.\d+)?)px\), (-?\d+(?:\.\d+)?)px\)/);
+                if (match) {
+                    startElementX = parseFloat(match[1]);
+                    startElementY = parseFloat(match[2]);
+                } else {
+                    startElementX = 0;
+                    startElementY = 0;
+                }
+            } else {
+                // For absolutely positioned elements, get current left/top
+                const computedStyle = window.getComputedStyle(element);
+                startElementX = parseFloat(computedStyle.left) || 0;
+                startElementY = parseFloat(computedStyle.top) || 0;
+            }
+
             isDragging = true;
             // Bring to front by giving it the highest z-index
             element.style.zIndex = highestZIndex++;
@@ -89,32 +98,36 @@ function makeDraggable(element, dragHandle, isCentered) {
         if (isDragging) {
             e.preventDefault();
 
+            let currentMouseX, currentMouseY;
             if (e.type === "touchmove") {
-                currentX = e.touches[0].clientX - initialX;
-                currentY = e.touches[0].clientY - initialY;
+                currentMouseX = e.touches[0].clientX;
+                currentMouseY = e.touches[0].clientY;
             } else {
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
+                currentMouseX = e.clientX;
+                currentMouseY = e.clientY;
             }
 
-            xOffset = currentX;
-            yOffset = currentY;
+            // Calculate how far the mouse moved
+            const deltaX = currentMouseX - startMouseX;
+            const deltaY = currentMouseY - startMouseY;
 
-            setTranslate(currentX, currentY, element, isCentered);
+            // Apply delta to element's starting position
+            const newX = startElementX + deltaX;
+            const newY = startElementY + deltaY;
+
+            setTranslate(newX, newY, element, isCentered);
         }
     }
 
     function dragEnd(e) {
-        initialX = currentX;
-        initialY = currentY;
         isDragging = false;
         // Don't reset z-index - keep the stacking order
     }
 
     function setTranslate(xPos, yPos, el, centered) {
         if (centered) {
-            // For centered elements (notepad)
-            el.style.transform = `translate(calc(-50% + ${xPos}px), ${yPos}px) rotate(-0.5deg)`;
+            // For centered elements (notepad) - keep translateX(-50%) for centering
+            el.style.transform = `translate(calc(-50% + ${xPos}px), ${yPos}px)`;
         } else {
             // For absolutely positioned elements (sticky notes)
             el.style.left = `${xPos}px`;
