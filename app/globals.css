@@ -1199,11 +1199,11 @@ select {
 
 .mini-notepad {
     position: absolute;
-    top: 600px;
-    right:250px;
+    top: 150px;
+    right:0px;
     transform: translateX(-50%);
     width: 450px;
-    max-height: 500px;
+    max-height: 400px;
     background: var(--sticky-yellow);
     border: 3px solid var(--paper-shadow);
     border-radius: 4px;
