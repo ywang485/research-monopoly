@@ -1199,7 +1199,7 @@ select {
 
 .mini-notepad {
     position: absolute;
-    top: 150px;
+    top: 200px;
     right:0px;
     transform: translateX(-50%);
     width: 450px;
