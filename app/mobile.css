@@ -17,6 +17,11 @@
    ============================================ */
 
 @media (max-width: 1024px) {
+    /* === DISABLE BROWSER DOUBLE-TAP-TO-ZOOM === */
+    * {
+        touch-action: manipulation;
+    }
+
     /* === GAME CONTAINER === */
     #game-container {
         margin: 0;
@@ -145,6 +150,13 @@
         display: none !important;
     }
 
+    /* === HIDE TAB BAR ON SETUP SCREEN === */
+    /* Only show tab bar when game is active (body has game-active class) */
+    body:not(.game-active) .mobile-tab-bar,
+    body:not(.game-active) .mobile-tab-panel {
+        display: none !important;
+    }
+
     /* === MOBILE TAB BAR === */
     .mobile-tab-bar {
         display: flex !important;
@@ -199,7 +211,7 @@
     }
 
     .mobile-tab-btn.roll-tab {
-        background: var(--pencil-green);
+        background: var(--pencil-aqua);
         color: white;
     }
 
@@ -242,7 +254,7 @@
 
     .mobile-tab-panel-header h3 {
         font-family: var(--font-pixel);
-        font-size: 12px;
+        font-size: 16px;
         color: var(--ink-dark);
         margin: 0;
     }
@@ -337,7 +349,7 @@
     }
 
     #modal-title {
-        font-size: 14px;
+        font-size: 16px;
         margin-bottom: 16px;
         position: sticky;
         top: 0;
@@ -348,7 +360,7 @@
 
     #modal-body {
         flex: 1;
-        font-size: 16px;
+        font-size: 20px;
         line-height: 1.5;
         overflow-y: auto;
     }
@@ -375,7 +387,7 @@
     #modal-buttons .sketch-btn {
         flex: 1;
         min-height: 48px;
-        font-size: 10px;
+        font-size: 16px;
         max-width: 200px;
     }
 
@@ -398,7 +410,7 @@
     }
 
     .suggestion-btn {
-        font-size: 14px;
+        font-size: 16px;
         padding: 14px;
         min-height: 48px;
     }
@@ -412,7 +424,7 @@
 
     /* Investment display */
     .investment-display {
-        font-size: 14px;
+        font-size: 16px;
     }
 
     /* Input fields in modals - 16px prevents iOS zoom */
@@ -449,7 +461,7 @@
     }
 
     .subtitle {
-        font-size: 14px;
+        font-size: 16px;
         margin-bottom: 16px;
     }
 
@@ -461,7 +473,7 @@
     }
 
     .sticky-note h2 {
-        font-size: 10px;
+        font-size: 16px;
         margin-bottom: 12px;
     }
 
@@ -528,7 +540,7 @@
 
     /* Start button */
     .sketch-btn.large {
-        font-size: 14px;
+        font-size: 16px;
         padding: 16px;
         min-height: 56px;
         margin-top: 16px;
@@ -541,14 +553,14 @@
 
     .entity-suggestion-btn {
         min-height: 44px;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     /* === LLM STATUS INDICATOR === */
     .llm-indicator {
         top: 8px;
         right: 8px;
-        font-size: 10px;
+        font-size: 16px;
         padding: 4px 8px;
     }
 
@@ -563,7 +575,7 @@
     }
 
     .final-stats {
-        font-size: 14px;
+        font-size: 16px;
     }
 }
 
