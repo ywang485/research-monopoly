@@ -55,3 +55,4 @@ static/user-content/
 # Backup files
 *.backup
 *.bak
+.vercel

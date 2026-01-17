@@ -98,14 +98,19 @@
     .paper-label-row {
         padding: 8px 12px;
         gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
     }
 
     .paper-label {
         font-size: 16px;
         padding: 4px 8px;
         transform: none;
+    }
+
+    #entity-display {
+        font-size: 25px !important;
+        order: -1; /* Ensure entity info is always first */
     }
 
     /* === BOARD WRAPPER === */
