@@ -252,6 +252,11 @@ function runAnimationFrame() {
         } else {
             playSound('hop');
         }
+
+        // Center viewport on the moving entity (when zoomed in)
+        if (typeof centerViewportOnSpace === 'function') {
+            centerViewportOnSpace(anim.currentPos);
+        }
     }
 
     // Check if animation is complete

@@ -372,6 +372,56 @@ function zoomReset() {
     }
 }
 
+// Center the viewport on a specific space position (when zoomed in)
+function centerViewportOnSpace(spaceIndex) {
+    const container = document.getElementById('board-container');
+    if (!container) return;
+
+    // Only scroll if zoomed in (board is larger than container)
+    if (GameState.zoom.level <= 1) return;
+
+    // Get the space position from stored board positions
+    const positions = GameState.boardPositions;
+    if (!positions || !positions[spaceIndex]) return;
+
+    const pos = positions[spaceIndex];
+    const spaceSize = GameState.boardSpaceSize || 60;
+    const scale = GameState.boardScale || 1;
+    const offsetX = GameState.boardOffsetX || 0;
+    const offsetY = GameState.boardOffsetY || 0;
+
+    // Calculate the center of the space in screen coordinates
+    const spaceCenterX = (pos.x + spaceSize / 2) * scale + offsetX;
+    const spaceCenterY = (pos.y + spaceSize / 2) * scale + offsetY;
+
+    // Calculate scroll position to center the space in the viewport
+    const targetScrollX = spaceCenterX - container.clientWidth / 2;
+    const targetScrollY = spaceCenterY - container.clientHeight / 2;
+
+    // Clamp to valid scroll range
+    const maxScrollX = container.scrollWidth - container.clientWidth;
+    const maxScrollY = container.scrollHeight - container.clientHeight;
+
+    const clampedScrollX = Math.max(0, Math.min(targetScrollX, maxScrollX));
+    const clampedScrollY = Math.max(0, Math.min(targetScrollY, maxScrollY));
+
+    // Smooth scroll to the position
+    container.scrollTo({
+        left: clampedScrollX,
+        top: clampedScrollY,
+        behavior: 'smooth'
+    });
+}
+
+// Center viewport on current player (convenience function)
+function centerViewportOnCurrentPlayer() {
+    if (!GameState.players || GameState.players.length === 0) return;
+    const player = GameState.players[GameState.currentPlayerIndex];
+    if (player && player.isAlive) {
+        centerViewportOnSpace(player.position);
+    }
+}
+
 function initZoomControls() {
     const zoomInBtn = document.getElementById('zoom-in-btn');
     const zoomOutBtn = document.getElementById('zoom-out-btn');
