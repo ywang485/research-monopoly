@@ -16,7 +16,7 @@
    MOBILE PHONE BREAKPOINT (320-480px)
    ============================================ */
 
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
     /* === GAME CONTAINER === */
     #game-container {
         margin: 0;
@@ -568,7 +568,7 @@
 }
 
 /* Hide mobile elements on desktop */
-@media (min-width: 481px) {
+@media (min-width: 1025px) {
     .mobile-tab-bar,
     .mobile-tab-panel,
     .mobile-space-info {
