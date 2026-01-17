@@ -690,16 +690,22 @@ input[type="text"]:focus, select:focus, textarea:focus {
     background: rgba(255,255,255,0.9);
 }
 
-input[type="text"]::placeholder {
+input[type="text"]::placeholder,
+textarea::placeholder {
     color: var(--ink-light);
     font-style: italic;
 }
 
 textarea {
-    height: 120px;
+    height: auto;
+    min-height: 80px;
     resize: vertical;
     border: 2px dashed var(--ink-light);
     border-radius: 5px;
+}
+
+#hypothesis-input {
+    min-height: 60px;
 }
 
 select {

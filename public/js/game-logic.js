@@ -517,7 +517,7 @@ async function handleEurekaSpace(player) {
         </div>
         <div class="input-group">
             <label>Or formulate ${your} eureka moment:</label>
-            <input type="text" id="hypothesis-input" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}...">
+            <textarea id="hypothesis-input" rows="3" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}..."></textarea>
         </div>
         <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
         `,
@@ -644,7 +644,7 @@ async function handleHypothesisSpace(player, space) {
             ` : ''}
             <div class="input-group">
                 <label>Or pretend to have original thoughts:</label>
-                <input type="text" id="hypothesis-input" placeholder="Enter your hypothesis about ${GameState.entity.name}...">
+                <textarea id="hypothesis-input" rows="3" placeholder="Enter your hypothesis about ${GameState.entity.name}..."></textarea>
             </div>
             <p class="info-text">Life years remaining: ${availableYears}</p>
             ${!canAfford ? `<p style="color: #a86060;">${you}'ll likely die before ${you_lower} come up with anything</p>` : ''}
