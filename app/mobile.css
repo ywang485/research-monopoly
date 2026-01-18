@@ -642,8 +642,9 @@
 
     .game-footer p {
         margin: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     /* Hide footer during gameplay (when game-active class is on body) */
