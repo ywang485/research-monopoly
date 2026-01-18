@@ -151,20 +151,28 @@ RECRUIT|Graduate School|0
 HYPOTHESIS|Research Question 3|4
 CONFERENCE|Annual Symposium|0
 HYPOTHESIS|Research Question 4|3
-COMMUNITY_SERVICE|Community Service|0
+RECRUIT|Postdoc Hiring|0
 HYPOTHESIS|Research Question 5|2
-SABBATICAL|Research Leave|0
+COMMUNITY_SERVICE|Community Service|0
 HYPOTHESIS|Research Question 6|5
-SCANDAL|Academic Scandal|0
+SABBATICAL|Research Leave|0
 HYPOTHESIS|Research Question 7|3
-COLLABORATION|Research Network|0
+RECRUIT|Lab Assistant Pool|0
 HYPOTHESIS|Research Question 8|4
+SCANDAL|Academic Scandal|0
+HYPOTHESIS|Research Question 9|3
+COLLABORATION|Research Network|0
+HYPOTHESIS|Research Question 10|4
 EUREKA|Breakthrough Moment|0
-HYPOTHESIS|Research Question 9|2
-GRANT|Major Funding|0
-HYPOTHESIS|Research Question 10|3
-RECRUIT|Faculty Hiring|0
-HYPOTHESIS|Research Question 11|4
-CONFERENCE|Global Conference|0
+HYPOTHESIS|Research Question 11|2
+RECRUIT|Research Internship|0
 HYPOTHESIS|Research Question 12|3
+GRANT|Major Funding|0
+HYPOTHESIS|Research Question 13|4
+RECRUIT|Faculty Hiring|0
+HYPOTHESIS|Research Question 14|3
+CONFERENCE|Global Conference|0
+HYPOTHESIS|Research Question 15|2
+RECRUIT|Visiting Scholar Program|0
+HYPOTHESIS|Research Question 16|4
 `;
