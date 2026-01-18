@@ -960,6 +960,7 @@ function handleCommunityServiceSpace(player) {
                 },
                 {
                     text: 'Do it myself 😔',
+                    closeModal: false,
                     action: () => {
                         player.age += serviceCost;
 
