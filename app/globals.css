@@ -1505,6 +1505,9 @@ select {
     transition: all 0.2s ease;
     line-height: 1.4;
     border-radius: 3px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 
 .suggestion-btn:hover {
