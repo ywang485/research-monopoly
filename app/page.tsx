@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { jsPDF } from 'jspdf'
 import SetupScreen from './components/SetupScreen'
 import GameplayScreen from './components/GameplayScreen'
+import Footer from './components/Footer'
 
 export default function Home() {
   useEffect(() => {
@@ -116,6 +117,8 @@ export default function Home() {
         <SetupScreen />
         <GameplayScreen />
       </div>
+
+      <Footer />
     </>
   )
 }

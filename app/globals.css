@@ -2461,3 +2461,26 @@ select {
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--paper-shadow);
 }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.game-footer {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: center;
+    font-family: var(--font-notes);
+    font-size: 25px;
+    color: var(--ink-dark);
+    border-top: 1px dashed var(--paper-shadow);
+}
+
+.game-footer a {
+    color: var(--pencil-blue);
+    text-decoration: none;
+}
+
+.game-footer a:hover {
+    text-decoration: underline;
+}

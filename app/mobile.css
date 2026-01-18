@@ -630,6 +630,27 @@
         line-height: 1.5 !important;
         margin-top: 8px !important;
     }
+
+    /* === FOOTER === */
+    .game-footer {
+        margin-top: 16px;
+        padding: 12px 16px;
+        font-size: 25px;
+        border-top: none;
+        background: transparent;
+    }
+
+    .game-footer p {
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Hide footer during gameplay (when game-active class is on body) */
+    body.game-active .game-footer {
+        display: none;
+    }
 }
 
 /* Hide mobile elements on desktop */
