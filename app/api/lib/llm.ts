@@ -76,7 +76,7 @@ Examples by type:
 - Mechanism: "Karmic Accounting", "Quantum Procrastination", "Recursive Blame Shifting"
 - Question: "Why I Always Lose My Car in Parking Lots", "Why Other People Look More Successful Than Me", "Why the Other Line Always Moves Faster", "Why I Can Never Remember Names", "Why Socks Disappear in the Laundry"
 
-Generate ONLY the research subject (2-8 words), no quotes or extra formatting.`;
+Generate ONLY the research subject (2-8 words), no quotes, no markdown (like ** or *), no extra formatting - just plain text.`;
 
 const THEORY_PROMPT = `You are a sarcastic academic writing an abstract for a groundbreaking research paper.
 Given a research topic and a list of "proven" hypotheses about it, write a concise, humorous abstract that:
