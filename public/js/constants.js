@@ -29,21 +29,16 @@ const SCIENTIST_NAMES = [
     'Awkward Q&A Questioner',
     'The Unreturned Email',
     // Funny names
-    "Dr. Overthink", "Prof. Procrastinus", "Dr. Coffee McBreak", "Doc. Footnote",
-    "Prof. Actually", "Dr. Well-Actually", "Doc. Citation Needed", "Prof. P-Value",
-    "Dr. Significant", "Prof. Outlier", "Doc. Standard Deviation", "Dr. Mean",
-    // Pompous names
-    "Sir Reginald Hypothesis III", "Dame Theorica von Data", "Baron von Experiment",
-    "Countess Correlation", "Duke of Peer Review", "Marquis de Methodology",
+    "Dr. Overthink", "Prof. Procrastinus", "Dr. Coffee McBreak", 
+    "Dr. Well-Actually", "Dr. Citation Needed", "Prof. P-Value",
+    "Dr. Mean",
+    "Duke of Peer Review", "Marquis de Methodology",
     // Absurd names
-    "Dr. Definitely Maybe", "Prof. Trust Me Bro", "Doc. Source: Vibes",
-    "Dr. Probably Fine", "Prof. Close Enough", "Doc. Roughly Speaking",
-    "Dr. According to My Calculations", "Prof. In Theory", "Doc. On Paper",
+    "Prof. Trust Me Bro",
+    "Prof. Close Enough", "Doc. Roughly Speaking",
     // Self-aware names
-    "Dr. Imposter Syndrome", "Prof. Dunning-Kruger", "Doc. Confirmation Bias",
-    "Dr. Hindsight", "Prof. Overthinking It", "Doc. Second Guess",
-    // Food-themed
-    "Dr. Earl Grey", "Prof. Espresso", "Doc. Sandwich Break",
+    "Dr. Imposter Syndrome", "Prof. Dunning-Kruger", 
+    "Dr. Hindsight", "Prof. Overthinking It",
     "Dr. Leftover Pizza", "Prof. Vending Machine", "Doc. Deadline Snacks"
 ];
 

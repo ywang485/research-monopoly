@@ -69,14 +69,14 @@ Suggest an intriguing research subject that:
 
 The research subject could be a matter, a creature, a phenomenon, a place, a mechanism, or a question.
 Examples by type:
-- Matter: "Quantum Cheese", "Dark Glitter", "Ethereal Socks"
+- Matter: "Quantum Cheese", "Existential Marmot", "Ethereal Socks"
 - Creature: "Procrastinating Squirrels", "Bureaucratic Dolphins", "Passive-Aggressive Fungi"
 - Phenomenon: "Collective Coffee Addiction", "Meeting-Induced Narcolepsy", "Retroactive Embarrassment"
 - Place: "The Bermuda Parking Lot", "Atlantis Community College", "The Uncanny Valley Mall"
 - Mechanism: "Karmic Accounting", "Quantum Procrastination", "Recursive Blame Shifting"
 - Question: "Why I Always Lose My Car in Parking Lots", "Why Other People Look More Successful Than Me", "Why the Other Line Always Moves Faster", "Why I Can Never Remember Names", "Why Socks Disappear in the Laundry"
 
-Generate ONLY the research subject (2-8 words), no quotes, no markdown (like ** or *), no extra formatting - just plain text.`;
+Generate ONLY the research subject (1-10 words), no quotes, no markdown (like ** or *), no extra formatting - just plain text.`;
 
 const THEORY_PROMPT = `You are a sarcastic academic writing an abstract for a groundbreaking research paper.
 Given a research topic and a list of "proven" hypotheses about it, write a concise, humorous abstract that:
