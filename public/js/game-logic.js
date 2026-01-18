@@ -169,13 +169,13 @@ class Player {
         showModal(
             '💀 OBITUARY 💀',
             `
-            <p style="font-size: 14px; margin-bottom: 10px;"><strong>${this.name}</strong> has passed away at the ripe old age of ${this.age}.</p>
+            <p style="font-size: 14px; margin-bottom: 10px;"><strong>${this.name}</strong> has passed away at the ripe old age of <span style="color: #e74c3c;">${this.age}</span>.</p>
             <p style="color: #888; font-style: italic; margin-bottom: 12px;">${randomMessage}</p>
             <div style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 10px;">
                 <p style="font-size: 10px;">Final Stats:</p>
-                <p style="font-size: 10px;">📊 Total Fame: ${this.totalFame}</p>
-                <p style="font-size: 10px;">📚 Theories Published: ${this.theoriesPublished.length}</p>
-                <p style="font-size: 10px;">🎓 Students Exploited: ${this.students.length}</p>
+                <p style="font-size: 10px;">📊 Total Fame: <span style="color: #e74c3c;">${this.totalFame}</span></p>
+                <p style="font-size: 10px;">📚 Theories Published: <span style="color: #e74c3c;">${this.theoriesPublished.length}</span></p>
+                <p style="font-size: 10px;">🎓 Students Exploited: <span style="color: #e74c3c;">${this.students.length}</span></p>
             </div>
             <p style="font-size: 9px; color: #666; margin-top: 12px;">The game continues without them.</p>
             `,
@@ -321,7 +321,7 @@ function handleStartSpace(player) {
     showModal(
         'New Academic Year',
         `<p>Congratulations! ${you}'ve survived another trip around the sun without quitting academia.</p>
-        <p>+2 fame for ${your} unrelenting stubbornness</p>
+        <p><span style="color: #e74c3c;">+2 fame</span> for ${your} unrelenting stubbornness</p>
         <p class="info-text">${your} family still doesn't understand what ${you} do for a living.</p>`,
         [{ text: 'Yay...', action: () => { updatePlayerStats(); endTurn(); } }]
     );
@@ -343,7 +343,7 @@ function handleConferenceSpace(player) {
             `
             <div class="dice-container">
                 <span class="dice">🎲</span>
-                <div class="dice-result">+${smallFameGain} Fame</div>
+                <div class="dice-result"><span style="color: #e74c3c;">+${smallFameGain} Fame</span></div>
             </div>
             <p>${you} showed up to the conference, but realized ${you_lower} have nothing to present.</p>
             <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
@@ -366,7 +366,7 @@ function handleConferenceSpace(player) {
         `
         <div class="dice-container">
             <span class="dice">🎲</span>
-            <div class="dice-result">+${fameGain} Fame!</div>
+            <div class="dice-result"><span style="color: #e74c3c;">+${fameGain} Fame!</span></div>
         </div>
         <p>${you} traveled across the country to present ${your} groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
         <p class="info-text">At least the hotel breakfast was mediocre!</p>
@@ -385,7 +385,7 @@ function handleSabbaticalSpace(player) {
         'Sabbatical Leave',
         `
         <p>${you} escaped to "write a book" (really just avoided emails for 6 months).</p>
-        <p>-2 years of aging from not attending meetings!</p>
+        <p><span style="color: #e74c3c;">-2 years</span> of aging from not attending meetings!</p>
         <p class="info-text">${you}'ll definitely finish that book chapter... eventually.</p>
         `,
         [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -403,10 +403,10 @@ function handleGrantSpace(player) {
         `
         <div class="dice-container">
             <span class="dice">💰</span>
-            <div class="dice-result">+2 Fame!</div>
+            <div class="dice-result"><span style="color: #e74c3c;">+2 Fame!</span></div>
         </div>
         <p>After only 47 revisions and 3 panel reviews, they actually gave ${you} money!</p>
-        <p>+2 fame (mostly from other academics jealous of ${your} funding)</p>
+        <p><span style="color: #e74c3c;">+2 fame</span> (mostly from other academics jealous of ${your} funding)</p>
         <p class="info-text">Now if only the grant actually covered ${your} students' stipends...</p>
         `,
         [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -426,7 +426,7 @@ function handleScandalSpace(player) {
         'Academic Scandal!',
         `
         <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
-        <p>-${fameLoss} fame from the Twitter mob and anonymous blog posts</p>
+        <p><span style="color: #e74c3c;">-${fameLoss} fame</span> from the Twitter mob and anonymous blog posts</p>
         <p class="info-text">Maybe ${you} should have checked those p-values more carefully...</p>
         `,
         [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -448,8 +448,8 @@ function handleCollaborationSpace(player) {
         showModal(
             'Research Collaboration',
             `
-            <p>${you} and ${collaborator.name} are now co-authors!</p>
-            <p>Both +${bonus} fame (now ${you_lower} have to decide authorship order...)</p>
+            <p>${you} and <span style="color: #e74c3c;">${collaborator.name}</span> are now co-authors!</p>
+            <p>Both <span style="color: #e74c3c;">+${bonus} fame</span> (now ${you_lower} have to decide authorship order...)</p>
             <p class="info-text">May the most passive-aggressive email win.</p>
             `,
             [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -519,7 +519,7 @@ async function handleEurekaSpace(player) {
             <label>Or formulate ${your} eureka moment:</label>
             <textarea id="hypothesis-input" rows="3" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}..."></textarea>
         </div>
-        <p class="info-text">Normal cost: ${closestSpace.investmentCost} years. Eureka cost: FREE!</p>
+        <p class="info-text">Normal cost: <span style="color: #e74c3c;">${closestSpace.investmentCost} years</span>. Eureka cost: <span style="color: #2ecc71;">FREE!</span></p>
         `,
         [
             {
@@ -633,7 +633,7 @@ async function handleHypothesisSpace(player, space) {
             'New Research Opportunity!',
             `
             <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
-            <p>Invest ${space.investmentCost} years to claim this territory before someone else does.</p>
+            <p>Invest <span style="color: #e74c3c;">${space.investmentCost} years</span> to claim this territory before someone else does.</p>
             ${canAfford ? `
             <div class="suggestions-container">
                 <label>AI-generated hypotheses (because originality is hard):</label>
@@ -646,7 +646,7 @@ async function handleHypothesisSpace(player, space) {
                 <label>Or pretend to have original thoughts:</label>
                 <textarea id="hypothesis-input" rows="3" placeholder="Enter your hypothesis about ${GameState.entity.name}..."></textarea>
             </div>
-            <p class="info-text">Life years remaining: ${availableYears}</p>
+            <p class="info-text">Life years remaining: <span style="color: #e74c3c;">${availableYears}</span></p>
             ${!canAfford ? `<p style="color: #a86060;">${you}'ll likely die before ${you_lower} come up with anything</p>` : ''}
             `,
             [
@@ -702,7 +702,7 @@ async function handleHypothesisSpace(player, space) {
 
         let investmentsHTML = '<div class="investment-display">';
         space.investments.forEach(inv => {
-            investmentsHTML += `<div class="investor"><span>${inv.player}</span><span>${inv.years} years</span></div>`;
+            investmentsHTML += `<div class="investor"><span>${inv.player}</span><span style="color: #e74c3c;">${inv.years} years</span></div>`;
         });
         investmentsHTML += '</div>';
 
@@ -720,7 +720,7 @@ async function handleHypothesisSpace(player, space) {
                 <label>How many years to waste on this?</label>
                 <input type="number" id="investment-years" min="1" max="${availableYears}" value="1" placeholder="Years to invest">
             </div>
-            <p class="info-text">Life years remaining: ${availableYears}</p>
+            <p class="info-text">Life years remaining: <span style="color: #e74c3c;">${availableYears}</span></p>
             ${availableYears < 1 ? `<p style="color: #a86060;">${you} literally can't afford any investment.</p>` : ''}
             `,
             [
@@ -858,8 +858,8 @@ async function handleHypothesisSpace(player, space) {
                 <p><strong>Established Theory:</strong></p>
                 <p>"${space.hypothesis}"</p>
                 <p style="margin-top: 15px; color: #a86060;">${randomComplaint}</p>
-                <p class="info-text" style="margin-top: 15px;">${you} spent ${surveyCost} year doing a literature survey on this theory.</p>
-                <p class="info-text">Age: ${player.age - surveyCost} → ${player.age} years old</p>
+                <p class="info-text" style="margin-top: 15px;">${you} spent <span style="color: #e74c3c;">${surveyCost} year</span> doing a literature survey on this theory.</p>
+                <p class="info-text">Age: <span style="color: #e74c3c;">${player.age - surveyCost} → ${player.age}</span> years old</p>
                 `,
                 [{ text: '*Sigh* Fine', action: () => {
                     log(`${player.name} grudgingly surveyed the literature on: "${space.hypothesis}"`, 'important');
@@ -884,7 +884,7 @@ function handleRecruitSpace(player) {
         studentsHTML += `
             <div class="student-option ${canAfford ? '' : 'disabled'}" data-type="${key}" style="${canAfford ? '' : 'opacity: 0.5;'}">
                 <div class="student-type">${val.name}</div>
-                <div class="student-info">Provides: ${val.years} years | Cost: ${val.cost} fame</div>
+                <div class="student-info">Provides: <span style="color: #e74c3c;">${val.years} years</span> | Cost: <span style="color: #e74c3c;">${val.cost} fame</span></div>
             </div>
         `;
     });
@@ -893,8 +893,8 @@ function handleRecruitSpace(player) {
         'Graduate Recruitment',
         `
         <p>Trade ${your} fame points for indentured servants... I mean, research assistants!</p>
-        <p>Fame available: ${availableFame}</p>
-        <p>Current exploitation victims: ${player.students.length}</p>
+        <p>Fame available: <span style="color: #e74c3c;">${availableFame}</span></p>
+        <p>Current exploitation victims: <span style="color: #e74c3c;">${player.students.length}</span></p>
         ${studentsHTML}
         <p class="info-text">They'll do all the work while ${you} take all the credit!</p>
         `,
@@ -932,8 +932,8 @@ function handleCommunityServiceSpace(player) {
             'Community Service',
             `
             <p>Oh no! ${you}'ve been assigned mandatory community service work.</p>
-            <p>This will cost ${you_lower} <strong>${serviceCost} years</strong> of ${your} precious research time.</p>
-            <p class="info-text">BUT WAIT... ${you_lower} have a ${studentName} who could take ${your} place!</p>
+            <p>This will cost ${you_lower} <strong><span style="color: #e74c3c;">${serviceCost} years</span></strong> of ${your} precious research time.</p>
+            <p class="info-text">BUT WAIT... ${you_lower} have a <span style="color: #e74c3c;">${studentName}</span> who could take ${your} place!</p>
             <p>What will ${you_lower} do?</p>
             `,
             [
@@ -950,7 +950,7 @@ function handleCommunityServiceSpace(player) {
                         showModal(
                             'Student Sacrificed',
                             `
-                            <p>${you} threw ${your} ${sacrificedName} under the bus!</p>
+                            <p>${you} threw ${your} <span style="color: #e74c3c;">${sacrificedName}</span> under the bus!</p>
                             <p>They're now spending their days picking up litter instead of doing research.</p>
                             <p class="info-text">Academia: where we build character by crushing dreams!</p>
                             `,
@@ -968,7 +968,7 @@ function handleCommunityServiceSpace(player) {
                             'Community Service',
                             `
                             <p>${you} nobly chose to do the community service ${you_lower}self.</p>
-                            <p>+${serviceCost} years of aging from mindless bureaucratic tasks.</p>
+                            <p><span style="color: #e74c3c;">+${serviceCost} years</span> of aging from mindless bureaucratic tasks.</p>
                             <p class="info-text">${your} student is grateful... for now.</p>
                             `,
                             [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -985,7 +985,7 @@ function handleCommunityServiceSpace(player) {
             'Community Service',
             `
             <p>${you}'ve been assigned mandatory community service work!</p>
-            <p>+${serviceCost} years of aging from filling out forms and attending sensitivity training.</p>
+            <p><span style="color: #e74c3c;">+${serviceCost} years</span> of aging from filling out forms and attending sensitivity training.</p>
             <p class="info-text">If only ${you_lower} had a grad student to dump this on...</p>
             `,
             [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -1011,7 +1011,7 @@ function handleNPCTurn() {
         `
         <div class="dice-container">
             <span class="dice" id="npc-rolling-dice" style="font-size: 64px;">🎲</span>
-            <div class="dice-result" id="npc-dice-result" style="opacity: 0; color: #7a6080;">?</div>
+            <div class="dice-result" id="npc-dice-result" style="opacity: 0; color: #e74c3c;">?</div>
         </div>
         <p style="text-align: center; color: #7a6080; font-size: 18px;">Scientific Underdeterminism moves...</p>
         `,
@@ -1117,9 +1117,9 @@ function handleNPCProveTheory(space) {
         <p>This is now an established theory about ${GameState.entity.name}!</p>
         <div class="dice-container">
             <span class="dice">🎲</span>
-            <div class="dice-result">Significance: ${'★'.repeat(significance)}${'☆'.repeat(6 - significance)}</div>
+            <div class="dice-result">Significance: <span style="color: #e74c3c;">${'★'.repeat(significance)}${'☆'.repeat(6 - significance)}</span></div>
         </div>
-        <p><strong>${winner ? winner.name : 'Unknown'}</strong> published the paper and earned <strong>${fameReward} fame!</strong></p>
+        <p><strong>${winner ? winner.name : 'Unknown'}</strong> published the paper and earned <span style="color: #e74c3c;"><strong>${fameReward} fame!</strong></span></p>
         `,
         [{
             text: 'Historic!',
@@ -1248,7 +1248,7 @@ function playerRollDice() {
         `
         <div class="dice-container">
             <span class="dice" id="rolling-dice">🎲</span>
-            <div class="dice-result" id="dice-result" style="opacity: 0">${roll}</div>
+            <div class="dice-result" id="dice-result" style="opacity: 0; color: #e74c3c;">${roll}</div>
         </div>
         `,
         []

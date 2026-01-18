@@ -1424,7 +1424,7 @@ select {
 #modal-body .info-text {
     font-family: var(--font-notes);
     color: var(--ink-light);
-    font-size: 16px;
+    font-size: 20px;
     margin-top: 10px;
     font-style: italic;
 }
