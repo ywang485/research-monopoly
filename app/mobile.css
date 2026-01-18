@@ -598,6 +598,38 @@
     .final-stats {
         font-size: 16px;
     }
+
+    /* === THEORY CONTRIBUTORS === */
+    .theory-contributors {
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
+    .contributor {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .contributor-rank {
+        font-size: 18px;
+    }
+
+    .contributor-name {
+        font-size: 18px;
+    }
+
+    .contributor-stats {
+        font-size: 14px;
+    }
+
+    .contributor-bio {
+        width: 100%;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+        margin-top: 8px !important;
+    }
 }
 
 /* Hide mobile elements on desktop */
