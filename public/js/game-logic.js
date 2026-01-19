@@ -524,6 +524,7 @@ async function handleEurekaSpace(player) {
         [
             {
                 text: 'Claim it!',
+                disabled: true,
                 action: () => {
                     const hypothesis = document.getElementById('hypothesis-input').value.trim();
                     if (hypothesis) {
@@ -550,6 +551,13 @@ async function handleEurekaSpace(player) {
         ]
     );
 
+    // Enable/disable "Claim it!" button based on hypothesis input
+    const hypothesisInput = document.getElementById('hypothesis-input');
+    const claimButton = document.querySelector('#modal-buttons button');
+    hypothesisInput.addEventListener('input', () => {
+        claimButton.disabled = !hypothesisInput.value.trim();
+    });
+
     // Fetch suggestions asynchronously and update the modal
     const suggestions = await fetchHypothesisSuggestions(3);
 
@@ -567,6 +575,8 @@ async function handleEurekaSpace(player) {
             suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
                 btn.addEventListener('click', () => {
                     document.getElementById('hypothesis-input').value = suggestions[i];
+                    // Enable the claim button since a suggestion was selected
+                    document.querySelector('#modal-buttons button').disabled = false;
                     // Highlight the selected suggestion
                     suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
                     btn.classList.add('selected');
@@ -652,7 +662,7 @@ async function handleHypothesisSpace(player, space) {
             [
                 {
                     text: 'Invest',
-                    disabled: !canAfford,
+                    disabled: true,
                     action: () => {
                         const hypothesis = document.getElementById('hypothesis-input').value.trim();
                         if (hypothesis && availableYears >= space.investmentCost) {
@@ -675,6 +685,13 @@ async function handleHypothesisSpace(player, space) {
             ]
         );
 
+        // Enable/disable "Invest" button based on hypothesis input and affordability
+        const hypothesisInput = document.getElementById('hypothesis-input');
+        const investButton = document.querySelector('#modal-buttons button');
+        hypothesisInput.addEventListener('input', () => {
+            investButton.disabled = !hypothesisInput.value.trim() || !canAfford;
+        });
+
         // Fetch suggestions asynchronously and update the modal (only if player can afford)
         if (canAfford) {
             const suggestions = await fetchHypothesisSuggestions(3);
@@ -688,6 +705,8 @@ async function handleHypothesisSpace(player, space) {
                 suggestionsContainer.querySelectorAll('.suggestion-btn').forEach((btn, i) => {
                     btn.addEventListener('click', () => {
                         document.getElementById('hypothesis-input').value = suggestions[i];
+                        // Enable the invest button since a suggestion was selected
+                        document.querySelector('#modal-buttons button').disabled = false;
                         // Highlight the selected suggestion
                         suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(b => b.classList.remove('selected'));
                         btn.classList.add('selected');
