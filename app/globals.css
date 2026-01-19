@@ -2479,6 +2479,9 @@ select {
 .game-footer a {
     color: var(--pencil-blue);
     text-decoration: none;
+    border: 1px solid var(--sticky-blue);
+    background: var(--sticky-blue);
+    border-radius: 10px;
 }
 
 .game-footer a:hover {
