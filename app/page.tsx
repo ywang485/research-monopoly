@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { jsPDF } from 'jspdf'
+import { Analytics } from "@vercel/analytics/next"
 import SetupScreen from './components/SetupScreen'
 import GameplayScreen from './components/GameplayScreen'
 import Footer from './components/Footer'
