@@ -1,4 +1,5 @@
 // LLM utility functions
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Helper function to retry operations with exponential backoff
 async function retryWithBackoff<T>(
@@ -34,6 +35,12 @@ export function getAvailableLLM() {
   if (process.env.GOOGLE_API_KEY) return 'google';
   return null;
 }
+
+export const MODELS = {
+  openai: 'gpt-3.5-turbo',
+  anthropic: 'claude-haiku-4-5-20251001',
+  google: 'gemini-2.0-flash'
+};
 
 const SYSTEM_PROMPT = `You are a sarcastic and humorous academic who generates absurd pseudo-scientific hypotheses.
 Your hypotheses should be:
@@ -151,7 +158,7 @@ export async function generateWithOpenAI(entity: string, existingHypotheses: str
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: MODELS.openai,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
@@ -177,7 +184,7 @@ export async function generateWithAnthropic(entity: string, existingHypotheses: 
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: MODELS.anthropic,
         max_tokens: 150,
         system: SYSTEM_PROMPT,
         messages: [
@@ -193,29 +200,19 @@ export async function generateWithAnthropic(entity: string, existingHypotheses: 
 }
 
 export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
-  return retryWithBackoff(async () => {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses)}`
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 150,
-          temperature: 0.9
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text.trim();
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 150,
+      temperature: 0.9
+    }
   });
+
+  const prompt = `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses)}`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text().trim();
 }
 
 export async function generateAdditionWithOpenAI(existingHypothesis: string) {
@@ -227,7 +224,7 @@ export async function generateAdditionWithOpenAI(existingHypothesis: string) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: MODELS.openai,
         messages: [
           { role: 'system', content: ADDITION_PROMPT },
           { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
@@ -253,7 +250,7 @@ export async function generateAdditionWithAnthropic(existingHypothesis: string) 
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: MODELS.anthropic,
         max_tokens: 60,
         system: ADDITION_PROMPT,
         messages: [
@@ -269,29 +266,19 @@ export async function generateAdditionWithAnthropic(existingHypothesis: string) 
 }
 
 export async function generateAdditionWithGoogle(existingHypothesis: string) {
-  return retryWithBackoff(async () => {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${ADDITION_PROMPT}\n\nExisting hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:`
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 60,
-          temperature: 0.9
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text.trim();
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 60,
+      temperature: 0.9
+    }
   });
+
+  const prompt = `${ADDITION_PROMPT}\n\nExisting hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text().trim();
 }
 
 export async function generateEntityWithOpenAI(variationIndex: number = 0) {
@@ -306,7 +293,7 @@ export async function generateEntityWithOpenAI(variationIndex: number = 0) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: MODELS.openai,
         messages: [
           { role: 'system', content: ENTITY_PROMPT },
           { role: 'user', content: `Suggest a ${variation} and funny research subject for a satirical academic game (suggestion #${variationIndex + 1}):` }
@@ -335,7 +322,7 @@ export async function generateEntityWithAnthropic(entityType: string, variationI
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: MODELS.anthropic,
         max_tokens: 30,
         system: ENTITY_PROMPT,
         messages: [
@@ -351,43 +338,33 @@ export async function generateEntityWithAnthropic(entityType: string, variationI
 }
 
 export async function generateEntityWithGoogle(entityType: string, variationIndex: number = 0) {
-  return retryWithBackoff(async () => {
-    const variations = ['unique', 'creative', 'unexpected'];
-    const variation = variations[variationIndex % variations.length];
-
-    const categories = [
-      'Matter',
-      'Creature',
-      'Phenomenon',
-      'Place',
-      'Mechanism',
-      'Question'
-    ];
-
-    const typeIdx = Math.floor(Math.random() * categories.length);
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${categories[typeIdx]} for a satirical academic game (suggestion #${variationIndex + 1}):`
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 30,
-          temperature: 1.0
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text.trim();
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 30,
+      temperature: 1.0
+    }
   });
+
+  const variations = ['unique', 'creative', 'unexpected'];
+  const variation = variations[variationIndex % variations.length];
+
+  const categories = [
+    'Matter',
+    'Creature',
+    'Phenomenon',
+    'Place',
+    'Mechanism',
+    'Question'
+  ];
+
+  const typeIdx = Math.floor(Math.random() * categories.length);
+
+  const prompt = `${ENTITY_PROMPT}\n\nSuggest a ${variation} and funny research ${categories[typeIdx]} for a satirical academic game (suggestion #${variationIndex + 1}):`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text().trim();
 }
 
 export async function generateTheoryWithOpenAI(entity: string, hypotheses: string[]) {
@@ -399,7 +376,7 @@ export async function generateTheoryWithOpenAI(entity: string, hypotheses: strin
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: MODELS.openai,
         messages: [
           { role: 'system', content: THEORY_PROMPT },
           { role: 'user', content: `Entity: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:` }
@@ -425,7 +402,7 @@ export async function generateTheoryWithAnthropic(entity: string, hypotheses: st
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: MODELS.anthropic,
         max_tokens: 300,
         system: THEORY_PROMPT,
         messages: [
@@ -441,29 +418,19 @@ export async function generateTheoryWithAnthropic(entity: string, hypotheses: st
 }
 
 export async function generateTheoryWithGoogle(entity: string, hypotheses: string[]) {
-  return retryWithBackoff(async () => {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${THEORY_PROMPT}\n\nResearch topic: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 300,
-          temperature: 0.9
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text.trim();
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 300,
+      temperature: 0.9
+    }
   });
+
+  const prompt = `${THEORY_PROMPT}\n\nResearch topic: "${entity}"\n\nProven hypotheses:\n${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nWrite the dramatic integrated theory announcement:`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text().trim();
 }
 
 export async function generateReviewWithOpenAI(hypothesis: string) {
@@ -475,7 +442,7 @@ export async function generateReviewWithOpenAI(hypothesis: string) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: MODELS.openai,
         messages: [
           { role: 'system', content: PEER_REVIEW_PROMPT },
           { role: 'user', content: `Review this hypothesis: "${hypothesis}"` }
@@ -501,7 +468,7 @@ export async function generateReviewWithAnthropic(hypothesis: string) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: MODELS.anthropic,
         max_tokens: 150,
         system: PEER_REVIEW_PROMPT,
         messages: [
@@ -517,27 +484,17 @@ export async function generateReviewWithAnthropic(hypothesis: string) {
 }
 
 export async function generateReviewWithGoogle(hypothesis: string) {
-  return retryWithBackoff(async () => {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `${PEER_REVIEW_PROMPT}\n\nReview this hypothesis: "${hypothesis}"`
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 150,
-          temperature: 0.9
-        }
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    return data.candidates[0].content.parts[0].text.trim();
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 150,
+      temperature: 0.9
+    }
   });
+
+  const prompt = `${PEER_REVIEW_PROMPT}\n\nReview this hypothesis: "${hypothesis}"`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text().trim();
 }
