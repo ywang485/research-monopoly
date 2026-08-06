@@ -665,78 +665,278 @@ function hideMobileSpaceInfo() {
 // SETUP SCREEN
 // ============================================
 
-// Helper to create player input HTML
-function createPlayerInputHTML(playerNum, name, color, isAI = false) {
-    return `
-        <input type="text" class="player-name" placeholder="Player ${playerNum} Name" value="${name}">
-        <button type="button" class="randomize-name-btn" title="Random Name">🎲</button>
-        <input type="color" class="player-color" value="${color}">
-        <label class="ai-toggle"><input type="checkbox" class="player-ai"${isAI ? ' checked' : ''}> AI</label>
-    `;
+// ============================================
+// PLAYER GROUPS (players + team arguments)
+// ============================================
+let nextPlayerId = 1;
+let nextGroupId = 1;
+let playerGroups = [];    // [{ id: number, playerIds: number[] }]
+let groupArguments = {};  // { [groupId]: string }
+let playerRegistry = {};  // { [playerId]: { name, color, isAI } }
+let playerOrder = [];     // playerIds in creation order (drives Add/Remove Player)
+let groupArgFetchToken = 0; // guards stale/overlapping async suggestion fetches
+
+function escapeAttr(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Handle randomize button clicks (using event delegation)
-function setupRandomizeButtons(container) {
+function createSingletonGroup(playerId) {
+    const group = { id: nextGroupId++, playerIds: [playerId] };
+    playerGroups.push(group);
+    groupArguments[group.id] = '';
+    return group;
+}
+
+function removePlayerFromGroups(playerId) {
+    for (let i = playerGroups.length - 1; i >= 0; i--) {
+        const g = playerGroups[i];
+        const idx = g.playerIds.indexOf(playerId);
+        if (idx !== -1) {
+            g.playerIds.splice(idx, 1);
+            if (g.playerIds.length === 0) {
+                playerGroups.splice(i, 1);
+                delete groupArguments[g.id];
+            }
+            break;
+        }
+    }
+}
+
+// Registers a new player (own singleton group by default) and returns their id
+function createPlayer(name, color, isAI) {
+    const id = nextPlayerId++;
+    playerRegistry[id] = { name, color, isAI };
+    playerOrder.push(id);
+    createSingletonGroup(id);
+    return id;
+}
+
+// Removes the most recently added player entirely (row, registry entry, group membership)
+function removeLastPlayer() {
+    const id = playerOrder.pop();
+    if (id === undefined) return;
+    usedNames.delete(playerRegistry[id]?.name);
+    delete playerRegistry[id];
+    removePlayerFromGroups(id);
+}
+
+function renderGroups() {
+    const container = document.getElementById('group-list');
+    if (!container) return;
+
+    container.innerHTML = playerGroups.map(g => {
+        const rows = g.playerIds.map(pid => {
+            const p = playerRegistry[pid];
+            if (!p) return '';
+            return `
+                <div class="player-input" data-player-id="${pid}">
+                    <span class="drag-handle" draggable="true" data-player-id="${pid}" title="Drag to move to another team">⠿</span>
+                    <input type="text" class="player-name" data-player-id="${pid}" placeholder="Player Name" value="${escapeAttr(p.name)}">
+                    <button type="button" class="randomize-name-btn" data-player-id="${pid}" title="Random Name">🎲</button>
+                    <input type="color" class="player-color" data-player-id="${pid}" value="${p.color}">
+                    <label class="ai-toggle"><input type="checkbox" class="player-ai" data-player-id="${pid}"${p.isAI ? ' checked' : ''}> AI</label>
+                    ${g.playerIds.length > 1 ? `<button type="button" class="remove-from-group-btn" data-player-id="${pid}" title="Move to a new team">×</button>` : ''}
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="group-card" data-group-id="${g.id}">
+                <div class="group-members">${rows}</div>
+                <textarea class="group-argument-input" data-group-id="${g.id}" placeholder="What is this team trying to prove?">${groupArguments[g.id] || ''}</textarea>
+            </div>`;
+    }).join('');
+}
+
+// Move a player into an existing group, merging their old group into it.
+// Deletes the old group (and adopts its argument, if the target's is empty) once it's empty.
+function mergePlayerIntoGroup(playerId, targetGroupId) {
+    const targetGroup = playerGroups.find(g => g.id === targetGroupId);
+    if (!targetGroup || targetGroup.playerIds.includes(playerId)) return;
+
+    const sourceGroup = playerGroups.find(g => g.playerIds.includes(playerId));
+    if (!sourceGroup) return;
+
+    sourceGroup.playerIds = sourceGroup.playerIds.filter(pid => pid !== playerId);
+    targetGroup.playerIds.push(playerId);
+
+    if (sourceGroup.playerIds.length === 0) {
+        if (!groupArguments[targetGroupId]?.trim() && groupArguments[sourceGroup.id]?.trim()) {
+            groupArguments[targetGroupId] = groupArguments[sourceGroup.id];
+        }
+        playerGroups = playerGroups.filter(g => g.id !== sourceGroup.id);
+        delete groupArguments[sourceGroup.id];
+    }
+}
+
+const DRAG_MIME = 'text/x-theoropoly-player-id';
+
+function setupGroupListEvents(container) {
     container.addEventListener('click', (e) => {
-        if (e.target.classList.contains('randomize-name-btn')) {
-            const playerInput = e.target.closest('.player-input');
-            const nameInput = playerInput.querySelector('.player-name');
-            const oldName = nameInput.value;
+        const removeBtn = e.target.closest('.remove-from-group-btn');
+        if (removeBtn) {
+            const playerId = Number(removeBtn.dataset.playerId);
+            removePlayerFromGroups(playerId);
+            createSingletonGroup(playerId);
+            renderGroups();
+            return;
+        }
 
-            // Remove old name from used set so it can be reused
-            usedNames.delete(oldName);
-
-            // Get new random name
-            nameInput.value = getRandomScientistName();
+        const randomizeBtn = e.target.closest('.randomize-name-btn');
+        if (randomizeBtn) {
+            const pid = Number(randomizeBtn.dataset.playerId);
+            const nameInput = randomizeBtn.closest('.player-input')?.querySelector('.player-name');
+            usedNames.delete(playerRegistry[pid]?.name);
+            const newName = getRandomScientistName();
+            if (playerRegistry[pid]) playerRegistry[pid].name = newName;
+            if (nameInput) nameInput.value = newName;
         }
     });
+
+    container.addEventListener('input', (e) => {
+        const nameInput = e.target.closest('.player-name');
+        if (nameInput) {
+            const pid = Number(nameInput.dataset.playerId);
+            if (playerRegistry[pid]) playerRegistry[pid].name = nameInput.value;
+            return;
+        }
+        const argInput = e.target.closest('.group-argument-input');
+        if (argInput) {
+            groupArguments[Number(argInput.dataset.groupId)] = argInput.value;
+        }
+    });
+
+    container.addEventListener('change', (e) => {
+        const colorInput = e.target.closest('.player-color');
+        if (colorInput) {
+            const pid = Number(colorInput.dataset.playerId);
+            if (playerRegistry[pid]) playerRegistry[pid].color = colorInput.value;
+            return;
+        }
+        const aiToggle = e.target.closest('.player-ai');
+        if (aiToggle) {
+            const pid = Number(aiToggle.dataset.playerId);
+            if (playerRegistry[pid]) playerRegistry[pid].isAI = aiToggle.checked;
+        }
+    });
+
+    // Only the drag handle initiates a row drag, so name/color/AI controls stay clickable
+    container.addEventListener('dragstart', (e) => {
+        const handle = e.target.closest('.drag-handle');
+        if (!handle) return;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData(DRAG_MIME, handle.dataset.playerId);
+        handle.closest('.player-input')?.classList.add('dragging');
+    });
+
+    container.addEventListener('dragend', (e) => {
+        const handle = e.target.closest('.drag-handle');
+        handle?.closest('.player-input')?.classList.remove('dragging');
+        document.querySelectorAll('.group-card.drag-over').forEach(c => c.classList.remove('drag-over'));
+    });
+
+    // Dropping on a card merges into it; dropping anywhere else (outside any card,
+    // including outside the group list entirely) splits the player into a new group.
+    // Listens on `document` so "outside any group card" isn't limited to the list's own bounds.
+    document.addEventListener('dragover', (e) => {
+        if (!e.dataTransfer.types.includes(DRAG_MIME)) return;
+        e.preventDefault();
+        const card = e.target.closest('.group-card');
+        document.querySelectorAll('.group-card.drag-over').forEach(c => {
+            if (c !== card) c.classList.remove('drag-over');
+        });
+        if (card) card.classList.add('drag-over');
+    });
+
+    document.addEventListener('drop', (e) => {
+        if (!e.dataTransfer.types.includes(DRAG_MIME)) return;
+        e.preventDefault();
+        document.querySelectorAll('.group-card.drag-over').forEach(c => c.classList.remove('drag-over'));
+
+        const playerId = Number(e.dataTransfer.getData(DRAG_MIME));
+        if (Number.isNaN(playerId)) return;
+
+        const card = e.target.closest('.group-card');
+        if (card) {
+            mergePlayerIntoGroup(playerId, Number(card.dataset.groupId));
+        } else {
+            removePlayerFromGroups(playerId);
+            createSingletonGroup(playerId);
+        }
+        renderGroups();
+    });
+}
+
+// Fetch a suggested argument for each current group and fill in their fields
+async function suggestGroupArguments(topic) {
+    if (playerGroups.length === 0) return;
+
+    const myToken = ++groupArgFetchToken;
+    const groupIdsSnapshot = playerGroups.map(g => g.id);
+    const groupListEl = document.getElementById('group-list');
+
+    // Only disable the argument fields themselves - player name/color/AI stay editable
+    groupListEl?.querySelectorAll('.group-argument-input').forEach(el => el.disabled = true);
+
+    const suggestions = await fetchGroupArgumentSuggestions(topic, groupIdsSnapshot.length);
+
+    groupListEl?.querySelectorAll('.group-argument-input').forEach(el => el.disabled = false);
+
+    // Stale response - a newer suggestion request superseded this one
+    if (myToken !== groupArgFetchToken) return;
+
+    // Structural change guard - groups were merged/split/removed while we were fetching
+    const currentIds = playerGroups.map(g => g.id);
+    if (currentIds.length !== groupIdsSnapshot.length || !currentIds.every((id, idx) => id === groupIdsSnapshot[idx])) {
+        return;
+    }
+
+    if (suggestions && suggestions.length > 0) {
+        groupIdsSnapshot.forEach((id, idx) => {
+            if (suggestions[idx]) groupArguments[id] = suggestions[idx];
+        });
+        renderGroups();
+    }
 }
 
 function initSetupScreen() {
     const addBtn = document.getElementById('add-player-btn');
     const removeBtn = document.getElementById('remove-player-btn');
-    const playerInputs = document.getElementById('player-inputs');
+    const groupListEl = document.getElementById('group-list');
     const mapSelect = document.getElementById('map-select');
     const customMapInput = document.getElementById('custom-map-input');
     const startBtn = document.getElementById('start-game-btn');
 
-    // Reset used names and randomize initial player names
+    // Reset used names and seed the two default players (each their own team)
     resetUsedNames();
     const initialColors = ['#3EAAF7', '#3EE5F7', '#3E6FF7', '#3EF7CC'];
     const initialAI = [false, true];
 
-    // Update initial player inputs with random names and randomize buttons
-    const existingInputs = playerInputs.querySelectorAll('.player-input');
-    existingInputs.forEach((input, index) => {
-        const randomName = getRandomScientistName();
-        input.innerHTML = createPlayerInputHTML(index + 1, randomName, initialColors[index], initialAI[index]);
-    });
+    playerGroups = [];
+    groupArguments = {};
+    playerRegistry = {};
+    playerOrder = [];
+    nextGroupId = 1;
+    nextPlayerId = 1;
 
-    // Setup event delegation for randomize buttons
-    setupRandomizeButtons(playerInputs);
+    createPlayer(getRandomScientistName(), initialColors[0], initialAI[0]);
+    createPlayer(getRandomScientistName(), initialColors[1], initialAI[1]);
+
+    setupGroupListEvents(groupListEl);
+    renderGroups();
 
     addBtn.addEventListener('click', () => {
-        const count = playerInputs.children.length;
-        if (count < 4) {
+        const total = playerOrder.length;
+        if (total < 4) {
             const colors = ['#e74c3c', '#3498db', '#27ae60', '#9b59b6'];
-            const randomName = getRandomScientistName();
-
-            const div = document.createElement('div');
-            div.className = 'player-input';
-            div.innerHTML = createPlayerInputHTML(count + 1, randomName, colors[count], false);
-            playerInputs.appendChild(div);
+            createPlayer(getRandomScientistName(), colors[total], false);
+            renderGroups();
         }
     });
 
     removeBtn.addEventListener('click', () => {
-        if (playerInputs.children.length > 2) {
-            // Remove the name from used set
-            const lastInput = playerInputs.lastChild;
-            const nameInput = lastInput.querySelector('.player-name');
-            if (nameInput) {
-                usedNames.delete(nameInput.value);
-            }
-            playerInputs.removeChild(lastInput);
+        if (playerOrder.length > 2) {
+            removeLastPlayer();
+            renderGroups();
         }
     });
 
@@ -1078,10 +1278,26 @@ function initSetupScreen() {
                         // Highlight selected
                         suggestionsContainer.querySelectorAll('.entity-suggestion-btn').forEach(b => b.classList.remove('selected'));
                         btn.classList.add('selected');
+
+                        // Also suggest a team argument for each current group
+                        suggestGroupArguments(entities[i]);
                     });
                 });
             } else {
                 suggestionsContainer.innerHTML = '<div class="suggestion-error">Failed to generate suggestions</div>';
+            }
+        });
+    }
+
+    // Manually-typed topic - pressing Enter also suggests a team argument for each group
+    const entityNameInput = document.getElementById('entity-name');
+    if (entityNameInput) {
+        entityNameInput.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const topic = entityNameInput.value.trim();
+            if (topic) {
+                suggestGroupArguments(topic);
             }
         });
     }
@@ -1106,13 +1322,28 @@ function startGame() {
         }
     }
 
-    // Get players
-    const playerInputs = document.querySelectorAll('.player-input');
-    playerInputs.forEach((input, index) => {
-        const name = input.querySelector('.player-name').value || `Player ${index + 1}`;
-        const color = input.querySelector('.player-color').value;
-        const isAI = input.querySelector('.player-ai')?.checked || false;
-        GameState.players.push(new Player(name, color, index, isAI, startingAge));
+    // Get players (from the registry kept in sync by the group editor's input listeners)
+    const playerIdToIndex = {};
+    playerOrder.forEach((pid, index) => {
+        const p = playerRegistry[pid];
+        const name = (p.name || '').trim() || `Player ${index + 1}`;
+        GameState.players.push(new Player(name, p.color, index, p.isAI, startingAge));
+        playerIdToIndex[pid] = index;
+    });
+
+    // Capture team groups and their arguments
+    GameState.groups = playerGroups
+        .map(g => ({
+            id: g.id,
+            argument: (groupArguments[g.id] || '').trim(),
+            playerIndices: g.playerIds.map(pid => playerIdToIndex[pid]).filter(idx => idx !== undefined)
+        }))
+        .filter(g => g.playerIndices.length > 0);
+
+    GameState.groups.forEach(g => {
+        g.playerIndices.forEach(idx => {
+            GameState.players[idx].groupId = g.id;
+        });
     });
 
     // Parse map

@@ -807,6 +807,80 @@ select {
     margin-top: 15px;
 }
 
+/* Player groups (teams) - each player row lives inside its team's card */
+.group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.group-card {
+    border: 2px dashed var(--ink-light);
+    background: rgba(255,255,255,0.5);
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.group-card.drag-over {
+    border-color: var(--pencil-blue);
+    border-style: solid;
+    background: rgba(62,111,247,0.1);
+}
+
+.group-members {
+    display: flex;
+    flex-direction: column;
+}
+
+.group-members .player-input {
+    background: rgba(255,255,255,0.5);
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
+.group-members .player-input.dragging {
+    opacity: 0.4;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: var(--ink-light);
+    font-size: 16px;
+    padding: 0 2px;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.remove-from-group-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 4px;
+    color: var(--ink-dark);
+    flex-shrink: 0;
+}
+
+.group-argument-input {
+    min-height: 50px;
+    font-size: 14px;
+}
+
+.group-argument-input:disabled {
+    opacity: 0.5;
+}
+
 /* ============================================
    HYBRID BUTTONS - Pixel Art on Notebook Paper
    ============================================ */

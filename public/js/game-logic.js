@@ -9,6 +9,7 @@ const GameState = {
         name: ''
     },
     players: [],
+    groups: [],
     npc: {
         name: 'Scientific Underdeterminism',
         position: 0
@@ -66,6 +67,7 @@ class Player {
         this.theoriesPublished = [];
         this.isAlive = true;
         this.isAI = isAI;
+        this.groupId = null;
     }
 
     get availableFame() {

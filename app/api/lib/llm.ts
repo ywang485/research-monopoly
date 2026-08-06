@@ -85,6 +85,21 @@ Examples by type:
 
 Generate ONLY the research subject (1-10 words), no quotes, no markdown (like ** or *), no extra formatting - just plain text.`;
 
+const ARGUMENT_PROMPT = `You are a creative game designer writing "team objectives" for a satirical academic board game.
+Given a research topic and a number of teams, generate one short claim per team that the team will spend the game trying to "prove" about the topic.
+
+Each claim must:
+- Take a genuinely different position or angle on the topic than the others (agree, disagree, or a sideways/tangential take) - no two teams should end up arguing the same thing
+- Be phrasable as something a research team sets out to prove
+- Sound absurd but superficially academic, matching a sarcastic pseudo-science tone
+- Be ONE single sentence of 2 to 15 words - short and punchy, no sub-clauses
+
+Output ONLY a numbered list, one claim per line, in the format:
+1. <claim>
+2. <claim>
+...
+No extra commentary, headers, or formatting.`;
+
 const THEORY_PROMPT = `You are a sarcastic academic writing an abstract for a groundbreaking research paper.
 Given a research topic and a list of "proven" hypotheses about it, write a concise, humorous abstract that:
 - Follows academic abstract structure: objective, findings, and implications
@@ -365,6 +380,94 @@ export async function generateEntityWithGoogle(entityType: string, variationInde
   const result = await model.generateContent(prompt);
   const response = result.response;
   return response.text().trim();
+}
+
+// Hard-caps a line at 15 words as a safety net in case the model ignores the length instruction
+function capWords(text: string, maxWords: number = 15): string {
+  const words = text.split(/\s+/).filter(Boolean);
+  return words.length <= maxWords ? text : words.slice(0, maxWords).join(' ').replace(/[,;:]$/, '') + '…';
+}
+
+function parseNumberedList(text: string, count: number): string[] {
+  return text
+    .split('\n')
+    .map(line => line.replace(/^\s*(?:\d+[.)]|[-*])\s*/, '').trim())
+    .filter(line => line.length > 0)
+    .map(line => capWords(line))
+    .slice(0, count);
+}
+
+export function buildArgumentPrompt(topic: string, count: number) {
+  return `Research topic: "${topic}"\nNumber of teams: ${count}\n\nGenerate ${count} distinct team claims as a numbered list:`;
+}
+
+// NOTE: unlike generateEntityWith*, this makes a single call requesting all `count`
+// claims together so the model can see its own prior claims and keep them distinct -
+// N independent parallel calls (like the entity generator) can't do that.
+export async function generateArgumentsWithOpenAI(topic: string, count: number) {
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODELS.openai,
+        messages: [
+          { role: 'system', content: ARGUMENT_PROMPT },
+          { role: 'user', content: buildArgumentPrompt(topic, count) }
+        ],
+        max_tokens: 40 * count,
+        temperature: 0.9
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return parseNumberedList(data.choices[0].message.content.trim(), count);
+  });
+}
+
+export async function generateArgumentsWithAnthropic(topic: string, count: number) {
+  return retryWithBackoff(async () => {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: MODELS.anthropic,
+        max_tokens: 40 * count,
+        system: ARGUMENT_PROMPT,
+        messages: [
+          { role: 'user', content: buildArgumentPrompt(topic, count) }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return parseNumberedList(data.content[0].text.trim(), count);
+  });
+}
+
+export async function generateArgumentsWithGoogle(topic: string, count: number) {
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+  const model = genAI.getGenerativeModel({
+    model: MODELS.google,
+    generationConfig: {
+      maxOutputTokens: 40 * count,
+      temperature: 0.9
+    }
+  });
+
+  const prompt = `${ARGUMENT_PROMPT}\n\n${buildArgumentPrompt(topic, count)}`;
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return parseNumberedList(response.text().trim(), count);
 }
 
 export async function generateTheoryWithOpenAI(entity: string, hypotheses: string[]) {

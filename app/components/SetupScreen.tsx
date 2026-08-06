@@ -15,9 +15,9 @@ export default function SetupScreen() {
 
       <div className="page-content">
         <h1 className="hand-title">
-          <span className="title-underline">Scientific Research is Gambling with Your Life</span>
+          <span className="title-underline">Theoropoly</span>
         </h1>
-        <p className="subtitle"> How much life can you invest? </p>
+        <p className="subtitle"> How much would you sacrifice for science? </p>
 
         {/* Decorative tape */}
         <div className="tape tape-1"></div>
@@ -50,22 +50,11 @@ export default function SetupScreen() {
         <div className="setup-section sticky-note pink">
           <div className="paper-clip">📎</div>
           <h2>Players (2-4)</h2>
-          <div id="player-inputs">
-            <div className="player-input">
-              <input type="text" className="player-name" placeholder="Player 1 Name" defaultValue="Dr. Hypothesis" />
-              <input type="color" className="player-color" defaultValue="#3EE5F7" />
-              <label className="ai-toggle"><input type="checkbox" className="player-ai" /> AI</label>
-            </div>
-            <div className="player-input">
-              <input type="text" className="player-name" placeholder="Player 2 Name" defaultValue="Prof. Theory" />
-              <input type="color" className="player-color" defaultValue="#3E6FF7" />
-              <label className="ai-toggle"><input type="checkbox" className="player-ai" defaultChecked /> AI</label>
-            </div>
-          </div>
           <div className="button-group">
             <button id="add-player-btn" className="sketch-btn">+ Add Player</button>
             <button id="remove-player-btn" className="sketch-btn">- Remove Player</button>
           </div>
+          <div id="group-list" className="group-list"></div>
         </div>
 
         <div className="setup-section sticky-note blue">

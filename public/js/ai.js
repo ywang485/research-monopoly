@@ -213,6 +213,31 @@ async function fetchEntitySuggestions(entityType, count = 3) {
     }
 }
 
+async function fetchGroupArgumentSuggestions(topic, count) {
+    if (!GameState.llm.available || count < 1) {
+        return null;
+    }
+
+    try {
+        const response = await fetch('/api/generate-arguments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic, count })
+        });
+
+        const data = await response.json();
+
+        if (data.fallback || data.error) {
+            return null;
+        }
+
+        return data.arguments;
+    } catch (e) {
+        console.warn('Failed to fetch group argument suggestions:', e);
+        return null;
+    }
+}
+
 async function fetchIntegratedTheory(entity, hypotheses) {
     if (!GameState.llm.available || hypotheses.length === 0) {
         return null;
