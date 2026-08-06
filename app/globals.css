@@ -1528,6 +1528,13 @@ select {
     margin: 10px 0;
 }
 
+#modal-body .collaborator-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
 #modal-body .info-text {
     font-family: var(--font-notes);
     color: var(--ink-light);

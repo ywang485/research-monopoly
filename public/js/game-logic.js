@@ -435,35 +435,90 @@ function handleScandalSpace(player) {
     );
 }
 
+const COLLABORATION_BONUS_PERCENT = 0.2;
+
 function handleCollaborationSpace(player) {
     const you = player.isAI ? player.name : 'You';
     const you_lower = player.isAI ? player.name : 'you';
 
     const otherPlayers = GameState.players.filter(p => p.isAlive && p.index !== player.index);
 
-    if (otherPlayers.length > 0) {
-        const collaborator = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
-        const bonus = 3;
-        player.addFame(bonus);
-        collaborator.addFame(bonus);
-
-        showModal(
-            'Research Collaboration',
-            `
-            <p>${you} and <span style="color: #e74c3c;">${collaborator.name}</span> are now co-authors!</p>
-            <p>Both <span style="color: #e74c3c;">+${bonus} fame</span> (now ${you_lower} have to decide authorship order...)</p>
-            <p class="info-text">May the most passive-aggressive email win.</p>
-            `,
-            [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
-        );
-    } else {
+    if (otherPlayers.length === 0) {
         showModal(
             'Research Collaboration',
             `<p>${you} wanted to collaborate but everyone else is dead or has better things to do.</p>
             <p class="info-text">Solo authorship it is!</p>`,
             [{ text: 'Forever alone', action: () => endTurn() }]
         );
+        return;
     }
+
+    if (player.isAI) {
+        // AI just grabs whoever's nearby - no strategic pondering
+        const collaborator = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+        resolveCollaboration(player, collaborator);
+        return;
+    }
+
+    // Human player picks who to collaborate with
+    showModal(
+        'Research Collaboration',
+        `
+        <p>${you} bump into a colleague at the coffee machine. Who does ${you_lower} rope into co-authorship?</p>
+        <div class="collaborator-choices">
+            ${otherPlayers.map(p => `
+                <button type="button" class="sketch-btn collaborator-choice-btn" data-player-index="${p.index}" style="border-color: ${p.color}; color: ${p.color};">${p.name}</button>
+            `).join('')}
+        </div>
+        `,
+        []
+    );
+
+    document.querySelectorAll('.collaborator-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            hideModal();
+            const collaborator = GameState.players[Number(btn.dataset.playerIndex)];
+            resolveCollaboration(player, collaborator);
+        });
+    });
+}
+
+// Whichever of the two has less fame gets a bonus (no cost to the other) worth
+// COLLABORATION_BONUS_PERCENT of the more-famous collaborator's fame
+function resolveCollaboration(player, collaborator) {
+    let lower = null;
+    let higher = null;
+    if (player.totalFame < collaborator.totalFame) {
+        lower = player;
+        higher = collaborator;
+    } else if (collaborator.totalFame < player.totalFame) {
+        lower = collaborator;
+        higher = player;
+    }
+
+    let resultHtml = `<p>${player.name} and <span style="color: ${collaborator.color};">${collaborator.name}</span> are now co-authors!</p>`;
+
+    if (lower) {
+        const bonus = Math.floor(higher.totalFame * COLLABORATION_BONUS_PERCENT);
+        if (bonus > 0) {
+            lower.addFame(bonus);
+            resultHtml += `
+                <p><span style="color: ${lower.color};">${lower.name}</span> rides on <span style="color: ${higher.color};">${higher.name}</span>'s coattails, gaining <span style="color: #e74c3c;">+${bonus} fame</span> (${Math.round(COLLABORATION_BONUS_PERCENT * 100)}% of ${higher.name}'s reputation).</p>
+            `;
+        } else {
+            resultHtml += `<p>Neither of them has any reputation worth borrowing yet.</p>`;
+        }
+    } else {
+        resultHtml += `<p>Equally (un)known, neither gains anything from the association.</p>`;
+    }
+
+    resultHtml += `<p class="info-text">May the most passive-aggressive email win the authorship order debate.</p>`;
+
+    showModal(
+        'Research Collaboration',
+        resultHtml,
+        [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
+    );
 }
 
 async function handleEurekaSpace(player) {
