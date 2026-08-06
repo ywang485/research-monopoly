@@ -1007,6 +1007,20 @@ select {
     z-index: 10;
 }
 
+.entity-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.team-argument-display {
+    font-family: var(--font-handwriting);
+    font-size: 22px;
+    color: #666;
+    padding: 0 16px;
+    display: none;
+}
+
 .paper-label {
     font-family: var(--font-handwriting);
     font-size: 35px;
@@ -1198,6 +1212,25 @@ select {
     border-radius: 10px;
     margin-left: 6px;
     vertical-align: middle;
+}
+
+.player-stat .team-meta {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+}
+
+.player-stat .team-info,
+.player-stat .team-argument {
+    font-family: var(--font-notes);
+    font-size: 12px;
+    color: var(--ink-light);
+}
+
+.player-stat .team-argument {
+    font-style: italic;
+    color: var(--ink-dark);
+    margin-top: 3px;
 }
 
 /* ============================================

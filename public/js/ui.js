@@ -76,11 +76,15 @@ function updatePlayerStats() {
                 .filter(idx => idx !== index)
                 .map(idx => GameState.players[idx]?.name)
                 .filter(Boolean);
+            let inner = '';
             if (teammates.length > 0) {
-                teamHtml += `<div class="team-info">🤝 Team: ${teammates.join(', ')}</div>`;
+                inner += `<div class="team-info">🤝 Team: ${teammates.join(', ')}</div>`;
             }
             if (group.argument) {
-                teamHtml += `<div class="team-argument">🎯 Arguing: "${group.argument}"</div>`;
+                inner += `<div class="team-argument">🎯 Arguing: "${group.argument}"</div>`;
+            }
+            if (inner) {
+                teamHtml = `<div class="team-meta">${inner}</div>`;
             }
         }
 

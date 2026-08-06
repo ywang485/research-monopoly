@@ -8,9 +8,12 @@ export default function GameplayScreen() {
         <div className="notebook-spread-container">
           {/* Paper labels for headers (stapled across top) */}
             <div className="paper-label-row">
-              <div id="entity-display" className="paper-label">
-                <div className="staple"></div>
-                <span id="entity-info"></span>
+              <div className="entity-label-group">
+                <div id="entity-display" className="paper-label">
+                  <div className="staple"></div>
+                  <span id="entity-info"></span>
+                </div>
+                <div id="team-argument-display" className="team-argument-display"></div>
               </div>
               <div id="turn-display" className="paper-label">
                 <div className="staple"></div>

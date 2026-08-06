@@ -1022,6 +1022,7 @@ function handleNPCTurn() {
     document.getElementById('current-turn').textContent = `Turn: Scientific Underdeterminism`;
     document.getElementById('current-turn').style.color = '#7a6080';
     document.getElementById('roll-dice-btn').disabled = true;
+    updateTeamArgumentDisplay(null);
 
     log('Scientific Underdeterminism is taking its turn...', 'important');
     playSound('dice');
@@ -1187,6 +1188,21 @@ function nextPlayer() {
     } while (!GameState.players[GameState.currentPlayerIndex].isAlive && attempts < GameState.players.length);
 }
 
+// Shows the current player's team argument underneath the research topic label
+function updateTeamArgumentDisplay(player) {
+    const el = document.getElementById('team-argument-display');
+    if (!el) return;
+
+    const group = player ? GameState.groups?.find(g => g.id === player.groupId) : null;
+    if (group && group.argument) {
+        el.textContent = `"${group.argument}"`;
+        el.style.display = 'block';
+    } else {
+        el.textContent = '';
+        el.style.display = 'none';
+    }
+}
+
 function updateTurnDisplay() {
     const player = GameState.players[GameState.currentPlayerIndex];
 
@@ -1206,6 +1222,7 @@ function updateTurnDisplay() {
     document.getElementById('current-turn').textContent = `Turn: ${player.name}${aiIndicator}`;
     document.getElementById('current-turn').style.color = player.color;
     updatePlayerStats();
+    updateTeamArgumentDisplay(player);
 
     // If current player is AI, automatically start their turn
     if (player.isAI && player.isAlive && !GameState.gameOver && !GameState.animation.active) {
