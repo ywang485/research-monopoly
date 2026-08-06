@@ -63,7 +63,16 @@ function updateLLMIndicator() {
 // ============================================
 // HYPOTHESIS GENERATION
 // ============================================
-async function generateLLMHypothesis() {
+
+// Looks up the argument the player's team is trying to prove, if they have one set
+function getPlayerTeamArgument(player) {
+    if (!player || player.groupId === null || player.groupId === undefined) return null;
+    const group = GameState.groups?.find(g => g.id === player.groupId);
+    const argument = group?.argument?.trim();
+    return argument || null;
+}
+
+async function generateLLMHypothesis(player) {
     if (!GameState.llm.available) {
         return generateFallbackHypothesis();
     }
@@ -79,6 +88,8 @@ async function generateLLMHypothesis() {
             .filter(s => s.hypothesis && s.isProven)
             .map(s => s.hypothesis);
 
+        const teamArgument = getPlayerTeamArgument(player);
+
         const response = await fetch('/api/generate-hypothesis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -86,7 +97,8 @@ async function generateLLMHypothesis() {
                 entity: GameState.entity.name,
                 entityType: GameState.entity.type,
                 existingHypotheses,
-                provenHypotheses
+                provenHypotheses,
+                teamArgument
             })
         });
 
@@ -103,17 +115,20 @@ async function generateLLMHypothesis() {
     }
 }
 
-async function generateLLMHypothesisAddition(existingHypothesis) {
+async function generateLLMHypothesisAddition(existingHypothesis, player) {
     if (!GameState.llm.available) {
         return generateFallbackHypothesisAddition();
     }
 
     try {
+        const teamArgument = getPlayerTeamArgument(player);
+
         const response = await fetch('/api/generate-addition', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                existingHypothesis
+                existingHypothesis,
+                teamArgument
             })
         });
 
@@ -142,7 +157,7 @@ function generateFallbackHypothesisAddition() {
 // ============================================
 // SUGGESTION FETCHING
 // ============================================
-async function fetchHypothesisSuggestions(count = 3) {
+async function fetchHypothesisSuggestions(count = 3, player = null) {
     if (!GameState.llm.available) {
         // Return fallback suggestions
         const suggestions = [];
@@ -157,13 +172,16 @@ async function fetchHypothesisSuggestions(count = 3) {
             .filter(s => s.hypothesis)
             .map(s => s.hypothesis);
 
+        const teamArgument = getPlayerTeamArgument(player);
+
         const response = await fetch('/api/generate-suggestions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 entity: GameState.entity.name,
                 existingHypotheses,
-                count
+                count,
+                teamArgument
             })
         });
 
@@ -509,7 +527,7 @@ async function handleAIHypothesisSpace(player, space) {
             }
 
             // Generate hypothesis (async if LLM available)
-            const hypothesis = await generateLLMHypothesis();
+            const hypothesis = await generateLLMHypothesis(player);
 
             space.hypothesis = hypothesis;
             space.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
@@ -535,7 +553,7 @@ async function handleAIHypothesisSpace(player, space) {
             if (GameState.llm.available) {
                 log(`${player.name} is elaborating on the hypothesis...`);
             }
-            const addition = await generateLLMHypothesisAddition(space.hypothesis);
+            const addition = await generateLLMHypothesisAddition(space.hypothesis, player);
             if (addition) {
                 space.hypothesis = space.hypothesis + ' ' + addition;
                 space.contributions.push({ text: addition, author: player.name, playerIndex: player.index });
@@ -621,7 +639,7 @@ async function handleAIEurekaSpace(player) {
         log(`${player.name} had a EUREKA moment and is formulating a brilliant hypothesis...`);
     }
 
-    const hypothesis = await generateLLMHypothesis();
+    const hypothesis = await generateLLMHypothesis(player);
 
     // Claim the space for free
     closestSpace.hypothesis = hypothesis;

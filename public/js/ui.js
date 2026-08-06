@@ -68,6 +68,22 @@ function updatePlayerStats() {
         const activeIndicator = GameState.currentPlayerIndex === index && !GameState.isNPCTurn ? ' ◄' : '';
         const aiBadge = player.isAI ? '<span class="ai-badge">AI</span>' : '';
 
+        // Team info - who they're grouped with and what the team is trying to prove
+        const group = GameState.groups?.find(g => g.id === player.groupId);
+        let teamHtml = '';
+        if (group) {
+            const teammates = group.playerIndices
+                .filter(idx => idx !== index)
+                .map(idx => GameState.players[idx]?.name)
+                .filter(Boolean);
+            if (teammates.length > 0) {
+                teamHtml += `<div class="team-info">🤝 Team: ${teammates.join(', ')}</div>`;
+            }
+            if (group.argument) {
+                teamHtml += `<div class="team-argument">🎯 Arguing: "${group.argument}"</div>`;
+            }
+        }
+
         div.innerHTML = `
             <div class="name" style="color: ${player.color}">${player.name}${aiBadge}${activeIndicator}</div>
             <div class="stats">
@@ -76,6 +92,7 @@ function updatePlayerStats() {
                 <span>Fame: <span class="stat-value">${player.availableFame}/${player.totalFame}</span></span>
                 <span>Students: <span class="stat-value">${player.students.length}</span></span>
             </div>
+            ${teamHtml}
         `;
         container.appendChild(div);
     });

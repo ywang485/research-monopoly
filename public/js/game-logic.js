@@ -561,7 +561,7 @@ async function handleEurekaSpace(player) {
     });
 
     // Fetch suggestions asynchronously and update the modal
-    const suggestions = await fetchHypothesisSuggestions(3);
+    const suggestions = await fetchHypothesisSuggestions(3, player);
 
     if (suggestions && suggestions.length > 0) {
 
@@ -696,7 +696,7 @@ async function handleHypothesisSpace(player, space) {
 
         // Fetch suggestions asynchronously and update the modal (only if player can afford)
         if (canAfford) {
-            const suggestions = await fetchHypothesisSuggestions(3);
+            const suggestions = await fetchHypothesisSuggestions(3, player);
             const suggestionsContainer = document.getElementById('hypothesis-suggestions');
             if (suggestionsContainer) {
                 suggestionsContainer.innerHTML = suggestions.map((s, i) =>

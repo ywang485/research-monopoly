@@ -46,9 +46,9 @@ const SYSTEM_PROMPT = `You are a sarcastic and humorous academic who generates a
 Your hypotheses should be:
 - Completely ridiculous but sound superficially plausible
 - Sacastic and funny
-- With plain and easy-to-understand Englis
-- Concise, about one sentence long
+- With plain and easy-to-understand English
 - Related to the given entity/topic
+- ONE single sentence of 3 to 15 words - short and punchy, no sub-clauses or run-ons
 
 Generate ONLY the hypothesis text, no quotes or extra formatting.`;
 
@@ -146,8 +146,12 @@ Examples of the tone:
 
 Generate ONLY the bio paragraph, no quotes, no player name header, just the narrative.`;
 
-export function buildHypothesisPrompt(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
+export function buildHypothesisPrompt(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
   let prompt = `Generate a humorous pseudo-scientific hypothesis about "${entity}".`;
+
+  if (teamArgument) {
+    prompt += `\n\nIMPORTANT: You are researching on behalf of a team whose entire career is dedicated to proving this claim: "${teamArgument}". The hypothesis must argue in favor of and support this claim - do not contradict or undermine it.`;
+  }
 
   if (provenHypotheses.length > 0) {
     prompt += `\n\nIMPORTANT: The following hypotheses have already been "proven" by the scientific community. Your new hypothesis should reference, build upon, or be inspired by one or more of these established findings:\n`;
@@ -164,7 +168,7 @@ export function buildHypothesisPrompt(entity: string, existingHypotheses: string
   return prompt;
 }
 
-export async function generateWithOpenAI(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
+export async function generateWithOpenAI(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -176,20 +180,20 @@ export async function generateWithOpenAI(entity: string, existingHypotheses: str
         model: MODELS.openai,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
+          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument) }
         ],
-        max_tokens: 150,
+        max_tokens: 40,
         temperature: 0.9
       })
     });
 
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.choices[0].message.content.trim();
+    return capWords(data.choices[0].message.content.trim());
   });
 }
 
-export async function generateWithAnthropic(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
+export async function generateWithAnthropic(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -200,37 +204,46 @@ export async function generateWithAnthropic(entity: string, existingHypotheses: 
       },
       body: JSON.stringify({
         model: MODELS.anthropic,
-        max_tokens: 150,
+        max_tokens: 40,
         system: SYSTEM_PROMPT,
         messages: [
-          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses) }
+          { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument) }
         ]
       })
     });
 
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
-    return data.content[0].text.trim();
+    return capWords(data.content[0].text.trim());
   });
 }
 
-export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = []) {
+export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
   const model = genAI.getGenerativeModel({
     model: MODELS.google,
     generationConfig: {
-      maxOutputTokens: 150,
+      maxOutputTokens: 40,
       temperature: 0.9
     }
   });
 
-  const prompt = `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses)}`;
+  const prompt = `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument)}`;
   const result = await model.generateContent(prompt);
   const response = result.response;
-  return response.text().trim();
+  return capWords(response.text().trim());
 }
 
-export async function generateAdditionWithOpenAI(existingHypothesis: string) {
+function buildAdditionPrompt(existingHypothesis: string, teamArgument?: string) {
+  let prompt = `Existing hypothesis: "${existingHypothesis}"`;
+  if (teamArgument) {
+    prompt += `\n\nIMPORTANT: You are researching on behalf of a team whose entire career is dedicated to proving this claim: "${teamArgument}". Your addition must reinforce this claim, not undermine it.`;
+  }
+  prompt += `\n\nGenerate a sarcastic addition:`;
+  return prompt;
+}
+
+export async function generateAdditionWithOpenAI(existingHypothesis: string, teamArgument?: string) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -242,7 +255,7 @@ export async function generateAdditionWithOpenAI(existingHypothesis: string) {
         model: MODELS.openai,
         messages: [
           { role: 'system', content: ADDITION_PROMPT },
-          { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
+          { role: 'user', content: buildAdditionPrompt(existingHypothesis, teamArgument) }
         ],
         max_tokens: 60,
         temperature: 0.9
@@ -255,7 +268,7 @@ export async function generateAdditionWithOpenAI(existingHypothesis: string) {
   });
 }
 
-export async function generateAdditionWithAnthropic(existingHypothesis: string) {
+export async function generateAdditionWithAnthropic(existingHypothesis: string, teamArgument?: string) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -269,7 +282,7 @@ export async function generateAdditionWithAnthropic(existingHypothesis: string) 
         max_tokens: 60,
         system: ADDITION_PROMPT,
         messages: [
-          { role: 'user', content: `Existing hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:` }
+          { role: 'user', content: buildAdditionPrompt(existingHypothesis, teamArgument) }
         ]
       })
     });
@@ -280,7 +293,7 @@ export async function generateAdditionWithAnthropic(existingHypothesis: string) 
   });
 }
 
-export async function generateAdditionWithGoogle(existingHypothesis: string) {
+export async function generateAdditionWithGoogle(existingHypothesis: string, teamArgument?: string) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
   const model = genAI.getGenerativeModel({
     model: MODELS.google,
@@ -290,7 +303,7 @@ export async function generateAdditionWithGoogle(existingHypothesis: string) {
     }
   });
 
-  const prompt = `${ADDITION_PROMPT}\n\nExisting hypothesis: "${existingHypothesis}"\n\nGenerate a sarcastic addition:`;
+  const prompt = `${ADDITION_PROMPT}\n\n${buildAdditionPrompt(existingHypothesis, teamArgument)}`;
   const result = await model.generateContent(prompt);
   const response = result.response;
   return response.text().trim();
