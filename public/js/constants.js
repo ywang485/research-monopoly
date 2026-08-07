@@ -61,7 +61,45 @@ const SPACE_TYPES = {
     GRANT: 'grant',
     SCANDAL: 'scandal',
     COLLABORATION: 'collaboration',
-    EUREKA: 'eureka'
+    EUREKA: 'eureka',
+    INSTITUTION: 'institution'
+};
+
+// ============================================
+// ITEMS
+// ============================================
+const ITEM_TYPES = {
+    LOADED_DICE: 'loaded_dice',
+    EXTRA_TURN: 'extra_turn',
+    INITIATE_SCANDAL: 'initiate_scandal',
+    SCANDAL_IMMUNITY: 'scandal_immunity'
+};
+
+const ITEMS = {
+    [ITEM_TYPES.LOADED_DICE]: {
+        name: 'Loaded Dice',
+        icon: '🎲',
+        cost: 12,
+        description: 'Next time you roll, pick any value 1-6 instead of leaving it to chance.'
+    },
+    [ITEM_TYPES.EXTRA_TURN]: {
+        name: 'All-Nighter',
+        icon: '☕',
+        cost: 18,
+        description: 'Roll again immediately after your current turn ends.'
+    },
+    [ITEM_TYPES.INITIATE_SCANDAL]: {
+        name: 'Anonymous Tip',
+        icon: '📰',
+        cost: 15,
+        description: 'Leak dirt on a rival - they immediately lose fame.'
+    },
+    [ITEM_TYPES.SCANDAL_IMMUNITY]: {
+        name: 'Tenure',
+        icon: '🛡️',
+        cost: 10,
+        description: 'Passive - automatically blocks the next scandal against you.'
+    }
 };
 
 // Colored pencil palette for notebook aesthetic
@@ -75,7 +113,8 @@ const SPACE_COLORS = {
     [SPACE_TYPES.GRANT]: '#2ecc71',      // Pencil bright green
     [SPACE_TYPES.SCANDAL]: '#c0392b',    // Pencil dark red
     [SPACE_TYPES.COLLABORATION]: '#e67e22', // Pencil orange
-    [SPACE_TYPES.EUREKA]: '#f1c40f'      // Pencil bright yellow
+    [SPACE_TYPES.EUREKA]: '#f1c40f',     // Pencil bright yellow
+    [SPACE_TYPES.INSTITUTION]: '#8e44ad' // Pencil violet
 };
 
 // Handwritten formula decorations for notebook margins
@@ -95,7 +134,8 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
     [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
-    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).'
+    [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).',
+    [SPACE_TYPES.INSTITUTION]: 'Spend fame on items that give you an edge: control your dice roll, take an extra turn, leak dirt on a rival, or protect yourself from scandal.'
 };
 
 const MAX_AGE = 80;
@@ -146,13 +186,13 @@ RECRUIT|Graduate School|0
 HYPOTHESIS|Research Question 3|4
 CONFERENCE|Annual Symposium|0
 HYPOTHESIS|Research Question 4|3
-RECRUIT|Postdoc Hiring|0
+INSTITUTION|Research Institution|0
 HYPOTHESIS|Research Question 5|2
 COMMUNITY_SERVICE|Community Service|0
 HYPOTHESIS|Research Question 6|5
 SABBATICAL|Research Leave|0
 HYPOTHESIS|Research Question 7|3
-RECRUIT|Lab Assistant Pool|0
+INSTITUTION|Innovation Lab|0
 HYPOTHESIS|Research Question 8|4
 SCANDAL|Academic Scandal|0
 HYPOTHESIS|Research Question 9|3

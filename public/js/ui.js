@@ -110,6 +110,27 @@ function updatePlayerStats() {
     }
 }
 
+// Enables the Items button only during a live human turn when they own at least one usable item
+function updateItemButton() {
+    const btn = document.getElementById('use-item-btn');
+    if (!btn) return;
+
+    const player = GameState.players[GameState.currentPlayerIndex];
+    const isLiveHumanTurn = player && !player.isAI && player.isAlive && !GameState.isNPCTurn && !GameState.gameOver;
+    const usableCount = player
+        ? Object.entries(player.items || {})
+            .filter(([id, count]) => id !== ITEM_TYPES.SCANDAL_IMMUNITY && count > 0)
+            .reduce((sum, [, count]) => sum + count, 0)
+        : 0;
+
+    btn.disabled = !isLiveHumanTurn || usableCount === 0;
+    btn.textContent = usableCount > 0 ? `Items (${usableCount})` : 'Items';
+
+    if (typeof updateMobilePanels === 'function') {
+        updateMobilePanels();
+    }
+}
+
 function updateTheoriesList() {
     const container = document.getElementById('theories-list');
     container.innerHTML = '';
@@ -1385,6 +1406,10 @@ function startGame() {
 
     // Setup game controls
     document.getElementById('roll-dice-btn').addEventListener('click', playerRollDice);
+    document.getElementById('use-item-btn').addEventListener('click', () => {
+        const player = GameState.players[GameState.currentPlayerIndex];
+        if (player) openInventoryModal(player);
+    });
 
     // Initial render
     renderBoard();

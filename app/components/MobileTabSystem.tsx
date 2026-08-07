@@ -21,6 +21,10 @@ export default function MobileTabSystem() {
           <span className="tab-icon">🎲</span>
           <span className="tab-label">Roll</span>
         </button>
+        <button className="mobile-tab-btn" data-tab="items" id="mobile-items-btn">
+          <span className="tab-icon">🎒</span>
+          <span className="tab-label">Items</span>
+        </button>
       </div>
 
       {/* Players Panel */}

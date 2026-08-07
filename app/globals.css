@@ -1535,6 +1535,85 @@ select {
     margin-top: 15px;
 }
 
+#modal-body .shop-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+#modal-body .shop-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255,255,255,0.5);
+    border: 2px dashed var(--ink-light);
+    border-radius: 5px;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+#modal-body .shop-item-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#modal-body .shop-item-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+#modal-body .shop-item-name {
+    font-family: var(--font-notes);
+    font-weight: bold;
+    color: var(--ink-dark);
+    font-size: 15px;
+}
+
+#modal-body .shop-item-cost {
+    font-weight: normal;
+    color: var(--ink-light);
+    font-size: 13px;
+}
+
+#modal-body .shop-item-owned {
+    font-weight: normal;
+    color: var(--pencil-blue);
+    font-size: 13px;
+}
+
+#modal-body .shop-item-desc {
+    font-family: var(--font-handwriting);
+    color: var(--ink-light);
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+#modal-body .shop-buy-btn,
+#modal-body .inventory-use-btn {
+    flex-shrink: 0;
+    font-size: 8px;
+    padding: 8px 14px;
+}
+
+#modal-body .dice-pick-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+#modal-body .dice-pick-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+}
+
 #modal-body .info-text {
     font-family: var(--font-notes);
     color: var(--ink-light);
@@ -2549,12 +2628,15 @@ select {
 
 #action-buttons {
     width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     justify-content: right;
     align-items: right;
     position: relative;
     margin: auto 30 auto auto ;
     z-index: 1000; /* Always on top of draggable panels */
-    bottom: 100px;
+    bottom: 150px;
     right: 0px;
     transform: rotate(-1deg);
 }
@@ -2562,6 +2644,13 @@ select {
 .roll-btn {
     font-size: 20px;
     padding: 15px 40px;
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+    width: 100%;
+}
+
+#use-item-btn {
+    font-size: 20px;
+    padding: 15px 15px;
     box-shadow: 3px 3px 0 var(--paper-shadow);
     width: 100%;
 }

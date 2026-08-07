@@ -19,7 +19,8 @@ function loadIconImages() {
             { key: 'break', src: '/icons/break.svg' },
             { key: 'scandal', src: '/icons/scandal.svg' },
             { key: 'collaboration', src: '/icons/collaboration.svg' },
-            { key: 'eureka', src: '/icons/eureka.svg' }
+            { key: 'eureka', src: '/icons/eureka.svg' },
+            { key: 'institution', src: '/icons/institution.svg' }
         ];
 
         let loadedCount = 0;
@@ -85,7 +86,8 @@ function drawIcon(ctx, iconType, cx, cy, scale) {
         [SPACE_TYPES.GRANT]: 'grant',
         [SPACE_TYPES.SCANDAL]: 'scandal',
         [SPACE_TYPES.COLLABORATION]: 'collaboration',
-        [SPACE_TYPES.EUREKA]: 'eureka'
+        [SPACE_TYPES.EUREKA]: 'eureka',
+        [SPACE_TYPES.INSTITUTION]: 'institution'
     };
 
     // Get the icon image key
@@ -142,6 +144,9 @@ function drawIcon(ctx, iconType, cx, cy, scale) {
             break;
         case SPACE_TYPES.EUREKA:
             drawEurekaFallback(ctx, cx, cy, s);
+            break;
+        case SPACE_TYPES.INSTITUTION:
+            drawInstitutionFallback(ctx, cx, cy, s);
             break;
     }
 }
@@ -202,6 +207,10 @@ function drawCollaborationFallback(ctx, cx, cy, s) {
 
 function drawEurekaFallback(ctx, cx, cy, s) {
     drawTextFallback(ctx, cx, cy, s, 'EUREKA');
+}
+
+function drawInstitutionFallback(ctx, cx, cy, s) {
+    drawTextFallback(ctx, cx, cy, s, 'SHOP');
 }
 
 // ============================================

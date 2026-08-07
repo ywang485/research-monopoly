@@ -17,7 +17,7 @@ export default function SetupScreen() {
         <h1 className="hand-title">
           <span className="title-underline">Theoropoly</span>
         </h1>
-        <p className="subtitle"> How much would you sacrifice for science? </p>
+        <p className="subtitle"> How much would you sacrifice for "science"? </p>
 
         {/* Decorative tape */}
         <div className="tape tape-1"></div>

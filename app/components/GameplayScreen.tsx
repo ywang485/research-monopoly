@@ -83,6 +83,7 @@ export default function GameplayScreen() {
 
                 {/* Dice button */}
                 <div id="action-buttons">
+                  <button id="use-item-btn" className="sketch-btn" disabled>Items</button>
                   <button id="roll-dice-btn" className="sketch-btn roll-btn">🎲 Roll Dice</button>
                 </div>
               </div>

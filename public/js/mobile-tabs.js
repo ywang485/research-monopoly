@@ -32,6 +32,15 @@ function initMobileTabSystem() {
                 return;
             }
 
+            if (tabName === 'items') {
+                // Trigger the inventory modal via the main (hidden) items button
+                const itemsBtn = document.getElementById('use-item-btn');
+                if (itemsBtn && !itemsBtn.disabled) {
+                    itemsBtn.click();
+                }
+                return;
+            }
+
             toggleMobilePanel(tabName);
         });
     });
@@ -54,8 +63,9 @@ function initMobileTabSystem() {
         }
     });
 
-    // Update dice button state based on game state
+    // Update dice/items button state based on game state
     updateMobileDiceButton();
+    updateMobileItemsButton();
 }
 
 function toggleMobilePanel(tabName) {
@@ -138,8 +148,9 @@ function updateMobilePanels() {
         syncMobilePanelContent(currentOpenTab);
     }
 
-    // Update dice button state
+    // Update dice/items button state
     updateMobileDiceButton();
+    updateMobileItemsButton();
 }
 
 // Update the mobile dice button state
@@ -156,6 +167,19 @@ function updateMobileDiceButton() {
         } else {
             mobileDiceBtn.classList.remove('disabled');
         }
+    }
+}
+
+// Update the mobile items button state (mirrors the desktop #use-item-btn)
+function updateMobileItemsButton() {
+    if (!isMobileView) return;
+
+    const mobileItemsBtn = document.getElementById('mobile-items-btn');
+    const itemsBtn = document.getElementById('use-item-btn');
+
+    if (mobileItemsBtn && itemsBtn) {
+        mobileItemsBtn.disabled = itemsBtn.disabled;
+        mobileItemsBtn.classList.toggle('disabled', itemsBtn.disabled);
     }
 }
 
@@ -179,4 +203,5 @@ window.addEventListener('resize', () => {
 window.initMobileTabSystem = initMobileTabSystem;
 window.updateMobilePanels = updateMobilePanels;
 window.updateMobileDiceButton = updateMobileDiceButton;
+window.updateMobileItemsButton = updateMobileItemsButton;
 window.checkMobileView = checkMobileView;

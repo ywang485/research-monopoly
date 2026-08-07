@@ -68,6 +68,9 @@ class Player {
         this.isAlive = true;
         this.isAI = isAI;
         this.groupId = null;
+        this.items = { [ITEM_TYPES.LOADED_DICE]: 1 }; // { [itemId]: count } - everyone starts with 1 Loaded Dice
+        this.pendingExtraTurns = 0;
+        this.pendingDiceOverride = null;
     }
 
     get availableFame() {
@@ -415,22 +418,41 @@ function handleGrantSpace(player) {
     );
 }
 
+// Applies a scandal-style fame loss to `target`, honoring Tenure (Scandal Immunity) if they
+// own one. Returns { blocked, fameLoss } so callers can tailor their own flavor text.
+function applyScandal(target, amount) {
+    if (target.items[ITEM_TYPES.SCANDAL_IMMUNITY] > 0) {
+        target.items[ITEM_TYPES.SCANDAL_IMMUNITY]--;
+        log(`${target.name}'s Tenure absorbed a scandal that would've hit their fame!`, 'important');
+        return { blocked: true, fameLoss: 0 };
+    }
+
+    const fameLoss = Math.min(target.totalFame, amount);
+    target.totalFame -= fameLoss;
+    target.spentFame = Math.min(target.spentFame, target.totalFame);
+    return { blocked: false, fameLoss };
+}
+
 function handleScandalSpace(player) {
     const you = player.isAI ? player.name : 'you';
     const your = player.isAI ? `${player.name}'s` : 'your';
 
     playSound('scandal');
-    const fameLoss = Math.min(player.totalFame, rollDice() + 1);
-    player.totalFame -= fameLoss;
-    player.spentFame = Math.min(player.spentFame, player.totalFame);
+    const { blocked, fameLoss } = applyScandal(player, rollDice() + 1);
 
     showModal(
         'Academic Scandal!',
-        `
-        <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
-        <p><span style="color: #e74c3c;">-${fameLoss} fame</span> from the Twitter mob and anonymous blog posts</p>
-        <p class="info-text">Maybe ${you} should have checked those p-values more carefully...</p>
-        `,
+        blocked
+            ? `
+            <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
+            <p><span style="color: #2ecc71;">Tenure saves the day!</span> The allegations quietly disappear.</p>
+            <p class="info-text">Being unfireable has its perks.</p>
+            `
+            : `
+            <p style="color: #a86060;">Someone actually read ${your} paper and found... issues.</p>
+            <p><span style="color: #e74c3c;">-${fameLoss} fame</span> from the Twitter mob and anonymous blog posts</p>
+            <p class="info-text">Maybe ${you} should have checked those p-values more carefully...</p>
+            `,
         [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
     );
 }
@@ -519,6 +541,219 @@ function resolveCollaboration(player, collaborator) {
         resultHtml,
         [{ text: 'Awkward', action: () => { updatePlayerStats(); endTurn(); } }]
     );
+}
+
+// ============================================
+// RESEARCH INSTITUTION (item shop) & INVENTORY
+// ============================================
+function renderInstitutionShop(player) {
+    const itemRows = Object.entries(ITEMS).map(([id, item]) => {
+        const owned = player.items[id] || 0;
+        const affordable = player.availableFame >= item.cost;
+        return `
+            <div class="shop-item-row">
+                <div class="shop-item-info">
+                    <span class="shop-item-icon">${item.icon}</span>
+                    <div>
+                        <div class="shop-item-name">${item.name} <span class="shop-item-cost">(${item.cost} fame)</span>${owned > 0 ? ` <span class="shop-item-owned">owned ×${owned}</span>` : ''}</div>
+                        <div class="shop-item-desc">${item.description}</div>
+                    </div>
+                </div>
+                <button type="button" class="sketch-btn shop-buy-btn" data-item-id="${id}"${affordable ? '' : ' disabled'}>Buy</button>
+            </div>`;
+    }).join('');
+
+    showModal(
+        'Research Institution',
+        `
+        <p>Welcome to the Research Institution. Fame buys favors here.</p>
+        <p class="info-text">Available fame: <span style="color: #e74c3c;">${player.availableFame}</span></p>
+        <div class="shop-items">${itemRows}</div>
+        `,
+        [{ text: 'Leave', action: () => { updatePlayerStats(); updateItemButton(); endTurn(); } }]
+    );
+
+    document.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const itemId = btn.dataset.itemId;
+            const item = ITEMS[itemId];
+            if (player.spendFame(item.cost)) {
+                player.items[itemId] = (player.items[itemId] || 0) + 1;
+                log(`${player.name} bought ${item.name}.`);
+                renderInstitutionShop(player); // re-render so fame/owned counts stay live
+            }
+        });
+    });
+}
+
+function handleInstitutionSpace(player) {
+    if (player.isAI) {
+        // Costliest/most-impactful item first, matching makeAIDecision's recruit-space pattern
+        const priority = [
+            { id: ITEM_TYPES.EXTRA_TURN, threshold: 0.6 },
+            { id: ITEM_TYPES.INITIATE_SCANDAL, threshold: 0.5 },
+            { id: ITEM_TYPES.LOADED_DICE, threshold: 0.45 },
+            { id: ITEM_TYPES.SCANDAL_IMMUNITY, threshold: 0.4 }
+        ];
+
+        let bought = null;
+        for (const { id, threshold } of priority) {
+            const item = ITEMS[id];
+            if (player.availableFame >= item.cost && Math.random() > threshold) {
+                if (player.spendFame(item.cost)) {
+                    player.items[id] = (player.items[id] || 0) + 1;
+                    bought = item;
+                    break;
+                }
+            }
+        }
+
+        if (bought) {
+            log(`${player.name} browsed the Research Institution and bought ${bought.name}.`, 'important');
+            updatePlayerStats();
+            setTimeout(() => endTurn(), 500);
+        } else {
+            log(`${player.name} browsed the Research Institution but decided not to buy anything.`);
+            setTimeout(() => endTurn(), 300);
+        }
+        return;
+    }
+
+    renderInstitutionShop(player);
+}
+
+function openInventoryModal(player) {
+    const ownedEntries = Object.entries(ITEMS).filter(([id]) => (player.items[id] || 0) > 0);
+
+    if (ownedEntries.length === 0) {
+        showModal('Inventory', '<p>Nothing in the bag yet. Visit a Research Institution to stock up.</p>', [{ text: 'Close', action: () => {} }]);
+        return;
+    }
+
+    const rows = ownedEntries.map(([id, item]) => {
+        const owned = player.items[id];
+        const isPassive = id === ITEM_TYPES.SCANDAL_IMMUNITY;
+        return `
+            <div class="shop-item-row">
+                <div class="shop-item-info">
+                    <span class="shop-item-icon">${item.icon}</span>
+                    <div>
+                        <div class="shop-item-name">${item.name} <span class="shop-item-owned">×${owned}</span></div>
+                        <div class="shop-item-desc">${isPassive ? 'Passive - active protection, triggers automatically.' : item.description}</div>
+                    </div>
+                </div>
+                ${isPassive ? '' : `<button type="button" class="sketch-btn inventory-use-btn" data-item-id="${id}">Use</button>`}
+            </div>`;
+    }).join('');
+
+    showModal('Inventory', `<div class="shop-items">${rows}</div>`, [{ text: 'Close', action: () => {} }]);
+
+    document.querySelectorAll('.inventory-use-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const itemId = btn.dataset.itemId;
+            hideModal();
+            if (itemId === ITEM_TYPES.LOADED_DICE) useLoadedDiceItem(player);
+            else if (itemId === ITEM_TYPES.EXTRA_TURN) useExtraTurnItem(player);
+            else if (itemId === ITEM_TYPES.INITIATE_SCANDAL) useInitiateScandalItem(player);
+        });
+    });
+}
+
+function useLoadedDiceItem(player) {
+    const numberButtons = [1, 2, 3, 4, 5, 6].map(n =>
+        `<button type="button" class="sketch-btn dice-pick-btn" data-value="${n}">${n}</button>`
+    ).join('');
+
+    showModal(
+        'Loaded Dice',
+        `<p>Pick the value you want on your next roll.</p><div class="dice-pick-choices">${numberButtons}</div>`,
+        []
+    );
+
+    document.querySelectorAll('.dice-pick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const value = Number(btn.dataset.value);
+            player.items[ITEM_TYPES.LOADED_DICE]--;
+            player.pendingDiceOverride = value;
+            log(`${player.name} used Loaded Dice - next roll will be a ${value}.`, 'important');
+            hideModal();
+            updateItemButton();
+        });
+    });
+}
+
+function useExtraTurnItem(player) {
+    player.items[ITEM_TYPES.EXTRA_TURN]--;
+    player.pendingExtraTurns++;
+    log(`${player.name} used All-Nighter - they'll roll again after this turn.`, 'important');
+    updateItemButton();
+
+    showModal(
+        'All-Nighter',
+        `<p>${player.name} chugs an energy drink and gears up for another roll.</p>`,
+        [{ text: 'Buzzing', action: () => {} }]
+    );
+}
+
+function useInitiateScandalItem(player) {
+    const otherPlayers = GameState.players.filter(p => p.isAlive && p.index !== player.index);
+
+    if (otherPlayers.length === 0) {
+        showModal('Anonymous Tip', "<p>There's nobody left to leak dirt on.</p>", [{ text: 'Shucks', action: () => {} }]);
+        return;
+    }
+
+    showModal(
+        'Anonymous Tip',
+        `
+        <p>Who are you leaking dirt on?</p>
+        <div class="collaborator-choices">
+            ${otherPlayers.map(p => `<button type="button" class="sketch-btn scandal-target-btn" data-player-index="${p.index}" style="border-color: ${p.color}; color: ${p.color};">${p.name}</button>`).join('')}
+        </div>
+        `,
+        []
+    );
+
+    document.querySelectorAll('.scandal-target-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = GameState.players[Number(btn.dataset.playerIndex)];
+            player.items[ITEM_TYPES.INITIATE_SCANDAL]--;
+            const { blocked, fameLoss } = applyScandal(target, rollDice() + 3);
+            log(`${player.name} leaked dirt on ${target.name}.`, 'important');
+
+            showModal(
+                'Anonymous Tip',
+                blocked
+                    ? `<p><span style="color: ${target.color};">${target.name}</span>'s Tenure protects them - the tip goes nowhere.</p>`
+                    : `<p><span style="color: ${target.color};">${target.name}</span> loses <span style="color: #e74c3c;">${fameLoss} fame</span> in the fallout.</p>`,
+                [{ text: 'Sent', action: () => { updatePlayerStats(); updateItemButton(); } }]
+            );
+        });
+    });
+}
+
+// AI probabilistically uses banked items right before their turn passes to the next player
+function maybeUseAIItems(player) {
+    if (player.items[ITEM_TYPES.INITIATE_SCANDAL] > 0 && Math.random() > 0.5) {
+        const target = GameState.players
+            .filter(p => p.isAlive && p.index !== player.index)
+            .sort((a, b) => b.totalFame - a.totalFame)[0];
+        if (target) {
+            player.items[ITEM_TYPES.INITIATE_SCANDAL]--;
+            const { blocked, fameLoss } = applyScandal(target, rollDice() + 3);
+            log(blocked
+                ? `${player.name} tried to leak dirt on ${target.name}, but Tenure protected them.`
+                : `${player.name} leaked dirt on ${target.name}, who lost ${fameLoss} fame.`, 'important');
+        }
+    }
+
+    if (player.items[ITEM_TYPES.EXTRA_TURN] > 0 && Math.random() > 0.4) {
+        player.items[ITEM_TYPES.EXTRA_TURN]--;
+        player.pendingExtraTurns++;
+        log(`${player.name} pulled an All-Nighter and will go again.`, 'important');
+    }
+
+    updatePlayerStats();
 }
 
 async function handleEurekaSpace(player) {
@@ -677,6 +912,9 @@ function handleSpaceLanding(player, space) {
             break;
         case SPACE_TYPES.EUREKA:
             handleEurekaSpace(player);
+            break;
+        case SPACE_TYPES.INSTITUTION:
+            handleInstitutionSpace(player);
             break;
         default:
             endTurn();
@@ -1278,6 +1516,7 @@ function updateTurnDisplay() {
     document.getElementById('current-turn').style.color = player.color;
     updatePlayerStats();
     updateTeamArgumentDisplay(player);
+    updateItemButton();
 
     // If current player is AI, automatically start their turn
     if (player.isAI && player.isAlive && !GameState.gameOver && !GameState.animation.active) {
@@ -1312,6 +1551,19 @@ function updateTurnDisplay() {
 }
 
 function endTurn() {
+    const endingPlayer = GameState.players[GameState.currentPlayerIndex];
+
+    if (endingPlayer && endingPlayer.isAI) {
+        maybeUseAIItems(endingPlayer);
+    }
+
+    if (endingPlayer && endingPlayer.pendingExtraTurns > 0) {
+        endingPlayer.pendingExtraTurns--;
+        log(`${endingPlayer.name} gets to go again!`, 'important');
+        updateTurnDisplay();
+        return;
+    }
+
     // Check if all players have gone, then NPC takes turn
     const startIndex = GameState.currentPlayerIndex;
     nextPlayer();
@@ -1332,7 +1584,8 @@ function playerRollDice() {
     document.getElementById('roll-dice-btn').disabled = true;
     playSound('dice');
 
-    const roll = rollDice();
+    const roll = player.pendingDiceOverride ?? rollDice();
+    player.pendingDiceOverride = null;
     log(`${player.name} rolled a ${roll}`);
 
     // Animate dice rolling
