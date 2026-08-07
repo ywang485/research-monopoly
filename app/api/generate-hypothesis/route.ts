@@ -15,15 +15,18 @@ export async function POST(request: Request) {
   try {
     let hypothesis: string
 
+    // This route is only ever called for AI players' own hypotheses (see ai.js
+    // generateLLMHypothesis) - never for human-facing suggestions - so it always
+    // uses the deliberately sloppy AI-slop style.
     switch (llm) {
       case 'openai':
-        hypothesis = await generateWithOpenAI(entity, existingHypotheses, provenHypotheses, teamArgument)
+        hypothesis = await generateWithOpenAI(entity, existingHypotheses, provenHypotheses, teamArgument, true)
         break
       case 'anthropic':
-        hypothesis = await generateWithAnthropic(entity, existingHypotheses, provenHypotheses, teamArgument)
+        hypothesis = await generateWithAnthropic(entity, existingHypotheses, provenHypotheses, teamArgument, true)
         break
       case 'google':
-        hypothesis = await generateWithGoogle(entity, existingHypotheses, provenHypotheses, teamArgument)
+        hypothesis = await generateWithGoogle(entity, existingHypotheses, provenHypotheses, teamArgument, true)
         break
       default:
         throw new Error('Unknown LLM provider')

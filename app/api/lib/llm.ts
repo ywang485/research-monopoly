@@ -52,6 +52,18 @@ Your hypotheses should be:
 
 Generate ONLY the hypothesis text, no quotes or extra formatting.`;
 
+// Used only for AI players' own hypotheses (not human-facing suggestions) - deliberately
+// reads like classic low-effort AI slop: buzzwords, hedging, and confident vagueness.
+const AI_SLOP_SYSTEM_PROMPT = `You are a mediocre AI chatbot ghostwriting a pseudo-scientific hypothesis for a lazy academic, and it shows.
+Your hypotheses should be:
+- Written in obvious AI-slop style: buzzwords and empty intensifiers like "leverage", "synergy", "paradigm", "holistic", "robust", "cutting-edge", "game-changing", "seamlessly", "fundamentally", "arguably", "it's worth noting"
+- Confidently vague - sound impressive while saying very little, like a LinkedIn post crossed with a research abstract
+- Completely ridiculous but sound superficially plausible
+- Related to the given entity/topic
+- ONE single sentence of 3 to 15 words - short and punchy, no sub-clauses or run-ons
+
+Generate ONLY the hypothesis text, no quotes or extra formatting.`;
+
 const ADDITION_PROMPT = `You are a sarcastic academic colleague who loves to one-up other researchers with absurd elaborations.
 Given an existing hypothesis, generate a SHORT addition (1 sentence, under 100 characters) that:
 - Sarcastically "builds upon" the original in an absurd way
@@ -168,7 +180,7 @@ export function buildHypothesisPrompt(entity: string, existingHypotheses: string
   return prompt;
 }
 
-export async function generateWithOpenAI(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
+export async function generateWithOpenAI(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string, sloppyAI: boolean = false) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -179,7 +191,7 @@ export async function generateWithOpenAI(entity: string, existingHypotheses: str
       body: JSON.stringify({
         model: MODELS.openai,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: sloppyAI ? AI_SLOP_SYSTEM_PROMPT : SYSTEM_PROMPT },
           { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument) }
         ],
         max_tokens: 40,
@@ -193,7 +205,7 @@ export async function generateWithOpenAI(entity: string, existingHypotheses: str
   });
 }
 
-export async function generateWithAnthropic(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
+export async function generateWithAnthropic(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string, sloppyAI: boolean = false) {
   return retryWithBackoff(async () => {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -205,7 +217,7 @@ export async function generateWithAnthropic(entity: string, existingHypotheses: 
       body: JSON.stringify({
         model: MODELS.anthropic,
         max_tokens: 40,
-        system: SYSTEM_PROMPT,
+        system: sloppyAI ? AI_SLOP_SYSTEM_PROMPT : SYSTEM_PROMPT,
         messages: [
           { role: 'user', content: buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument) }
         ]
@@ -218,7 +230,7 @@ export async function generateWithAnthropic(entity: string, existingHypotheses: 
   });
 }
 
-export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string) {
+export async function generateWithGoogle(entity: string, existingHypotheses: string[] = [], provenHypotheses: string[] = [], teamArgument?: string, sloppyAI: boolean = false) {
   const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
   const model = genAI.getGenerativeModel({
     model: MODELS.google,
@@ -228,7 +240,7 @@ export async function generateWithGoogle(entity: string, existingHypotheses: str
     }
   });
 
-  const prompt = `${SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument)}`;
+  const prompt = `${sloppyAI ? AI_SLOP_SYSTEM_PROMPT : SYSTEM_PROMPT}\n\n${buildHypothesisPrompt(entity, existingHypotheses, provenHypotheses, teamArgument)}`;
   const result = await model.generateContent(prompt);
   const response = result.response;
   return capWords(response.text().trim());
