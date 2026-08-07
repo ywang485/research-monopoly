@@ -68,7 +68,7 @@ class Player {
         this.isAlive = true;
         this.isAI = isAI;
         this.groupId = null;
-        this.items = { [ITEM_TYPES.LOADED_DICE]: 1 }; // { [itemId]: count } - everyone starts with 1 Loaded Dice
+        this.items = { [ITEM_TYPES.LOADED_DICE]: 1 }; // { [itemId]: count } - everyone starts with 1 p-Hacked Results
         this.pendingExtraTurns = 0;
         this.pendingDiceOverride = null;
     }
@@ -665,7 +665,7 @@ function useLoadedDiceItem(player) {
     ).join('');
 
     showModal(
-        'Loaded Dice',
+        'p-Hacked Results',
         `<p>Pick the value you want on your next roll.</p><div class="dice-pick-choices">${numberButtons}</div>`,
         []
     );
@@ -675,7 +675,7 @@ function useLoadedDiceItem(player) {
             const value = Number(btn.dataset.value);
             player.items[ITEM_TYPES.LOADED_DICE]--;
             player.pendingDiceOverride = value;
-            log(`${player.name} used Loaded Dice - next roll will be a ${value}.`, 'important');
+            log(`${player.name} p-hacked their results - next roll will be a ${value}.`, 'important');
             hideModal();
             updateItemButton();
         });
@@ -699,14 +699,14 @@ function useInitiateScandalItem(player) {
     const otherPlayers = GameState.players.filter(p => p.isAlive && p.index !== player.index);
 
     if (otherPlayers.length === 0) {
-        showModal('Anonymous Tip', "<p>There's nobody left to leak dirt on.</p>", [{ text: 'Shucks', action: () => {} }]);
+        showModal('Reviewer #2', "<p>There's nobody left to subject to peer review.</p>", [{ text: 'Shucks', action: () => {} }]);
         return;
     }
 
     showModal(
-        'Anonymous Tip',
+        'Reviewer #2',
         `
-        <p>Who are you leaking dirt on?</p>
+        <p>Who's getting the Reviewer #2 treatment?</p>
         <div class="collaborator-choices">
             ${otherPlayers.map(p => `<button type="button" class="sketch-btn scandal-target-btn" data-player-index="${p.index}" style="border-color: ${p.color}; color: ${p.color};">${p.name}</button>`).join('')}
         </div>
@@ -719,13 +719,13 @@ function useInitiateScandalItem(player) {
             const target = GameState.players[Number(btn.dataset.playerIndex)];
             player.items[ITEM_TYPES.INITIATE_SCANDAL]--;
             const { blocked, fameLoss } = applyScandal(target, rollDice() + 3);
-            log(`${player.name} leaked dirt on ${target.name}.`, 'important');
+            log(`${player.name} sicced Reviewer #2 on ${target.name}.`, 'important');
 
             showModal(
-                'Anonymous Tip',
+                'Reviewer #2',
                 blocked
-                    ? `<p><span style="color: ${target.color};">${target.name}</span>'s Tenure protects them - the tip goes nowhere.</p>`
-                    : `<p><span style="color: ${target.color};">${target.name}</span> loses <span style="color: #e74c3c;">${fameLoss} fame</span> in the fallout.</p>`,
+                    ? `<p><span style="color: ${target.color};">${target.name}</span>'s Tenure protects them - Reviewer #2's rage bounces right off.</p>`
+                    : `<p><span style="color: ${target.color};">${target.name}</span> loses <span style="color: #e74c3c;">${fameLoss} fame</span> after a scathing "reject" verdict.</p>`,
                 [{ text: 'Sent', action: () => { updatePlayerStats(); updateItemButton(); } }]
             );
         });
@@ -742,8 +742,8 @@ function maybeUseAIItems(player) {
             player.items[ITEM_TYPES.INITIATE_SCANDAL]--;
             const { blocked, fameLoss } = applyScandal(target, rollDice() + 3);
             log(blocked
-                ? `${player.name} tried to leak dirt on ${target.name}, but Tenure protected them.`
-                : `${player.name} leaked dirt on ${target.name}, who lost ${fameLoss} fame.`, 'important');
+                ? `${player.name} sicced Reviewer #2 on ${target.name}, but Tenure protected them.`
+                : `${player.name} sicced Reviewer #2 on ${target.name}, who lost ${fameLoss} fame.`, 'important');
         }
     }
 

@@ -436,11 +436,11 @@ function executeAITurn(player) {
     setTimeout(() => {
         playSound('dice');
 
-        // Decide whether to use a banked Loaded Dice before rolling (simple v1 heuristic: always max it out)
+        // Decide whether to use banked p-Hacked Results before rolling (simple v1 heuristic: always max it out)
         if (player.pendingDiceOverride === null && player.items[ITEM_TYPES.LOADED_DICE] > 0 && Math.random() > 0.5) {
             player.items[ITEM_TYPES.LOADED_DICE]--;
             player.pendingDiceOverride = 6;
-            log(`${player.name} used Loaded Dice to guarantee a 6.`, 'important');
+            log(`${player.name} p-hacked their results to guarantee a 6.`, 'important');
         }
 
         const roll = player.pendingDiceOverride ?? rollDice();

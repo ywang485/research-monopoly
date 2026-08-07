@@ -77,10 +77,10 @@ const ITEM_TYPES = {
 
 const ITEMS = {
     [ITEM_TYPES.LOADED_DICE]: {
-        name: 'Loaded Dice',
+        name: 'p-Hacked Results',
         icon: '🎲',
         cost: 12,
-        description: 'Next time you roll, pick any value 1-6 instead of leaving it to chance.'
+        description: 'Torture the data until it confesses - next time you roll, pick any value 1-6 instead of leaving it to chance.'
     },
     [ITEM_TYPES.EXTRA_TURN]: {
         name: 'All-Nighter',
@@ -89,10 +89,10 @@ const ITEMS = {
         description: 'Roll again immediately after your current turn ends.'
     },
     [ITEM_TYPES.INITIATE_SCANDAL]: {
-        name: 'Anonymous Tip',
+        name: 'Reviewer #2',
         icon: '📰',
         cost: 15,
-        description: 'Leak dirt on a rival - they immediately lose fame.'
+        description: "Sic the most notoriously harsh reviewer in academia on a rival's work - they immediately lose fame."
     },
     [ITEM_TYPES.SCANDAL_IMMUNITY]: {
         name: 'Tenure',
@@ -135,7 +135,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
     [SPACE_TYPES.COLLABORATION]: 'Team up with a colleague! Gain 2 fame and rejuvenate by 1 year through shared research.',
     [SPACE_TYPES.EUREKA]: 'A flash of brilliance! Claim the nearest uninvested hypothesis space for FREE (no life cost).',
-    [SPACE_TYPES.INSTITUTION]: 'Spend fame on items that give you an edge: control your dice roll, take an extra turn, leak dirt on a rival, or protect yourself from scandal.'
+    [SPACE_TYPES.INSTITUTION]: 'Spend fame on items that give you an edge: control your dice roll, take an extra turn, sic Reviewer #2 on a rival, or protect yourself from scandal.'
 };
 
 const MAX_AGE = 80;
