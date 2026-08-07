@@ -470,6 +470,43 @@ function renderBoard() {
 
     });
 
+    // Draw the game title + fame leaderboard as one vertically-centered block
+    // in the empty space inside the board loop
+    const sortedPlayers = [...GameState.players].sort((a, b) => b.totalFame - a.totalFame);
+    const titleFontSize = Math.floor(logicalBoardWidth * 0.09);
+    const lbFontSize = Math.max(10, Math.floor(logicalBoardWidth * 0.02));
+    const lbLineHeight = lbFontSize * 1.5;
+    const titleToLeaderboardGap = logicalBoardWidth * 0.03;
+
+    const titleBlockHeight = titleFontSize;
+    const leaderboardBlockHeight = sortedPlayers.length * lbLineHeight;
+    const totalBlockHeight = titleBlockHeight + titleToLeaderboardGap + leaderboardBlockHeight;
+
+    const blockTop = logicalBoardHeight / 2 - totalBlockHeight / 2;
+    const titleCenterY = blockTop + titleBlockHeight / 2;
+    const leaderboardStartY = blockTop + titleBlockHeight + titleToLeaderboardGap;
+
+    ctx.save();
+    ctx.translate(logicalBoardWidth / 2, titleCenterY);
+    ctx.rotate(-3 * Math.PI / 180);
+    ctx.fillStyle = 'rgba(44, 62, 80, 0.15)';
+    ctx.font = `bold ${titleFontSize}px "Indie Flower", cursive`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Theoropoly', 0, 0);
+    ctx.restore();
+
+    ctx.font = `${lbFontSize}px "Indie Flower", cursive`;
+    ctx.fillStyle = 'rgba(44, 62, 80, 0.4)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    let lbY = leaderboardStartY;
+    sortedPlayers.forEach((player, idx) => {
+        const line = `${idx + 1}. ${player.name} - ${player.totalFame} fame, ${player.theoriesPublished.length} pubs, ${player.students.length} students`;
+        ctx.fillText(line, logicalBoardWidth / 2, lbY);
+        lbY += lbLineHeight;
+    });
+
     // Draw players (pencil-sketch circle tokens)
     GameState.players.forEach((player, pIndex) => {
         if (!player.isAlive) return;

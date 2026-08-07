@@ -3,7 +3,7 @@ export default function Footer() {
 
   return (
     <footer className="game-footer">
-      <p>&copy; {currentYear} Scientific Research is Gambling with Your Life. Created by <a href="https://ywang485.github.io">Yi</a>.</p>
+      <p>&copy; {currentYear} Theoropoly created by <a href="https://ywang485.github.io">Yi</a>.</p>
     </footer>
   )
 }

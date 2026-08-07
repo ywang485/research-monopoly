@@ -2157,9 +2157,9 @@ select {
     border: 3px solid var(--ink-dark);
     padding: 15px;
     font-family: var(--font-handwriting);
-    font-size: 14px;
+    font-size: 18px;
     z-index: 1000;
-    max-width: 280px;
+    max-width: 340px;
     pointer-events: none;
     display: none;
     box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
@@ -2173,7 +2173,7 @@ select {
 
 .board-tooltip .tooltip-title {
     font-family: var(--font-pixel);
-    font-size: 9px;
+    font-size: 12px;
     color: var(--pencil-blue);
     margin-bottom: 8px;
     padding-bottom: 6px;
@@ -2185,13 +2185,13 @@ select {
     font-family: var(--font-notes);
     color: var(--pencil-purple);
     margin-bottom: 6px;
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .board-tooltip .tooltip-desc {
     color: var(--ink-light);
     margin-bottom: 8px;
-    font-size: 13px;
+    font-size: 16px;
 }
 
 .board-tooltip .tooltip-hypothesis {
@@ -2221,7 +2221,7 @@ select {
     display: flex;
     justify-content: space-between;
     padding: 4px 0;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--ink-light);
 }
 
@@ -2235,7 +2235,7 @@ select {
     padding-top: 8px;
     border-top: 1px dotted var(--paper-shadow);
     font-family: var(--font-notes);
-    font-size: 12px;
+    font-size: 15px;
 }
 
 .board-tooltip .tooltip-status.empty {
@@ -2258,7 +2258,7 @@ select {
     margin-bottom: 6px;
     padding-bottom: 6px;
     border-bottom: 1px dotted var(--paper-shadow);
-    font-size: 13px;
+    font-size: 16px;
 }
 
 .board-tooltip .tooltip-contribution:last-child {
@@ -2269,7 +2269,7 @@ select {
 
 .board-tooltip .tooltip-contribution-author {
     color: var(--pencil-purple);
-    font-size: 11px;
+    font-size: 14px;
     margin-bottom: 2px;
 }
 
