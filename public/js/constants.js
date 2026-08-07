@@ -202,12 +202,4 @@ EUREKA|Breakthrough Moment|0
 HYPOTHESIS|Research Question 11|2
 RECRUIT|Research Internship|0
 HYPOTHESIS|Research Question 12|3
-GRANT|Major Funding|0
-HYPOTHESIS|Research Question 13|4
-RECRUIT|Faculty Hiring|0
-HYPOTHESIS|Research Question 14|3
-CONFERENCE|Global Conference|0
-HYPOTHESIS|Research Question 15|2
-RECRUIT|Visiting Scholar Program|0
-HYPOTHESIS|Research Question 16|4
 `;
