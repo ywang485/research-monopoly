@@ -24,6 +24,13 @@ function resetUsedNames() {
     usedNames.clear();
 }
 
+// No uniqueness tracking - students are plentiful and disposable, unlike players
+function generateStudentName() {
+    const first = STUDENT_FIRST_NAMES[Math.floor(Math.random() * STUDENT_FIRST_NAMES.length)];
+    const last = STUDENT_LAST_NAMES[Math.floor(Math.random() * STUDENT_LAST_NAMES.length)];
+    return `${first} ${last}`;
+}
+
 // ============================================
 // GAME UTILITIES
 // ============================================

@@ -82,7 +82,7 @@ class Player {
         // Years until death plus student years
         let years = MAX_AGE - this.age;
         this.students.forEach(s => {
-            years += STUDENT_TYPES[s].years;
+            years += STUDENT_TYPES[s.type].years;
         });
         return years;
     }
@@ -112,21 +112,36 @@ class Player {
         }
     }
 
-    investLife(years, useStudents = true) {
+    // studentSelection: optional array of indices into this.students that the player explicitly
+    // chose to sacrifice. Omit (or pass null) for automatic cheapest-first selection (used by AI).
+    investLife(years, studentSelection = null) {
         let yearsToInvest = years;
         let studentsUsed = [];
 
-        if (useStudents) {
-            // Use students first (prioritize lower value students)
+        if (studentSelection) {
+            // Player's explicit choice - consume exactly these students, regardless of fit
+            // (sacrificing an oversized student is allowed, the extra years are just wasted).
+            // Remove highest index first so earlier indices stay valid as we splice.
+            const indices = [...new Set(studentSelection)].sort((a, b) => b - a);
+            indices.forEach(idx => {
+                const student = this.students[idx];
+                if (student !== undefined) {
+                    yearsToInvest -= STUDENT_TYPES[student.type].years;
+                    studentsUsed.push(student);
+                    this.students.splice(idx, 1);
+                }
+            });
+        } else {
+            // No explicit selection - automatic cheapest-first consumption
             const studentOrder = ['undergraduate', 'master', 'phd'];
             for (const type of studentOrder) {
-                while (yearsToInvest > 0 && this.students.includes(type)) {
+                while (yearsToInvest > 0 && this.students.some(s => s.type === type)) {
                     const studentYears = STUDENT_TYPES[type].years;
                     if (studentYears <= yearsToInvest) {
                         yearsToInvest -= studentYears;
-                        const idx = this.students.indexOf(type);
-                        this.students.splice(idx, 1);
-                        studentsUsed.push(type);
+                        const idx = this.students.findIndex(s => s.type === type);
+                        const [student] = this.students.splice(idx, 1);
+                        studentsUsed.push(student);
                     } else {
                         break;
                     }
@@ -144,7 +159,7 @@ class Player {
             this.die();
         }
 
-        return { studentsUsed, personalYears: yearsToInvest };
+        return { studentsUsed, personalYears: Math.max(0, yearsToInvest) };
     }
 
     die() {
@@ -197,9 +212,10 @@ class Player {
     hireStudent(type) {
         const cost = STUDENT_TYPES[type].cost;
         if (this.spendFame(cost)) {
-            this.students.push(type);
+            const name = generateStudentName();
+            this.students.push({ type, name });
             playSound('hire');
-            log(`${this.name} hired a ${STUDENT_TYPES[type].name} for ${cost} fame.`);
+            log(`${this.name} hired ${name} as a ${STUDENT_TYPES[type].name} for ${cost} fame.`);
             return true;
         }
         return false;
@@ -925,6 +941,50 @@ function handleSpaceLanding(player, space) {
     }
 }
 
+// Renders a checkbox per owned student so the player can choose which ones to
+// sacrifice toward an investment's cost, instead of always spending cheapest-first.
+function renderStudentSelectionHTML(player) {
+    if (player.students.length === 0) return '';
+
+    const rows = player.students.map((student, idx) => `
+        <label class="student-select-row">
+            <input type="checkbox" class="student-select-checkbox" data-index="${idx}" data-years="${STUDENT_TYPES[student.type].years}">
+            ${student.name} <span class="student-select-years">(${STUDENT_TYPES[student.type].name}, ${STUDENT_TYPES[student.type].years}y)</span>
+        </label>
+    `).join('');
+
+    return `
+        <div class="input-group student-select-group">
+            <label>Sacrifice students to cover the cost (optional):</label>
+            <div class="student-select-list">${rows}</div>
+            <p class="info-text">Personal years needed: <span class="personal-years-remaining">-</span></p>
+        </div>
+    `;
+}
+
+// Keeps the "Personal years needed" readout in sync as checkboxes (or the cost itself) change.
+// Returns the update function so callers can also hook it up to a cost input, or null if
+// there's nothing to wire (player has no students).
+function wireStudentSelectionLiveUpdate(getCost) {
+    const checkboxes = document.querySelectorAll('.student-select-checkbox');
+    const summaryEl = document.querySelector('.personal-years-remaining');
+    if (checkboxes.length === 0 || !summaryEl) return null;
+
+    const update = () => {
+        const selectedYears = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .reduce((sum, cb) => sum + Number(cb.dataset.years), 0);
+        summaryEl.textContent = Math.max(0, getCost() - selectedYears);
+    };
+    checkboxes.forEach(cb => cb.addEventListener('change', update));
+    update();
+    return update;
+}
+
+function getSelectedStudentIndices() {
+    return Array.from(document.querySelectorAll('.student-select-checkbox:checked')).map(cb => Number(cb.dataset.index));
+}
+
 async function handleHypothesisSpace(player, space) {
     // Pronoun helpers for AI vs human players
     const you = player.isAI ? player.name : 'You';
@@ -943,6 +1003,7 @@ async function handleHypothesisSpace(player, space) {
             `
             <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
             <p>Invest <span style="color: #e74c3c;">${space.investmentCost} years</span> to claim this territory before someone else does.</p>
+            ${renderStudentSelectionHTML(player)}
             ${canAfford && GameState.suggestHypothesesForHumans ? `
             <div class="suggestions-container">
                 <label>AI-generated hypotheses (because originality is hard):</label>
@@ -968,7 +1029,7 @@ async function handleHypothesisSpace(player, space) {
                             space.hypothesis = hypothesis;
                             space.contributions.push({ text: hypothesis, author: player.name, playerIndex: player.index });
                             space.investments.push({ player: player.name, years: space.investmentCost, playerIndex: player.index });
-                            player.investLife(space.investmentCost);
+                            player.investLife(space.investmentCost, getSelectedStudentIndices());
                             log(`${player.name} proposed: "${hypothesis}" and invested ${space.investmentCost} years.`, 'important');
                             renderBoard();
                             updatePlayerStats();
@@ -990,6 +1051,8 @@ async function handleHypothesisSpace(player, space) {
         hypothesisInput.addEventListener('input', () => {
             investButton.disabled = !hypothesisInput.value.trim() || !canAfford;
         });
+
+        wireStudentSelectionLiveUpdate(() => space.investmentCost);
 
         // Fetch suggestions asynchronously and update the modal (only if player can afford and it's enabled)
         if (canAfford && GameState.suggestHypothesesForHumans) {
@@ -1038,6 +1101,7 @@ async function handleHypothesisSpace(player, space) {
                 <label>How many years to waste on this?</label>
                 <input type="number" id="investment-years" min="1" max="${availableYears}" value="1" placeholder="Years to invest">
             </div>
+            ${renderStudentSelectionHTML(player)}
             <p class="info-text">Life years remaining: <span style="color: #e74c3c;">${availableYears}</span></p>
             ${availableYears < 1 ? `<p style="color: #a86060;">${you} literally can't afford any investment.</p>` : ''}
             `,
@@ -1069,7 +1133,7 @@ async function handleHypothesisSpace(player, space) {
                             } else {
                                 space.investments.push({ player: player.name, years: yearsToInvest, playerIndex: player.index });
                             }
-                            player.investLife(yearsToInvest);
+                            player.investLife(yearsToInvest, getSelectedStudentIndices());
                             log(`${player.name} invested ${yearsToInvest} years in the hypothesis.`);
                             renderBoard();
                             updatePlayerStats();
@@ -1087,6 +1151,12 @@ async function handleHypothesisSpace(player, space) {
                 }
             ]
         );
+
+        const investmentYearsInput = document.getElementById('investment-years');
+        const updateStudentSummary = wireStudentSelectionLiveUpdate(() => parseInt(investmentYearsInput.value) || 0);
+        if (updateStudentSummary) {
+            investmentYearsInput.addEventListener('input', updateStudentSummary);
+        }
     } else {
         // Already proven - check if player is the leading investor
 
@@ -1243,15 +1313,16 @@ function handleCommunityServiceSpace(player) {
 
     if (player.students.length > 0) {
         // Player has students - offer choice to sacrifice one
-        const studentType = player.students[0];
-        const studentName = STUDENT_TYPES[studentType].name;
+        const student = player.students[0];
+        const studentName = student.name;
+        const studentTypeName = STUDENT_TYPES[student.type].name;
 
         showModal(
             'Community Service',
             `
             <p>Oh no! ${you}'ve been assigned mandatory community service work.</p>
             <p>This will cost ${you_lower} <strong><span style="color: #e74c3c;">${serviceCost} years</span></strong> of ${your} precious research time.</p>
-            <p class="info-text">BUT WAIT... ${you_lower} have a <span style="color: #e74c3c;">${studentName}</span> who could take ${your} place!</p>
+            <p class="info-text">BUT WAIT... ${you_lower} have <span style="color: #e74c3c;">${studentName}</span>, a ${studentTypeName}, who could take ${your} place!</p>
             <p>What will ${you_lower} do?</p>
             `,
             [
@@ -1261,14 +1332,14 @@ function handleCommunityServiceSpace(player) {
                     action: () => {
                         // Remove the first student
                         const sacrificedStudent = player.students.shift();
-                        const sacrificedName = STUDENT_TYPES[sacrificedStudent].name;
+                        const sacrificedName = sacrificedStudent.name;
 
-                        log(`${player.name} sacrificed their ${sacrificedName} to avoid community service!`, 'important');
+                        log(`${player.name} sacrificed ${sacrificedName} to avoid community service!`, 'important');
 
                         showModal(
                             'Student Sacrificed',
                             `
-                            <p>${you} threw ${your} <span style="color: #e74c3c;">${sacrificedName}</span> under the bus!</p>
+                            <p>${you} threw ${your} student <span style="color: #e74c3c;">${sacrificedName}</span> under the bus!</p>
                             <p>They're now spending their days picking up litter instead of doing research.</p>
                             <p class="info-text">Academia: where we build character by crushing dreams!</p>
                             `,

@@ -43,6 +43,24 @@ const SCIENTIST_NAMES = [
 ];
 
 // ============================================
+// STUDENT NAMES
+// ============================================
+// Ordinary human names, deliberately - hiring "an Undergraduate" is abstract,
+// hiring (and later sacrificing) an actual named person is not.
+const STUDENT_FIRST_NAMES = [
+    'Alex', 'Jordan', 'Sam', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Jamie',
+    'Avery', 'Quinn', 'Priya', 'Wei', 'Fatima', 'Diego', 'Yuki', 'Emma',
+    'Liam', 'Noah', 'Olivia', 'Mateo', 'Amara', 'Kenji', 'Zara', 'Lucas',
+    'Ingrid', 'Chidi', 'Sofia', 'Hiro', 'Aisha', 'Pavel'
+];
+
+const STUDENT_LAST_NAMES = [
+    'Chen', 'Patel', 'Garcia', 'Kim', 'Müller', 'Okafor', 'Nguyen', 'Rossi',
+    'Johnson', 'Silva', 'Kowalski', 'Tanaka', 'Andersson', 'Hassan', 'Novak',
+    'Reyes', 'Dubois', 'Petrov', 'Yamamoto', 'Osei'
+];
+
+// ============================================
 // GAME CONSTANTS
 // ============================================
 const STUDENT_TYPES = {

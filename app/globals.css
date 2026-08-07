@@ -1535,6 +1535,38 @@ select {
     margin-top: 15px;
 }
 
+#modal-body .student-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+#modal-body .student-select-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-notes);
+    font-size: 15px;
+    color: var(--ink-dark);
+    cursor: pointer;
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.5);
+    border: 2px dashed var(--ink-light);
+    border-radius: 5px;
+    transition: all 0.15s ease;
+}
+
+#modal-body .student-select-row:has(input:checked) {
+    background: var(--highlight-purple, rgba(155,89,182,0.2));
+    border-color: var(--pencil-purple);
+}
+
+#modal-body .student-select-years {
+    color: var(--ink-light);
+    font-size: 13px;
+}
+
 #modal-body .shop-items {
     display: flex;
     flex-direction: column;
