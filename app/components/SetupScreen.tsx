@@ -74,6 +74,11 @@ export default function SetupScreen() {
             <label htmlFor="starting-age">Initial Player Age:</label>
             <input type="number" id="starting-age" min="1" max="79" defaultValue="70" />
           </div>
+          <div className="input-group">
+            <label className="ai-toggle">
+              <input type="checkbox" id="suggest-hypotheses-toggle" defaultChecked /> Suggest hypotheses for human players
+            </label>
+          </div>
         </div>
 
         <button id="start-game-btn" className="sketch-btn large">▶ START GAME!</button>

@@ -1354,6 +1354,10 @@ function startGame() {
     GameState.entity.type = document.getElementById('entity-type').value;
     GameState.entity.name = document.getElementById('entity-name').value || 'The Unknown';
 
+    // Get hypothesis suggestion preference
+    const suggestHypothesesToggle = document.getElementById('suggest-hypotheses-toggle');
+    GameState.suggestHypothesesForHumans = suggestHypothesesToggle ? suggestHypothesesToggle.checked : true;
+
     // Get starting age
     const startingAgeInput = document.getElementById('starting-age');
     let startingAge = STARTING_AGE;

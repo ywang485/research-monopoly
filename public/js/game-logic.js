@@ -22,6 +22,7 @@ const GameState = {
     isNPCTurn: false,
     gameOver: false,
     turnNumber: 1,
+    suggestHypothesesForHumans: true, // whether human players see AI-suggested hypotheses
     // LLM state
     llm: {
         available: false,
@@ -801,12 +802,14 @@ async function handleEurekaSpace(player) {
         <p style="color: #c8b070; font-size: 12px;">It came to ${you_lower} in the shower!</p>
         <p>A brilliant insight about <strong>${GameState.entity.name}</strong> just hit ${you_lower}!</p>
         <p>${you} can claim the next available research question (<strong>"${closestSpace.name}"</strong>) <span style="color: #2ecc71;">FOR FREE</span>!</p>
+        ${GameState.suggestHypothesesForHumans ? `
         <div class="suggestions-container">
             <label>AI-generated hypotheses (because originality is hard):</label>
             <div id="hypothesis-suggestions" class="hypothesis-suggestions">
                 <div class="suggestion-loading">Generating suggestions...</div>
             </div>
         </div>
+        ` : ''}
         <div class="input-group">
             <label>Or formulate ${your} eureka moment:</label>
             <textarea id="hypothesis-input" rows="3" placeholder="Enter ${your} hypothesis about ${GameState.entity.name}..."></textarea>
@@ -850,7 +853,8 @@ async function handleEurekaSpace(player) {
         claimButton.disabled = !hypothesisInput.value.trim();
     });
 
-    // Fetch suggestions asynchronously and update the modal
+    // Fetch suggestions asynchronously and update the modal (if enabled)
+    if (!GameState.suggestHypothesesForHumans) return;
     const suggestions = await fetchHypothesisSuggestions(3, player);
 
     if (suggestions && suggestions.length > 0) {
@@ -939,7 +943,7 @@ async function handleHypothesisSpace(player, space) {
             `
             <p>Nobody's wasted their life on this question about <strong>${GameState.entity.name}</strong> yet!</p>
             <p>Invest <span style="color: #e74c3c;">${space.investmentCost} years</span> to claim this territory before someone else does.</p>
-            ${canAfford ? `
+            ${canAfford && GameState.suggestHypothesesForHumans ? `
             <div class="suggestions-container">
                 <label>AI-generated hypotheses (because originality is hard):</label>
                 <div id="hypothesis-suggestions" class="hypothesis-suggestions">
@@ -987,8 +991,8 @@ async function handleHypothesisSpace(player, space) {
             investButton.disabled = !hypothesisInput.value.trim() || !canAfford;
         });
 
-        // Fetch suggestions asynchronously and update the modal (only if player can afford)
-        if (canAfford) {
+        // Fetch suggestions asynchronously and update the modal (only if player can afford and it's enabled)
+        if (canAfford && GameState.suggestHypothesesForHumans) {
             const suggestions = await fetchHypothesisSuggestions(3, player);
             const suggestionsContainer = document.getElementById('hypothesis-suggestions');
             if (suggestionsContainer) {
