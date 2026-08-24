@@ -71,6 +71,7 @@ class Player {
         this.groupId = null;
         this.items = { [ITEM_TYPES.LOADED_DICE]: 1 }; // { [itemId]: count } - everyone starts with 1 p-Hacked Results
         this.pendingExtraTurns = 0;
+        this.pendingSkippedTurns = 0;
         this.pendingDiceOverride = null;
     }
 
@@ -406,15 +407,17 @@ function handleConferenceSpace(player) {
 function handleSabbaticalSpace(player) {
     const you = player.isAI ? player.name : 'You';
     const you_lower = player.isAI ? player.name : 'you';
+    const your = player.isAI ? `${player.name}'s` : 'your';
 
-    player.rejuvenate(2);
+    const skippedTurns = Math.floor(Math.random() * 3) + 1; // 1-3, randomly determined
+    player.pendingSkippedTurns += skippedTurns;
 
     showModal(
         'Sabbatical Leave',
         `
         <p>${you} escaped to "write a book" (really just avoided emails for 6 months).</p>
-        <p><span style="color: #e74c3c;">-2 years</span> of aging from not attending meetings!</p>
-        <p class="info-text">${you}'ll definitely finish that book chapter... eventually.</p>
+        <p><span style="color: #e74c3c;">${you} will be gone for ${skippedTurns} turn${skippedTurns === 1 ? '' : 's'}</span> - conveniently missing every deadline.</p>
+        <p class="info-text">${your} inbox will be a nightmare when ${you_lower} get back.</p>
         `,
         [{ text: 'Bliss', action: () => { updatePlayerStats(); endTurn(); } }]
     );
@@ -1592,6 +1595,27 @@ function updateTurnDisplay() {
             endTurn();
             return;
         }
+    }
+
+    // Burn a sabbatical-skipped turn instead of letting the player act
+    if (player.isAlive && player.pendingSkippedTurns > 0) {
+        player.pendingSkippedTurns--;
+        log(`${player.name} is on sabbatical and skips this turn (${player.pendingSkippedTurns} more to go).`, 'important');
+
+        if (player.isAI) {
+            // No human interaction needed to skip an AI's own turn
+            endTurn();
+        } else {
+            showModal(
+                'On Sabbatical',
+                `
+                <p>${player.name} is still "finding themselves" and skips this turn.</p>
+                <p class="info-text">${player.pendingSkippedTurns > 0 ? `${player.pendingSkippedTurns} more turn${player.pendingSkippedTurns === 1 ? '' : 's'} of blissful avoidance remain.` : 'Welcome back to the grind.'}</p>
+                `,
+                [{ text: 'Sigh', action: () => endTurn() }]
+            );
+        }
+        return;
     }
 
     const aiIndicator = player.isAI ? ' (AI)' : '';

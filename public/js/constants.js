@@ -147,7 +147,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.HYPOTHESIS]: 'A research opportunity! Create a new hypothesis or invest in an existing one. If Scientific Underdeterminism lands here, the hypothesis becomes a proven theory.',
     [SPACE_TYPES.RECRUIT]: 'Graduate recruitment center. Spend fame points to hire students who extend your available research years.',
     [SPACE_TYPES.CONFERENCE]: "Present your work and gain recognition! ",
-    [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break. Rejuvenate by 3 years of life.',
+    [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break - but you\'ll skip your next 1-3 turns while you\'re gone, randomly determined.',
     [SPACE_TYPES.COMMUNITY_SERVICE]: 'Forced to do community service! Lose years to service work, but you can sacrifice a student to get away with it.',
     [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 1-6 fame points from your peers.',
     [SPACE_TYPES.SCANDAL]: 'Academic misconduct allegations! Lose 5 fame points as your reputation suffers.',
