@@ -424,17 +424,18 @@ function handleGrantSpace(player) {
     const you = player.isAI ? player.name : 'you';
     const your = player.isAI ? `${player.name}'s` : 'your';
 
-    player.addFame(2);
+    const fameGain = rollDice();
+    player.addFame(fameGain);
 
     showModal(
         'Research Grant!',
         `
         <div class="dice-container">
             <span class="dice">💰</span>
-            <div class="dice-result"><span style="color: #e74c3c;">+2 Fame!</span></div>
+            <div class="dice-result"><span style="color: #e74c3c;">+${fameGain} Fame!</span></div>
         </div>
         <p>After only 47 revisions and 3 panel reviews, they actually gave ${you} money!</p>
-        <p><span style="color: #e74c3c;">+2 fame</span> (mostly from other academics jealous of ${your} funding)</p>
+        <p><span style="color: #e74c3c;">+${fameGain} fame</span> (mostly from other academics jealous of ${your} funding)</p>
         <p class="info-text">Now if only the grant actually covered ${your} students' stipends...</p>
         `,
         [{ text: 'Finally!', action: () => { updatePlayerStats(); endTurn(); } }]
