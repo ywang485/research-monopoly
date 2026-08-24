@@ -146,7 +146,7 @@ const SPACE_DESCRIPTIONS = {
     [SPACE_TYPES.START]: 'Begin your academic journey! Passing this space rejuvenates you by 2 years.',
     [SPACE_TYPES.HYPOTHESIS]: 'A research opportunity! Create a new hypothesis or invest in an existing one. If Scientific Underdeterminism lands here, the hypothesis becomes a proven theory.',
     [SPACE_TYPES.RECRUIT]: 'Graduate recruitment center. Spend fame points to hire students who extend your available research years.',
-    [SPACE_TYPES.CONFERENCE]: 'Present your work and gain recognition! Earn 3 fame points for attending.',
+    [SPACE_TYPES.CONFERENCE]: "Present your work and gain recognition! ",
     [SPACE_TYPES.SABBATICAL]: 'Take a well-deserved break. Rejuvenate by 3 years of life.',
     [SPACE_TYPES.COMMUNITY_SERVICE]: 'Forced to do community service! Lose years to service work, but you can sacrifice a student to get away with it.',
     [SPACE_TYPES.GRANT]: 'Research funding! Receive a grant and gain 2 fame points from your peers.',

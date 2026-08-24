@@ -349,6 +349,8 @@ function handleStartSpace(player) {
     );
 }
 
+const CONFERENCE_SIGNIFICANCE_FAME_FACTOR = 0.3;
+
 function handleConferenceSpace(player) {
     const you = player.isAI ? player.name : 'You';
     const you_lower = player.isAI ? player.name : 'you';
@@ -356,16 +358,16 @@ function handleConferenceSpace(player) {
 
     // Check if player has any publications
     if (player.theoriesPublished.length === 0) {
-        // Small fame gain for just attending
-        const smallFameGain = 1;
-        player.addFame(smallFameGain);
+        // Random fame gain (1-6) for just attending
+        const fameGain = rollDice();
+        player.addFame(fameGain);
 
         showModal(
             'Academic Conference',
             `
             <div class="dice-container">
                 <span class="dice">🎲</span>
-                <div class="dice-result"><span style="color: #e74c3c;">+${smallFameGain} Fame</span></div>
+                <div class="dice-result"><span style="color: #e74c3c;">+${fameGain} Fame</span></div>
             </div>
             <p>${you} showed up to the conference, but realized ${you_lower} have nothing to present.</p>
             <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
@@ -376,22 +378,26 @@ function handleConferenceSpace(player) {
         return;
     }
 
-    // Randomly select one of player's published hypotheses
+    // Reward scales with the player's established theories, weighted by significance -
+    // a prolific, high-impact researcher draws a bigger crowd than a one-hit wonder.
+    const establishedTheories = GameState.theories.filter(t => t.author === player.name);
+    const weightedSignificance = establishedTheories.reduce((sum, t) => sum + t.significance, 0);
+    const fameGain = Math.round(weightedSignificance * CONFERENCE_SIGNIFICANCE_FAME_FACTOR);
+    player.addFame(fameGain);
+
+    // Randomly select one of player's published hypotheses to showcase in the flavor text
     const randomIndex = Math.floor(Math.random() * player.theoriesPublished.length);
     const selectedHypothesis = player.theoriesPublished[randomIndex];
-
-    const fameGain = rollDice() + 2;
-    player.addFame(fameGain);
 
     showModal(
         'Academic Conference',
         `
         <div class="dice-container">
-            <span class="dice">🎲</span>
+            <span class="dice">🎓</span>
             <div class="dice-result"><span style="color: #e74c3c;">+${fameGain} Fame!</span></div>
         </div>
         <p>${you} traveled across the country to present ${your} groundbreaking work on <strong>"${selectedHypothesis}"</strong> in a windowless room to 6 people (3 were asleep).</p>
-        <p class="info-text">At least the hotel breakfast was mediocre!</p>
+        <p class="info-text">${establishedTheories.length} established theor${establishedTheories.length === 1 ? 'y' : 'ies'} (combined significance: ${weightedSignificance}) apparently counts for something.</p>
         `,
         [{ text: 'Worth it?', action: () => { updatePlayerStats(); endTurn(); } }]
     );
