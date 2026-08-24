@@ -1316,7 +1316,8 @@ function handleCommunityServiceSpace(player) {
     const you_lower = player.isAI ? player.name : 'you';
     const your = player.isAI ? `${player.name}'s` : 'your';
 
-    const serviceCost = 3; // Years of life spent on community service
+    const serviceCost = rollDice(); // Years of life spent on community service
+    const serviceCostLabel = `${serviceCost} year${serviceCost === 1 ? '' : 's'}`;
 
     if (player.students.length > 0) {
         // Player has students - offer choice to sacrifice one
@@ -1328,7 +1329,7 @@ function handleCommunityServiceSpace(player) {
             'Community Service',
             `
             <p>Oh no! ${you}'ve been assigned mandatory community service work.</p>
-            <p>This will cost ${you_lower} <strong><span style="color: #e74c3c;">${serviceCost} years</span></strong> of ${your} precious research time.</p>
+            <p>This will cost ${you_lower} <strong><span style="color: #e74c3c;">${serviceCostLabel}</span></strong> of ${your} precious research time.</p>
             <p class="info-text">BUT WAIT... ${you_lower} have <span style="color: #e74c3c;">${studentName}</span>, a ${studentTypeName}, who could take ${your} place!</p>
             <p>What will ${you_lower} do?</p>
             `,
@@ -1364,7 +1365,7 @@ function handleCommunityServiceSpace(player) {
                             'Community Service',
                             `
                             <p>${you} nobly chose to do the community service ${you_lower}self.</p>
-                            <p><span style="color: #e74c3c;">+${serviceCost} years</span> of aging from mindless bureaucratic tasks.</p>
+                            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from mindless bureaucratic tasks.</p>
                             <p class="info-text">${your} student is grateful... for now.</p>
                             `,
                             [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -1381,7 +1382,7 @@ function handleCommunityServiceSpace(player) {
             'Community Service',
             `
             <p>${you}'ve been assigned mandatory community service work!</p>
-            <p><span style="color: #e74c3c;">+${serviceCost} years</span> of aging from filling out forms and attending sensitivity training.</p>
+            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from filling out forms and attending sensitivity training.</p>
             <p class="info-text">If only ${you_lower} had a grad student to dump this on...</p>
             `,
             [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
