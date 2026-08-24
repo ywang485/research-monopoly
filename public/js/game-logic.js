@@ -1354,6 +1354,38 @@ function handleRecruitSpace(player) {
     }, 100);
 }
 
+// Sarcastic descriptions of what "community service" actually entails, scaled by how many
+// years it costs - the worse the roll, the more absurdly drawn-out the busywork gets.
+function getCommunityServiceFlavor(serviceCost) {
+    const flavors = [
+        {
+            task: 'sorting the recycling bins outside the department for one very long afternoon',
+            footer: "Barely a blip. You'll forget this by dinner."
+        },
+        {
+            task: 'stapling flyers for a bake sale that, tragically, nobody attended',
+            footer: 'A minor inconvenience, mostly to your dignity.'
+        },
+        {
+            task: 'sitting through a full semester of mandatory workshops taught by someone less qualified than you',
+            footer: 'Character-building, allegedly.'
+        },
+        {
+            task: 'chaperoning freshman orientation four separate times, each one worse than the last',
+            footer: 'A genuinely rough stretch.'
+        },
+        {
+            task: "serving on the department's Ethics Committee, which is somehow the least ethical place on campus",
+            footer: "That's a serious chunk of a career, gone."
+        },
+        {
+            task: 'trapped for half a decade on a committee formed to review the committee-formation process',
+            footer: 'Devastating. Bureaucracy wins again.'
+        }
+    ];
+    return flavors[Math.min(serviceCost, flavors.length) - 1];
+}
+
 function handleCommunityServiceSpace(player) {
     const you = player.isAI ? player.name : 'You';
     const you_lower = player.isAI ? player.name : 'you';
@@ -1361,6 +1393,7 @@ function handleCommunityServiceSpace(player) {
 
     const serviceCost = rollDice(); // Years of life spent on community service
     const serviceCostLabel = `${serviceCost} year${serviceCost === 1 ? '' : 's'}`;
+    const flavor = getCommunityServiceFlavor(serviceCost);
 
     if (player.students.length > 0) {
         // Player has students - offer choice to sacrifice one
@@ -1371,7 +1404,7 @@ function handleCommunityServiceSpace(player) {
         showModal(
             'Community Service',
             `
-            <p>Oh no! ${you}'ve been assigned mandatory community service work.</p>
+            <p>Oh no! ${you}'ve been assigned mandatory community service work: ${flavor.task}.</p>
             <p>This will cost ${you_lower} <strong><span style="color: #e74c3c;">${serviceCostLabel}</span></strong> of ${your} precious research time.</p>
             <p class="info-text">BUT WAIT... ${you_lower} have <span style="color: #e74c3c;">${studentName}</span>, a ${studentTypeName}, who could take ${your} place!</p>
             <p>What will ${you_lower} do?</p>
@@ -1391,7 +1424,7 @@ function handleCommunityServiceSpace(player) {
                             'Student Sacrificed',
                             `
                             <p>${you} threw ${your} student <span style="color: #e74c3c;">${sacrificedName}</span> under the bus!</p>
-                            <p>They're now spending their days picking up litter instead of doing research.</p>
+                            <p>They're now off ${flavor.task}, instead of doing research.</p>
                             <p class="info-text">Academia: where we build character by crushing dreams!</p>
                             `,
                             [{ text: 'No regrets', action: () => { updatePlayerStats(); endTurn(); } }]
@@ -1407,9 +1440,9 @@ function handleCommunityServiceSpace(player) {
                         showModal(
                             'Community Service',
                             `
-                            <p>${you} nobly chose to do the community service ${you_lower}self.</p>
-                            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from mindless bureaucratic tasks.</p>
-                            <p class="info-text">${your} student is grateful... for now.</p>
+                            <p>${you} nobly chose to do the community service ${you_lower}self: ${flavor.task}.</p>
+                            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from the ordeal.</p>
+                            <p class="info-text">${flavor.footer}</p>
                             `,
                             [{ text: 'Integrity?', action: () => { updatePlayerStats(); endTurn(); } }]
                         );
@@ -1424,9 +1457,9 @@ function handleCommunityServiceSpace(player) {
         showModal(
             'Community Service',
             `
-            <p>${you}'ve been assigned mandatory community service work!</p>
-            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from filling out forms and attending sensitivity training.</p>
-            <p class="info-text">If only ${you_lower} had a grad student to dump this on...</p>
+            <p>${you}'ve been assigned mandatory community service work: ${flavor.task}.</p>
+            <p><span style="color: #e74c3c;">+${serviceCostLabel}</span> of aging from the ordeal.</p>
+            <p class="info-text">${flavor.footer}</p>
             `,
             [{ text: 'Such is life', action: () => { updatePlayerStats(); endTurn(); } }]
         );
