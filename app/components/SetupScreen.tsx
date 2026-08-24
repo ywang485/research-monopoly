@@ -72,7 +72,7 @@ export default function SetupScreen() {
           </div>
           <div className="input-group">
             <label htmlFor="starting-age">Initial Player Age:</label>
-            <input type="number" id="starting-age" min="1" max="79" defaultValue="70" />
+            <input type="number" id="starting-age" min="1" max="79" defaultValue="30" />
           </div>
           <div className="input-group">
             <label className="ai-toggle">
