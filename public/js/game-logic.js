@@ -352,6 +352,45 @@ function handleStartSpace(player) {
 
 const CONFERENCE_SIGNIFICANCE_FAME_FACTOR = 0.3;
 
+// Sarcastic flavor text for showing up to a conference with nothing to present, indexed by
+// the random fame roll (1-6) - the better the roll, the more absurd it is that it worked.
+function getEmptyHandedConferenceFlavor(fameGain, you, you_lower, your) {
+    const flavors = [
+        {
+            body: `${you} showed up to the conference, but realized ${you_lower} have nothing to present.`,
+            detail: `Awkwardly attended other people's talks and ate free cookies instead.`,
+            footer: `A single, deeply unimpressed fame point. Groundbreaking.`
+        },
+        {
+            body: `${you} wandered the halls with an empty poster tube, radiating "I belong here" energy that fooled absolutely no one.`,
+            detail: `Someone asked what ${you_lower} were presenting. ${you} pointed vaguely at the snack table.`,
+            footer: `Two fame points, mostly out of pity.`
+        },
+        {
+            body: `${you} nodded thoughtfully through three talks ${you_lower} didn't understand and called it "networking."`,
+            detail: `Collected a solid handful of business cards ${you_lower} will never look at again.`,
+            footer: `A respectable haul for someone with zero actual research.`
+        },
+        {
+            body: `${you} bluffed ${your} way through a Q&A ${you_lower} weren't even part of, and people believed ${you_lower}.`,
+            detail: `Turns out confidently saying "great question" buys a lot of goodwill.`,
+            footer: `Not bad for a researcher with nothing to research.`
+        },
+        {
+            body: `${you} charmed an entire panel of senior academics using only vibes and an expensive-looking lanyard.`,
+            detail: `Someone asked to cite ${your} "upcoming work." It does not exist.`,
+            footer: `Suspiciously excellent fame gain for someone who published literally nothing.`
+        },
+        {
+            body: `${you} somehow became the most talked-about academic at the conference without presenting a single idea.`,
+            detail: `Rumor has it ${you_lower}'re getting a keynote invite next year. For what, nobody knows.`,
+            footer: `Maximum fame. Academia truly is a popularity contest.`
+        }
+    ];
+
+    return flavors[Math.min(fameGain, flavors.length) - 1];
+}
+
 function handleConferenceSpace(player) {
     const you = player.isAI ? player.name : 'You';
     const you_lower = player.isAI ? player.name : 'you';
@@ -362,6 +401,7 @@ function handleConferenceSpace(player) {
         // Random fame gain (1-6) for just attending
         const fameGain = rollDice();
         player.addFame(fameGain);
+        const flavor = getEmptyHandedConferenceFlavor(fameGain, you, you_lower, your);
 
         showModal(
             'Academic Conference',
@@ -370,9 +410,9 @@ function handleConferenceSpace(player) {
                 <span class="dice">🎲</span>
                 <div class="dice-result"><span style="color: #e74c3c;">+${fameGain} Fame</span></div>
             </div>
-            <p>${you} showed up to the conference, but realized ${you_lower} have nothing to present.</p>
-            <p>Awkwardly attended other people's talks and ate free cookies instead.</p>
-            <p class="info-text">At least someone remembered ${your} name tag!</p>
+            <p>${flavor.body}</p>
+            <p>${flavor.detail}</p>
+            <p class="info-text">${flavor.footer}</p>
             `,
             [{ text: 'Oops', action: () => { updatePlayerStats(); endTurn(); } }]
         );
